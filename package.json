@@ -1,0 +1,27 @@
+{
+  "name": "dannn",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Dannn Ai mono repo",
+  "author": "zhaozunhong",
+  "license": "MIT",
+  "keywords": [
+    "Ai",
+    "Ai Chat",
+    "electron"
+  ],
+  "scripts": {
+    "lint": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.10.2",
+    "@unocss/eslint-config": "66.1.0-beta.6",
+    "@unocss/eslint-plugin": "66.1.0-beta.6",
+    "electron": "^35.0.3",
+    "esbuild": "^0.25.1",
+    "eslint": "^9.23.0",
+    "eslint-plugin-format": "^1.0.1",
+    "esno": "^4.8.0",
+    "typescript": "^5.8.2"
+  }
+}

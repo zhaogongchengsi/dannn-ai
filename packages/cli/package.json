@@ -1,0 +1,20 @@
+{
+  "name": "@dannn/cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./dist/index.js",
+  "bin": {
+    "dannn": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:esbuild",
+    "dev": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:esbuild --watch"
+  },
+  "dependencies": {
+    "citty": "^0.1.6",
+    "consola": "^3.4.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.1"
+  }
+}

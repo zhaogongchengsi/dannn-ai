@@ -1,0 +1,15 @@
+{
+  "name": "@dannn/app",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "dannn build -i ./index.ts,preload.ts -d ./dist -m prod",
+    "run": "electron .",
+    "start": "pnpm run build && pnpm run run"
+  },
+  "dependencies": {
+    "@dannn/cli": "workspace:^"
+  }
+}
