@@ -8,6 +8,7 @@ describe('withAsyncContext', () => {
 		const instance = { hook: mockHook };
 		const asyncFunction = vi.fn().mockResolvedValue(undefined);
 
+		// @ts-ignore
 		await withAsyncContext(instance, asyncFunction);
 
 		expect(asyncFunction).toHaveBeenCalled();
@@ -17,6 +18,7 @@ describe('withAsyncContext', () => {
 		const mockHook = new Hook();
 		const instance = { hook: mockHook };
 
+		// @ts-ignore
 		await withAsyncContext(instance, async () => {
 			const context = useDannn();
 			await new Promise((resolve) => setTimeout(resolve, 100));
@@ -30,6 +32,7 @@ describe('withAsyncContext', () => {
 		const instance = { hook: mockHook };
 		const asyncFunction = vi.fn().mockRejectedValue(new Error('Test error'));
 
+		// @ts-ignore
 		await expect(withAsyncContext(instance, asyncFunction)).rejects.toThrow('Test error');
 	});
 });

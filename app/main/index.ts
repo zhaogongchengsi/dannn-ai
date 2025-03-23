@@ -1,5 +1,9 @@
 import { app } from 'electron'
-import { Window } from './lib/window.ts'
+import { withAsyncContext } from './lib/context'
+import { Hook } from './lib/hook'
+import { Window } from './lib/window'
+import { Loader } from './lib/loader'
+import { Config } from './lib/config'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -8,18 +12,22 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 const window = new Window()
+const hook = new Hook()
+const loader = new Loader()
+const config = new Config()
 
 async function bootstrap() {
-	window.show()
+	loader.init()
+	config.init()
+
+	withAsyncContext({
+		hook,
+		window,
+		loader,
+		config,
+	}, async () => {
+		await window.show()
+	})
 }
 
 bootstrap()
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-	if (process.platform !== 'darwin') {
-		app.quit()
-	}
-})
