@@ -22,9 +22,6 @@ export async function build({ entry, dir, mode }: BuildOptions) {
     ...mode ? { 'process.env.MODE': JSON.stringify(mode), MODE: JSON.stringify(mode) } : {},
   }
 
-
-  console.log('define:', define)
-
   return await esbuild({
     entryPoints: Array.isArray(entry) ? entry : [entry],
     outdir: dir || 'dist',

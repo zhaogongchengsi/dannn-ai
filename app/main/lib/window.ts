@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeImage } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeImage } from 'electron'
 import logo from '../../public/logo.png'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
@@ -7,6 +7,8 @@ export class Window {
   window: BrowserWindow | null = null
   name: string = 'Window'
   isShow: boolean = false
+  isReady: boolean = false
+  waitReadyPromise: PromiseWithResolvers<void> | null = null
   constructor(name?: string) {
     this.name = name || this.name
   }
@@ -38,6 +40,11 @@ export class Window {
     app.on('activate', () => {
         this.window?.show()
     })
+
+    ipcMain.on('ready', () => {
+      this.isReady = true
+      this.waitReadyPromise?.resolve()
+    })
   }
 
   send(channel: string, ...args: any[]) {
@@ -48,6 +55,7 @@ export class Window {
     if (this.window && !this.isShow) {
       this.window.show()
       this.isShow = true
+      this.waitReadyPromise =  Promise.withResolvers<void>()
     }
     else {
       await this.createWindow()
@@ -56,6 +64,14 @@ export class Window {
   }
 
   async show() {
-    this.send('show')
+    if (this.isReady) {
+      this.send('show')
+    }
+    else if (this.waitReadyPromise) {
+      await this.waitReadyPromise.promise
+      this.send('show')
+    } else {
+      throw new Error('Window is not ready')
+    }
   }
 }

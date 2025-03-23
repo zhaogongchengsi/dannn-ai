@@ -7,3 +7,5 @@ const app = createApp(App)
 window.dannn.ipc.on('show', () => {
 	app.mount('#app')
 })
+
+window.dannn.ipc.send('ready')
