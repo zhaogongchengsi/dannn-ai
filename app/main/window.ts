@@ -1,32 +1,41 @@
-import process from 'node:process'
-import { BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
 
-export class Window extends BrowserWindow {
-  constructor() {
-    const mode = process.env.MODE
-    super({
-      width: 800,
-      height: 600,
-      show: false,
-      webPreferences: {
-        nodeIntegration: true,
-      },
-    })
+export class Window {
+  window: BrowserWindow | null = null
+  constructor() {}
 
-    if (mode === 'dev') {
-      this.loadURL('http://localhost:3001')
-    }
-    else {
-      this.loadFile('./index.html')
-    }
-  }
-
-  show() {
+  createWindow() {
     return new Promise<void>((resolve) => {
-      this.once('ready-to-show', () => {
-        super.show()
+      app.on('ready', () => {
+        this.window = new BrowserWindow({
+          width: 800,
+          height: 600,
+          show: false,
+          webPreferences: {
+            nodeIntegration: true,
+          },
+        })
+
+        if (MODE === 'dev') {
+          this.window.loadURL('http://localhost:3001')
+          this.window.webContents.openDevTools()
+        }
+        else {
+          this.window.loadFile('./index.html')
+        }
+
         resolve()
       })
     })
+  }
+
+  async show() {
+    if (this.window) {
+      this.window.show()
+    }
+    else {
+      await this.createWindow()
+      await this.show()
+    }
   }
 }

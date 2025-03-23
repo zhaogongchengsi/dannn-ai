@@ -1,5 +1,1 @@
-declare namespace NodeJS {
-  interface ProcessEnv {
-    MODE: 'prod' | 'dev'
-  }
-}
+declare const MODE: 'prod' | 'dev'

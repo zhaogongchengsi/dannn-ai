@@ -42,7 +42,7 @@ export default defineCommand({
     }
 
     try {
-      consola.info(`Building ${packageJson.name} v${packageJson.version}`)
+      consola.info(`Building ${packageJson.name} mode ${mode} v${packageJson.version}`)
       await build({
         entry,
         dir,

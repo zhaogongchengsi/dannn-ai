@@ -19,8 +19,11 @@ export async function build({ entry, dir, mode }: BuildOptions) {
   const packageJson = readPackageJson(process.cwd())
 
   const define = {
-    ...mode ? { 'process.env.MODE': JSON.stringify(mode) } : { },
+    ...mode ? { 'process.env.MODE': JSON.stringify(mode), MODE: JSON.stringify(mode) } : {},
   }
+
+
+  console.log('define:', define)
 
   return await esbuild({
     entryPoints: Array.isArray(entry) ? entry : [entry],
@@ -32,10 +35,10 @@ export async function build({ entry, dir, mode }: BuildOptions) {
       ...builtinModules.map(module => `node:${module}`),
       'electron',
     ],
-	loader: {
-		".png": 'file',
-	},
-    minify: true,
+    loader: {
+      ".png": 'file',
+    },
+    // minify: true,
     tsconfig: 'tsconfig.json',
     treeShaking: true,
     format: packageJson?.type === 'module' ? 'esm' : 'cjs',
