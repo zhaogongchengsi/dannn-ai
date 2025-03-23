@@ -6,7 +6,7 @@ useConfigState()
 </script>
 
 <template>
-  <div>
+  <div class="w-screen h-screen">
     <Button>button</Button>
     <Home />
   </div>
