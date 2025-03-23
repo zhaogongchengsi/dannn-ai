@@ -32,6 +32,9 @@ export async function build({ entry, dir, mode }: BuildOptions) {
       ...builtinModules.map(module => `node:${module}`),
       'electron',
     ],
+	loader: {
+		".png": 'file',
+	},
     minify: true,
     tsconfig: 'tsconfig.json',
     treeShaking: true,

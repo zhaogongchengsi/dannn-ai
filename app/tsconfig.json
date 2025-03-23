@@ -1,3 +1,8 @@
 {
-  "extends": "../tsconfig.base.json" // 继承 tsconfig.base.json
+  "extends": "../tsconfig.base.json", // 继承 tsconfig.base.json
+  "compilerOptions": {
+    "baseUrl": "./",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true
+  }
 }

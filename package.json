@@ -11,7 +11,7 @@
     "electron"
   ],
   "scripts": {
-    "lint": "eslint . --fix"
+    
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.10.2",
