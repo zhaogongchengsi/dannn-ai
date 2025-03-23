@@ -1,4 +1,4 @@
-import { app } from 'electron'
+import { app, ipcMain } from 'electron'
 import { Low } from 'lowdb'
 import { JSONFilePreset } from 'lowdb/node'
 import { join } from 'pathe'
@@ -26,11 +26,20 @@ export class Store<D> {
 	}
 
 	async init() {
-		const db = await JSONFilePreset(
+		const db: Low<D> = await JSONFilePreset(
 			this.path,
 			this.defaultData,
 		)
 		this.db = db
+
+		ipcMain.handle(`${this.name}.get`, () => {
+			return this.getStore().data
+		})
+
+		ipcMain.handle(`${this.name}.set`, (_, key, value) => {
+			this.set(key, value)
+			return this.saveStore()
+		})
 	}
 
 	getStore() {
