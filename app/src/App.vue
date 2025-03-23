@@ -1,10 +1,9 @@
 <script setup lang='ts'>
-
+import Button from './components/ui/button/Button.vue'
 </script>
 
 <template>
   <div>
-    <h1>Vue 3 + Vite + TypeScript</h1>
-    <p>Vue 3 + Vite + TypeScript + Composition API</p>
+    <Button>button</Button>
   </div>
 </template>

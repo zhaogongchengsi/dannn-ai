@@ -1,16 +1,23 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, nativeImage } from 'electron'
+import logo from '../public/logo.png'
 
 export class Window {
   window: BrowserWindow | null = null
-  constructor() {}
+  name: string = 'Window'
+  constructor(name?: string) {
+    this.name = name || this.name
+  }
 
   createWindow() {
     return new Promise<void>((resolve) => {
       app.on('ready', () => {
+        const icon = nativeImage.createFromPath(logo)
+
         this.window = new BrowserWindow({
           width: 800,
           height: 600,
           show: false,
+          icon,
           webPreferences: {
             nodeIntegration: true,
           },
