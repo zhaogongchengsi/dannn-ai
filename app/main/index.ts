@@ -1,7 +1,5 @@
 import { app } from 'electron'
 import { Window } from './lib/window'
-import { Ipc } from './lib/ipc'
-import { Store } from './lib/store'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -10,14 +8,8 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 const window = new Window()
-const ipc = new Ipc()
-const store = new Store()
 
 async function bootstrap() {
-	await ipc.init()
-
-	await store.init()
-
 	window.show()
 	app.on('activate', () => {
 		window.show()

@@ -2,32 +2,33 @@ import { app } from 'electron'
 import { Low } from 'lowdb'
 import { JSONFilePreset } from 'lowdb/node'
 import { join } from 'pathe'
-import { Ipc } from './ipc'
 
-export interface StoreData {
-	window: {
-		width: number
-		height: number
+export interface StoreOptions<T = any> {
+	name: string
+	defaultDate: T
+}
+
+const nameSet = new Set<string>()
+
+export class Store<D> {
+	db: Low<D> | null = null
+	path: string
+	name: string
+	defaultData: D
+	constructor(opt: StoreOptions<D>) {
+		this.name = opt.name
+		if (nameSet.has(this.name)) {
+			throw new Error(`Store name ${this.name} already exists`)
+		}
+		nameSet.add(this.name)
+		this.defaultData = opt.defaultDate
+		this.path = join(app.getPath('userData'), '.dannn' , `${opt.name}.json`)
 	}
-	theme: 'light' | 'dark' | 'system'
-}
-
-const defaultData: StoreData = {
-	window: {
-		width: 900,
-		height: 670,
-	},
-	theme: 'system',
-}
-
-export class Store {
-	db: Low<StoreData> | null = null
-	constructor() { }
 
 	async init() {
 		const db = await JSONFilePreset(
-			join(app.getPath('userData'), 'dannn-ai.json'),
-			defaultData,
+			this.path,
+			this.defaultData,
 		)
 		this.db = db
 	}
@@ -39,7 +40,7 @@ export class Store {
 		throw new Error('Store not initialized')
 	}
 
-	get<K extends keyof StoreData>(key: K): StoreData[K] {
+	get<K extends keyof D>(key: K): D[K] {
 		return this.getStore().data[key]
 	}
 
@@ -47,17 +48,12 @@ export class Store {
 		return this.getStore().write()
 	}
 	
-	set<K extends keyof StoreData>(key: K, value: StoreData[K]) {
+	set<K extends keyof D>(key: K, value: D[K]) {
 		this.getStore().data[key] = value
 		return this.saveStore()
 	}
 
-	register(ipc: Ipc) {
-		ipc.register('store.get', (name: keyof StoreData) => {
-			return this.get(name)
-		})
-		ipc.register('store.set', (key: keyof StoreData, value: StoreData[keyof StoreData]) => {
-			this.set(key, value)
-		})
+	getFilePath() {
+		return this.path
 	}
 }
