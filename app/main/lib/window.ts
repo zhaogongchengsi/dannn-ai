@@ -34,6 +34,10 @@ export class Window {
     else {
       this.window.loadFile('./index.html')
     }
+
+    app.on('activate', () => {
+        this.window?.show()
+    })
   }
 
   async show() {

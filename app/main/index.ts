@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { Window } from './lib/window'
+import { Window } from './lib/window.ts'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -11,9 +11,6 @@ const window = new Window()
 
 async function bootstrap() {
 	window.show()
-	app.on('activate', () => {
-		window.show()
-	})
 }
 
 bootstrap()

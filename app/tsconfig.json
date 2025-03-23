@@ -1,13 +1,11 @@
 {
-  "extends": "../tsconfig.base.json", // 继承 tsconfig.base.json
-  "compilerOptions": {
-    "baseUrl": "./",
-    "moduleResolution": "bundler",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "resolveJsonModule": true
-  }
+	"files": [],
+	"references": [
+		{
+			"path": "tsconfig.node.json"
+		},
+		{
+			"path": "./tsconfig.web.json"
+		}
+	]
 }

@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.base.json", // 继承 tsconfig.base.json
+  "compilerOptions": {
+    "baseUrl": "./",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "main/**/*.ts",
+    "main/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
