@@ -41,7 +41,7 @@ export class Window {
         this.window?.show()
     })
 
-    ipcMain.on('ready', () => {
+    ipcMain.once('ready', () => {
       this.isReady = true
       this.waitReadyPromise?.resolve()
     })
@@ -66,10 +66,21 @@ export class Window {
   async show() {
     if (this.isReady) {
       this.send('show')
+      this.window?.webContents.once('did-start-loading', () => {
+        ipcMain.once('ready', () => {
+          this.show()
+        })
+      })
     }
     else if (this.waitReadyPromise) {
       await this.waitReadyPromise.promise
       this.send('show')
+      this.waitReadyPromise = null
+      this.window?.webContents.once('did-start-loading', () => {
+        ipcMain.once('ready', () => {
+          this.show()
+        })
+      })
     } else {
       throw new Error('Window is not ready')
     }

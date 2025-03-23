@@ -1,13 +1,4 @@
 import { Store } from "./store"
-
-export interface ConfigData {
-	window: {
-		width: number
-		height: number
-	}
-	theme: 'light' | 'dark' | 'system'
-}
-
 export class Config extends Store<ConfigData> {
 	constructor() {
 		super({
