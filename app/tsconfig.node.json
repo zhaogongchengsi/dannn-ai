@@ -9,7 +9,8 @@
   },
   "include": [
     "main/**/*.ts",
-    "main/**/*.d.ts"
+    "main/**/*.d.ts",
+    "env.d.ts"
   ],
   "exclude": [
     "node_modules"

@@ -40,14 +40,22 @@ export class Window {
     })
   }
 
-  async show() {
+  send(channel: string, ...args: any[]) {
+    this.window?.webContents.send(channel, ...args)
+  }
+
+  async display() {
     if (this.window && !this.isShow) {
       this.window.show()
       this.isShow = true
     }
     else {
       await this.createWindow()
-      await this.show()
+      await this.display()
     }
+  }
+
+  async show() {
+    this.send('show')
   }
 }

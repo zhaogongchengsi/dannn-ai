@@ -9,14 +9,14 @@ if (!app.requestSingleInstanceLock()) {
 	app.quit()
 }
 
-const window = new Window()
 const loader = new Loader()
 const config = new Config()
+const window = new Window()
 
 async function bootstrap() {
-	loader.init()
-	config.init()
-
+	await window.display()
+	await loader.init()
+	await config.init()
 	await window.show()
 }
 

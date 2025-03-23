@@ -1,15 +1,5 @@
 
-// This file is used to expose the ipcRenderer to the renderer process.
-
-interface DannnIpc {
-	send: (channel: string, data: any) => void;
-	on: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => void;
-	removeListener: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => void;
-}
-
-interface Dannn {
-	ipc: DannnIpc;
-}
+// This file is used to expose the ipcRenderer to the renderer process
 
 ; (async () => {
 	console.log('preload')
