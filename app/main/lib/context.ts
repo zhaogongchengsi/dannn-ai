@@ -1,21 +1,21 @@
-import { createContext } from "unctx";
-import { AsyncLocalStorage } from "node:async_hooks";
-import { Hook } from "./hook";
-import { Window } from "./window";
-import { Loader } from "./loader";
-import { Config } from "./config";
+import type { Config } from './config'
+import type { Hook } from './hook'
+import type { Loader } from './loader'
+import type { Window } from './window'
+import { AsyncLocalStorage } from 'node:async_hooks'
+import { createContext } from 'unctx'
 
 export interface DannnContext {
-	hook: Hook
-	window?: Window
-	loader: Loader
-	config: Config
+  hook: Hook
+  window?: Window
+  loader: Loader
+  config: Config
 }
 
 const ctx = createContext<DannnContext>({
-	asyncContext: true,
-	AsyncLocalStorage,
-});
+  asyncContext: true,
+  AsyncLocalStorage,
+})
 
 export const useDannn = ctx.use
 
@@ -26,6 +26,6 @@ export const useDannn = ctx.use
  * @param fn - The asynchronous function to be executed.
  * @returns A promise that resolves when the asynchronous function completes.
  */
-export function withAsyncContext(instance: DannnContext ,fn: () => Promise<void>) {
-	return ctx.callAsync(instance, fn);
+export function withAsyncContext(instance: DannnContext, fn: () => Promise<void>) {
+  return ctx.callAsync(instance, fn)
 }

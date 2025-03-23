@@ -1,7 +1,7 @@
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { app, BrowserWindow, ipcMain, nativeImage } from 'electron'
 import logo from '../../public/logo.png'
-import { dirname, resolve } from 'path'
-import { fileURLToPath } from 'url'
 
 export class Window {
   window: BrowserWindow | null = null
@@ -25,7 +25,7 @@ export class Window {
       icon,
       webPreferences: {
         nodeIntegration: true,
-        preload: resolve(dirname(fileURLToPath(import.meta.url)),'./preload.js'),
+        preload: resolve(dirname(fileURLToPath(import.meta.url)), './preload.js'),
       },
     })
 
@@ -38,7 +38,7 @@ export class Window {
     }
 
     app.on('activate', () => {
-        this.window?.show()
+      this.window?.show()
     })
 
     ipcMain.once('ready', () => {
@@ -55,7 +55,7 @@ export class Window {
     if (this.window && !this.isShow) {
       this.window.show()
       this.isShow = true
-      this.waitReadyPromise =  Promise.withResolvers<void>()
+      this.waitReadyPromise = Promise.withResolvers<void>()
     }
     else {
       await this.createWindow()
@@ -81,7 +81,8 @@ export class Window {
           this.show()
         })
       })
-    } else {
+    }
+    else {
       throw new Error('Window is not ready')
     }
   }
