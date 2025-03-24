@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { PrimitiveProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
-import { Primitive } from 'reka-ui'
+import { Primitive, type PrimitiveProps } from 'reka-ui'
 
 const props = withDefaults(defineProps<PrimitiveProps & {
   showOnHover?: boolean
