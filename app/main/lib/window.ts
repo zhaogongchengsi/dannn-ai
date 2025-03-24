@@ -25,6 +25,7 @@ export class Window {
       icon,
       webPreferences: {
         nodeIntegration: true,
+        webSecurity: false,
         preload: resolve(dirname(fileURLToPath(import.meta.url)), './preload.js'),
       },
     })

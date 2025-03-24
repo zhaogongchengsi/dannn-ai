@@ -2,7 +2,7 @@ interface DannnIpc {
   send: (channel: string, ...data: any[]) => void
   on: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => void
   removeListener: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => void
-  invoke: (channel: string, ...data: any[]) => Promise<any>
+  invoke: <T = any>(channel: string, ...data: any[]) => Promise<T>
 }
 
 interface Dannn {

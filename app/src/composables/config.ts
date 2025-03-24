@@ -1,7 +1,7 @@
 import { createGlobalState } from '@vueuse/core'
 import { ref } from 'vue'
 
-export const useConfigState = createGlobalState(
+export const useConfig = createGlobalState(
   () => {
     const config = ref<ConfigData>()
     const loading = ref(false)
