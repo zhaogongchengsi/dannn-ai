@@ -23,6 +23,7 @@ export class Window {
       height: 600,
       show: false,
       icon,
+      frame: MODE === 'dev',
       webPreferences: {
         nodeIntegration: true,
         webSecurity: false,
