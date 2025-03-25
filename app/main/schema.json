@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Extension Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "扩展名称"
+    },
+    "version": {
+      "type": "string",
+      "description": "扩展版本"
+    },
+    "icon": {
+      "type": "string",
+      "description": "扩展图标 URL",
+      "format": "uri"
+    },
+    "description": {
+      "type": "string",
+      "description": "扩展描述"
+    },
+    "author": {
+      "type": "string",
+      "description": "扩展作者"
+    },
+    "homepage": {
+      "type": "string",
+      "description": "扩展主页 URL",
+      "format": "uri"
+    },
+    "main": {
+      "type": "string",
+      "description": "扩展的入口文件路径"
+    },
+    "aiCollection": {
+      "type": "array",
+      "description": "AI 集合",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "AI 名称"
+          },
+          "description": {
+            "type": "string",
+            "description": "AI 介绍"
+          },
+          "role": {
+            "type": "string",
+            "description": "AI 角色"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "AI 提示词"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "image",
+              "audio",
+              "video"
+            ],
+            "description": "AI 类型"
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "支持的模型列表"
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "生成文本的随机性"
+          },
+          "maxTokens": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "最大 Token 数"
+          },
+          "topP": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "采样概率"
+          },
+          "frequencyPenalty": {
+            "type": "number",
+            "description": "频率惩罚"
+          },
+          "presencePenalty": {
+            "type": "number",
+            "description": "话题惩罚"
+          },
+          "apiEndpoint": {
+            "type": "string",
+            "description": "AI API 端点"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "API Key"
+          },
+          "customParams": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "额外自定义参数"
+          },
+          "functionCalls": {
+            "type": "array",
+            "description": "AI 可调用的函数定义",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "函数名"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "函数描述"
+                },
+                "parameters": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "description": "函数参数（JSON Schema 格式）"
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "该函数是否必须调用"
+                }
+              },
+              "required": [
+                "name",
+                "parameters"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "models"
+        ]
+      }
+    }
+  },
+  "required": [
+    "name",
+    "version"
+  ]
+}

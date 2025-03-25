@@ -35,6 +35,8 @@ export async function build({ entry, dir, mode }: BuildOptions) {
     loader: {
       ".png": 'file',
       '.tmpl': 'text',
+      ".svg": 'file',
+      ".json": 'json',
     },
     // minify: true,
     tsconfig: 'tsconfig.json',

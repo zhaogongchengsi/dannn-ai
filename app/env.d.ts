@@ -32,12 +32,64 @@ interface Extension {
 }
 
 interface CollectionAI {
-  name: string // AI 名称
-  description?: string // AI 介绍
-  role?: string // AI 角色
-  prompt?: string // AI 提示词
-  type: 'text' | 'image' | 'audio' | 'video' // AI 类型
-  models: string[] // 支持的模型列表
+  /** AI 名称 */
+  name: string
+
+  /** AI 介绍 */
+  description?: string
+
+  /** AI 角色 */
+  role?: string
+
+  /** AI 提示词 */
+  prompt?: string
+
+  /** AI 类型（文本、图像、音频、视频） */
+  type: 'text' | 'image' | 'audio' | 'video'
+
+  /** 支持的模型列表 */
+  models: string[]
+
+  /** 生成文本的随机性（0-1），0.0 更确定，1.0 更随机 */
+  temperature?: number
+
+  /** 生成的最大 Token 数 */
+  maxTokens?: number
+
+  /** 采样概率，替代 temperature，用于控制输出多样性 */
+  topP?: number
+
+  /** 频率惩罚，让 AI 避免重复性高的词汇 */
+  frequencyPenalty?: number
+
+  /** 话题惩罚，让 AI 更容易引入新话题 */
+  presencePenalty?: number
+
+  /** AI API 的调用地址 */
+  apiEndpoint?: string
+
+  /** AI 访问所需的 API Key */
+  apiKey?: string
+
+  /** 额外自定义参数 */
+  customParams?: Record<string, any>
+
+  /** AI 可调用的函数定义 */
+  functionCalls?: FunctionCall[]
+}
+
+interface FunctionCall {
+  /** 函数名 */
+  name: string
+
+  /** 函数描述 */
+  description?: string
+
+  /** 函数参数定义（JSON Schema 格式） */
+  parameters: Record<string, any>
+
+  /** 该函数是否必须调用 */
+  required?: boolean
 }
 
 type Extensions = Extension[]
