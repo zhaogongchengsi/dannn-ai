@@ -25,13 +25,19 @@ interface Extension {
   author?: string
   homepage?: string
   /**
-   * The main entry file
+   * The entry file
    */
-  mainEntry?: string
-  /**
-   * The client entry file
-   */
-  clientEntry?: string
+  main?: string
+  aiCollection?: CollectionAI[]
+}
+
+interface CollectionAI {
+  name: string // AI 名称
+  description?: string // AI 介绍
+  role?: string // AI 角色
+  prompt?: string // AI 提示词
+  type: 'text' | 'image' | 'audio' | 'video' // AI 类型
+  models: string[] // 支持的模型列表
 }
 
 type Extensions = Extension[]
