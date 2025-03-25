@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { protocol } from 'electron'
 import { Config } from './lib/config'
 import { Loader } from './lib/loader'
@@ -7,7 +8,7 @@ import { createDannnProtocol } from './protocol'
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
 protocol.registerSchemesAsPrivileged([
-    { scheme: 'dannn', privileges: { secure: true, standard: true, stream: true, supportFetchAPI: true, corsEnabled: true } },
+  { scheme: 'dannn', privileges: { secure: true, standard: true, stream: true, supportFetchAPI: true, corsEnabled: true } },
 ])
 
 const loader = new Loader()

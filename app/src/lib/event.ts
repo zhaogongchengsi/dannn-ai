@@ -14,7 +14,8 @@ export class Event<T extends EventMap> {
   }
 
   off<K extends EventKey<T>>(event: K, callback: EventCallback<T[K]>): void {
-    if (!this.events.has(event)) return
+    if (!this.events.has(event))
+      return
     const callbacks = this.events.get(event)!
     const index = callbacks.indexOf(callback)
     if (index !== -1) {
@@ -23,7 +24,8 @@ export class Event<T extends EventMap> {
   }
 
   emit<K extends EventKey<T>>(event: K, payload: T[K]): void {
-    if (!this.events.has(event)) return
+    if (!this.events.has(event))
+      return
     const callbacks = this.events.get(event)!
     callbacks.forEach(callback => callback(payload))
   }
