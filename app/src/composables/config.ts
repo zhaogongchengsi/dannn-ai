@@ -1,23 +1,31 @@
-import { createGlobalState } from '@vueuse/core'
+import { createGlobalState, useColorMode } from '@vueuse/core'
 import { ref } from 'vue'
 
 export const useConfig = createGlobalState(
   () => {
     const config = ref<ConfigData>()
     const loading = ref(false)
+    const mode = useColorMode()
 
     async function init() {
       loading.value = true
-      const data = await window.dannn.ipc.invoke('config.get')
+      const data = await window.dannn.ipc.invoke<ConfigData>('config.get')
         .catch((error) => {
           console.error(`Error getting config: ${error}`)
           return undefined
         })
-      loading.value = false
+        .finally(() => {
+          loading.value = false
+        })
+
+      if (!data) {
+        return
+      }
       config.value = data
+      mode.value = data.theme
     }
 
-    function set(key: keyof ConfigData, value: ConfigData[keyof ConfigData]) {
+    function set<K extends keyof ConfigData>(key: K, value: ConfigData[K]) {
       if (!config.value) {
         return
       }
@@ -25,7 +33,8 @@ export const useConfig = createGlobalState(
         ...config.value,
         [key]: value,
       }
-      window.dannn.ipc.send('config.set', key, value)
+
+      window.dannn.ipc.invoke('config.set', key, value)
     }
 
     function get(key: keyof ConfigData) {
@@ -41,6 +50,7 @@ export const useConfig = createGlobalState(
       get,
       loading,
       init,
+      mode,
     }
   },
 )

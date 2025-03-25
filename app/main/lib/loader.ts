@@ -4,7 +4,7 @@ export class Loader extends Store<Extensions> {
   constructor() {
     super({
       name: 'extensions',
-      defaultDate: [],
+      defaultData: [],
     })
   }
 }

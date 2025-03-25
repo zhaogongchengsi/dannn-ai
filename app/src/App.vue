@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import ModeToggle from './components/mode-toggle.vue'
 import { useConfig } from './composables/config'
 import { useExtension } from './composables/extension'
 
@@ -8,6 +9,6 @@ useExtension().init()
 
 <template>
   <div class="w-screen h-screen">
-    app
+    <ModeToggle />
   </div>
 </template>

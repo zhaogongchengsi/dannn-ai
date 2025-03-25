@@ -4,14 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dannn AI</title>
+    <style>
+      ._loading_container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 3rem;
+        height: 100vh;
+        background: linear-gradient(to right, #2563eb, #ff6e6c);
+      }
+      ._image {
+        width: 5rem /* 80px */;
+        height: 5rem /* 80px */;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
+        }
+      }
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      ._title {
+        font-size: 3rem /* 48px */;
+        line-height: 1;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
-      <div
-        class="w-full h-screen flex justify-center items-center flex-col gap-3 bg-gradient-to-r from-blue-500 to-purple-500 animate-background"
-      >
-        <img class="size-20 animate-pulse" src="./logo.png" alt="Dannn AI" />
-        <h1 class="font-bold text-5xl animate-pulse">Dannn AI</h1>
+      <div class="_loading_container">
+        <img class="_image" src="./logo.png" alt="Dannn AI" />
+        <h1 class="_title animate-pulse">Dannn AI</h1>
       </div>
     </div>
     <script type="module" src="./src/index.ts"></script>

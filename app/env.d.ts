@@ -14,7 +14,7 @@ interface ConfigData {
     width: number
     height: number
   }
-  theme: 'light' | 'dark' | 'system'
+  theme: 'light' | 'dark' | 'auto'
 }
 
 interface Extension {

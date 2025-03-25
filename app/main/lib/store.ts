@@ -1,11 +1,13 @@
 import type { Low } from 'lowdb'
+import { existsSync } from 'node:fs'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { app, ipcMain } from 'electron'
 import { JSONFilePreset } from 'lowdb/node'
-import { join } from 'pathe'
+import { dirname, join } from 'pathe'
 
 export interface StoreOptions<T = any> {
   name: string
-  defaultDate: T
+  defaultData: T
 }
 
 const nameSet = new Set<string>()
@@ -21,11 +23,12 @@ export class Store<D> {
       throw new Error(`Store name ${this.name} already exists`)
     }
     nameSet.add(this.name)
-    this.defaultData = opt.defaultDate
-    this.path = join(app.getPath('userData'), '.dannn', `${opt.name}.json`)
+    this.defaultData = opt.defaultData
+    this.path = join(app.getPath('home'), '.dannn', `${opt.name}.json`)
   }
 
   async init() {
+    await ensureFile(this.path)
     const db: Low<D> = await JSONFilePreset(
       this.path,
       this.defaultData,
@@ -64,5 +67,12 @@ export class Store<D> {
 
   getFilePath() {
     return this.path
+  }
+}
+
+async function ensureFile(path: string) {
+  if (!existsSync(path)) {
+    await mkdir(dirname(path), { recursive: true })
+    await writeFile(path, '{}', { flag: 'wx', encoding: 'utf-8' })
   }
 }
