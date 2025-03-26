@@ -59,6 +59,44 @@ export class Window extends EventEmitter<WindowEvents> {
       this.waitReadyPromise?.resolve()
     })
 
+    ipcMain.on('minimize', () => {
+      this.window?.minimize()
+    })
+
+    ipcMain.on('maximize', () => {
+      if (this.window?.isMaximized()) {
+        this.window.unmaximize()
+      }
+      else {
+        this.window?.maximize()
+      }
+    })
+
+    this.window.on('resize', () => {
+      const { width, height } = this.getSize()
+      this.send('window-resized', { width, height })
+    })
+
+    this.window.on('maximize', () => {
+      this.send('window-maximized')
+    })
+
+    this.window.on('unmaximize', () => {
+      this.send('window-unmaximized')
+    })
+
+    this.window.on('minimize', () => {
+      this.send('window-minimized')
+    })
+
+    this.window.on('restore', () => {
+      this.send('window-restored')
+    })
+
+    ipcMain.on('close', () => {
+      this.window?.close()
+    })
+
     this.window.on('resized', () => this.emit('resized'))
   }
 
