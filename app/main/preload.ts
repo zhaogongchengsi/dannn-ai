@@ -1,12 +1,18 @@
 // This file is used to expose the ipcRenderer to the renderer process
 
-; (async () => {
+;(async () => {
   const { contextBridge, ipcRenderer } = await import('electron')
   const process = await import('node:process')
   const fs = await import('node:fs/promises')
 
-  function readFile(path: string, encoding: BufferEncoding = 'utf-8') {
-    return fs.readFile(path, { encoding })
+  async function readFile(path: string, encoding: BufferEncoding = 'utf-8') {
+    return await fs.readFile(path, { encoding })
+  }
+
+  async function readDir(
+    path: string,
+  ): Promise <string[]> {
+    return await fs.readdir(path)
   }
 
   const is = {
@@ -27,6 +33,7 @@
     is,
     mode: MODE,
     readFile,
+    readDir,
   }
 
   contextBridge.exposeInMainWorld('dannn', dannn)

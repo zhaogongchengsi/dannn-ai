@@ -14,6 +14,7 @@ interface Dannn {
   }
   mode: 'prod' | 'dev'
   readFile: (path: string, encoding?: BufferEncoding) => Promise<string>
+  readDir: (path: string) => Promise<string[]>
 }
 
 interface ConfigData {
