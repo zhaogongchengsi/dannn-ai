@@ -1,15 +1,11 @@
 import process from 'node:process'
-import { ipcMain, protocol } from 'electron'
+import { ipcMain } from 'electron'
 import { EXTENSIONS_ROOT } from './constant'
 import { Config } from './lib/config'
 import { Window } from './lib/window'
 import { createDannnProtocol } from './protocol'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
-
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'dannn', privileges: { secure: true, standard: true, stream: true, supportFetchAPI: true, corsEnabled: true } },
-])
 
 const config = new Config()
 const window = new Window()
