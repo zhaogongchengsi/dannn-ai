@@ -13,8 +13,8 @@ useExtension().init()
   <div class="w-screen h-screen">
     <SidebarProvider>
       <AppSidebar />
-      <main>
-        <header>
+      <main class="flex flex-col flex-1">
+        <header class="px-2 py-1">
           <SidebarTrigger />
         </header>
       </main>
