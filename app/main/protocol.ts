@@ -2,19 +2,18 @@ import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { app, protocol } from 'electron'
 import { join } from 'pathe'
+import { EXTENSIONS_ROOT, PROTOCOL_NAME } from './constant'
 import { templateReplace } from './utils'
 import workerTmpl from './worker.tmpl'
 
 export async function createDannnProtocol() {
   protocol.registerSchemesAsPrivileged([
-    { scheme: 'dannn', privileges: { secure: true, standard: true, stream: true, supportFetchAPI: true, corsEnabled: true } },
+    { scheme: PROTOCOL_NAME, privileges: { secure: true, standard: true, stream: true, supportFetchAPI: true, corsEnabled: true } },
   ])
-
-  const extensionRoot = join(app.getPath('userData'), '.dannn', 'extensions')
 
   await app.whenReady()
 
-  protocol.handle('dannn', async (request) => {
+  protocol.handle(PROTOCOL_NAME, async (request) => {
     const url = new URL(request.url)
 
     if (url.hostname === 'loader.extension') {
@@ -33,7 +32,7 @@ export async function createDannnProtocol() {
       }
 
       // /Users/you name/Library/Application Support/@dannn/app/.dannn/extensions + {name} + /{pathname}.js
-      const filePath = join(extensionRoot, name, url.pathname)
+      const filePath = join(EXTENSIONS_ROOT, name, url.pathname)
 
       if (!['.js', '.cjs', '.mjs'].some(ext => filePath.endsWith(ext))) {
         return new Response('Worker Invalid extension', {
