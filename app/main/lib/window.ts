@@ -5,8 +5,8 @@ import { app, BrowserWindow, ipcMain, nativeImage } from 'electron'
 import logo from '../../public/logo.png'
 
 export interface WindowOptions {
-  width: number
-  height: number
+  width?: number
+  height?: number
 }
 
 export interface WindowEvents {

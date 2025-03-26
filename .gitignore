@@ -7,3 +7,7 @@ dist-ssr
 node_modules
 .idea/
 *.log
+app/dist
+app/dist-ssr
+app/extensions
+app/.dannn

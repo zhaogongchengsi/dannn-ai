@@ -1,3 +1,4 @@
+import { getExtensionsRoot } from '@/lib/api'
 import { createGlobalState } from '@vueuse/core'
 import { ref } from 'vue'
 
@@ -11,13 +12,12 @@ export const useExtension = createGlobalState(
 
     async function init() {
       loading.value = true
-      const data = await window.dannn.ipc.invoke<Extension[]>('extensions.get')
-        .catch((error) => {
-          console.error(`Error getting extensions: ${error}`)
-          return []
-        })
+      const root = await getExtensionsRoot()
+      const extensions = await window.dannn.readDir(root)
+      console.log('extensions', extensions)
+      console.log('root', root)
+
       loading.value = false
-      extensions.value = data
     }
 
     return {

@@ -1,9 +1,10 @@
 import type { Low } from 'lowdb'
 import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { app, ipcMain } from 'electron'
+import { ipcMain } from 'electron'
 import { JSONFilePreset } from 'lowdb/node'
 import { dirname, join } from 'pathe'
+import { APP_DATA_PATH } from '../constant'
 
 export interface StoreOptions<T = any> {
   name: string
@@ -24,11 +25,11 @@ export class Store<D> {
     }
     nameSet.add(this.name)
     this.defaultData = opt.defaultData
-    this.path = join(app.getPath('home'), '.dannn', `${opt.name}.json`)
+    this.path = join(APP_DATA_PATH, `${opt.name}.json`)
   }
 
   async init() {
-    await ensureFile(this.path)
+    await ensureFile(this.path, JSON.stringify(this.defaultData))
     const db: Low<D> = await JSONFilePreset(
       this.path,
       this.defaultData,
@@ -70,9 +71,9 @@ export class Store<D> {
   }
 }
 
-async function ensureFile(path: string) {
+async function ensureFile(path: string, data: string = '{}') {
   if (!existsSync(path)) {
     await mkdir(dirname(path), { recursive: true })
-    await writeFile(path, '{}', { flag: 'wx', encoding: 'utf-8' })
+    await writeFile(path, data, { flag: 'wx', encoding: 'utf-8' })
   }
 }

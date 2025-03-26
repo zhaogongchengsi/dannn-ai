@@ -16,11 +16,9 @@ type PathValue<T, P extends string> =
       ? T[P]
       : never
 
-type OnHandler<T> = <P extends Path<T>>(event: P, handler: (event: Electron.IpcRendererEvent, value: PathValue<T, P>) => void) => void
-
 interface DannnIpc<T> {
   send: (channel: string, ...data: any[]) => void
-  on: OnHandler<T>
+  on: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => void
   removeListener: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => void
   invoke: <T = any>(channel: string, ...data: any[]) => Promise<T>
 }
@@ -42,6 +40,7 @@ interface Dannn {
   mode: 'prod' | 'dev'
   readFile: (path: string, encoding?: BufferEncoding) => Promise<string>
   readDir: (path: string) => Promise<string[]>
+  validate: <T>(value: string) => Promise<T>
 }
 
 interface ConfigData {

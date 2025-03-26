@@ -15,12 +15,12 @@ export class ExtensionInstance extends Event<ExtensionEvents> {
 
   load() {
     return new Promise<void>((resolve) => {
-      if (!this.config.clientEntry) {
+      if (!this.config.main) {
         resolve()
         return
       }
-      const { clientEntry, name } = this.config
-      const worker = new Worker(`dannn://loader.extension/${clientEntry}?name=${name}`, { type: 'module' })
+      const { main, name } = this.config
+      const worker = new Worker(`dannn://loader.extension/${main}?name=${name}`, { type: 'module' })
       this.worker = worker
       worker.addEventListener('message', (event) => {
         this.emit('message', event)

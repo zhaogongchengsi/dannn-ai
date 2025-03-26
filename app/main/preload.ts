@@ -15,13 +15,17 @@
     return await fs.readdir(path)
   }
 
+  async function validate<T>(value: string) {
+    return await ipcRenderer.invoke('validate', value) as T
+  }
+
   const is = {
     mac: process.platform === 'darwin',
     win: process.platform === 'win32',
     linux: process.platform === 'linux',
   }
 
-  const dannn = {
+  const dannn: Dannn = {
     ipc: {
       send: (channel: string, ...data: any[]) => ipcRenderer.send(channel, ...data),
       on: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on(channel, listener),
@@ -34,6 +38,7 @@
     mode: MODE,
     readFile,
     readDir,
+    validate,
   }
 
   contextBridge.exposeInMainWorld('dannn', dannn)
