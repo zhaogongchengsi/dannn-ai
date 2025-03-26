@@ -33,10 +33,12 @@ export const useExtension = createGlobalState(
   },
 )
 
-export async function scanAvailableExtensions() {
+async function scanAvailableExtensions() {
 	const root = await getExtensionsRoot();
 	const extensions = await window.dannn.readDir(root);
 	const availableExtensions: Extension[] = [];
+
+	const cache = new Set<string>();
 
 	for (const extension of extensions) {
 		const pluginDir = join(root, extension);
@@ -54,6 +56,16 @@ export async function scanAvailableExtensions() {
 		const ok = await window.dannn.validate(config).catch(() => false);
 
 		if (!ok) {
+			continue;
+		}
+
+		const configValue = JSON.parse(config);
+
+		if (cache.has(configValue.name)) {
+			availableExtensions.splice(
+				availableExtensions.findIndex(ext => ext.name === configValue.name),
+				1,
+			);
 			continue;
 		}
 
