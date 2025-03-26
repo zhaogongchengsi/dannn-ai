@@ -12,6 +12,7 @@ interface Dannn {
     win: boolean
     linux: boolean
   }
+  mode: 'prod' | 'dev'
 }
 
 interface ConfigData {

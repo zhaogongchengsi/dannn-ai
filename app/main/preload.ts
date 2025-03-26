@@ -3,6 +3,11 @@
 ; (async () => {
   const { contextBridge, ipcRenderer } = await import('electron')
   const process = await import('node:process')
+  const fs = await import('node:fs/promises')
+
+  function readFile(path: string, encoding: BufferEncoding = 'utf-8') {
+    return fs.readFile(path, { encoding })
+  }
 
   const is = {
     mac: process.platform === 'darwin',
@@ -20,6 +25,8 @@
       },
     },
     is,
+    mode: MODE,
+    readFile,
   }
 
   contextBridge.exposeInMainWorld('dannn', dannn)
