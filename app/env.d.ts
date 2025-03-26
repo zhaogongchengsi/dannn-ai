@@ -7,6 +7,11 @@ interface DannnIpc {
 
 interface Dannn {
   ipc: DannnIpc
+  is: {
+    mac: boolean
+    win: boolean
+    linux: boolean
+  }
 }
 
 interface ConfigData {

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Extension Schema",
+  "title": "Dannn AI Extension Schema",
   "type": "object",
   "properties": {
     "name": {
@@ -152,5 +152,6 @@
   "required": [
     "name",
     "version"
-  ]
+  ],
+  "additionalProperties": false
 }

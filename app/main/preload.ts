@@ -2,6 +2,13 @@
 
 ; (async () => {
   const { contextBridge, ipcRenderer } = await import('electron')
+  const process = await import('node:process')
+
+  const is = {
+    mac: process.platform === 'darwin',
+    win: process.platform === 'win32',
+    linux: process.platform === 'linux',
+  }
 
   const dannn: Dannn = {
     ipc: {
@@ -12,6 +19,7 @@
         return await ipcRenderer.invoke(channel, ...data)
       },
     },
+    is,
   }
 
   contextBridge.exposeInMainWorld('dannn', dannn)
