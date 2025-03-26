@@ -46,6 +46,9 @@ const items = [
 
 <template>
   <Sidebar collapsible="icon">
+	<SidebarHeader>
+		header
+	</SidebarHeader>
     <SidebarContent>
       <SidebarGroup>
         <SidebarGroupContent>
