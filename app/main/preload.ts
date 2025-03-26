@@ -4,6 +4,7 @@
   const { contextBridge, ipcRenderer } = await import('electron')
   const process = await import('node:process')
   const fs = await import('node:fs/promises')
+  const fsSync = await import('node:fs')
 
   async function readFile(path: string, encoding: BufferEncoding = 'utf-8') {
     return await fs.readFile(path, { encoding })
@@ -15,8 +16,12 @@
     return await fs.readdir(path)
   }
 
+  async function exists(dir: string) {
+    return fsSync.existsSync(dir)
+  }
+
   async function validate<T>(value: string) {
-    return await ipcRenderer.invoke('validate', value) as T
+    return await ipcRenderer.invoke('validate', value) as boolean
   }
 
   const is = {
@@ -39,6 +44,7 @@
     readFile,
     readDir,
     validate,
+    exists,
   }
 
   contextBridge.exposeInMainWorld('dannn', dannn)

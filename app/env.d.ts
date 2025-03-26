@@ -40,7 +40,8 @@ interface Dannn {
   mode: 'prod' | 'dev'
   readFile: (path: string, encoding?: BufferEncoding) => Promise<string>
   readDir: (path: string) => Promise<string[]>
-  validate: <T>(value: string) => Promise<T>
+  validate: (value: string) => Promise<boolean>
+  exists: (dir: string) => Promise<boolean>
 }
 
 interface ConfigData {
