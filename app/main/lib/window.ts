@@ -1,26 +1,37 @@
+import EventEmitter from 'node:events'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { app, BrowserWindow, ipcMain, nativeImage } from 'electron'
 import logo from '../../public/logo.png'
 
-export class Window {
+export interface WindowOptions {
+  width: number
+  height: number
+}
+
+export interface WindowEvents {
+  resized: []
+}
+
+export class Window extends EventEmitter<WindowEvents> {
   window: BrowserWindow | null = null
   name: string = 'Window'
   isShow: boolean = false
   isReady: boolean = false
   waitReadyPromise: PromiseWithResolvers<void> | null = null
   constructor(name?: string) {
+    super()
     this.name = name || this.name
   }
 
-  async createWindow() {
+  async createWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
     this.isShow = false
     await app.whenReady()
     const icon = nativeImage.createFromPath(logo)
 
     this.window = new BrowserWindow({
-      width: 800,
-      height: 600,
+      width: width ?? 800,
+      height: height ?? 600,
       show: false,
       icon,
       frame: MODE === 'dev',
@@ -47,21 +58,28 @@ export class Window {
       this.isReady = true
       this.waitReadyPromise?.resolve()
     })
+
+    this.window.on('resized', () => this.emit('resized'))
+  }
+
+  getSize() {
+    const [width, height] = this.window?.getSize() || [0, 0]
+    return { width, height }
   }
 
   send(channel: string, ...args: any[]) {
     this.window?.webContents.send(channel, ...args)
   }
 
-  async display() {
+  async display(opt?: WindowOptions) {
     if (this.window && !this.isShow) {
       this.window.show()
       this.isShow = true
       this.waitReadyPromise = Promise.withResolvers<void>()
     }
     else {
-      await this.createWindow()
-      await this.display()
+      await this.createWindow(opt)
+      await this.display(opt)
     }
   }
 
