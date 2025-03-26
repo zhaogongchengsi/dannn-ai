@@ -14,7 +14,6 @@ import {
 	SidebarGroupLabel,
 	SidebarGroupAction,
 } from '@/components/ui/sidebar'
-import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { useExtension } from '@/composables/extension'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
@@ -76,7 +75,6 @@ const extensions = useExtension()
 		<div
 			class="flex items-center justify-between group-data-[collapsible=offcanvas]:flex-col group-data-[collapsible=icon]:flex-col">
 			<ModeToggle />
-			<SidebarTrigger />
 		</div>
 	</SidebarFooter>
 </Sidebar>
