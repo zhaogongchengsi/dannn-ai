@@ -13,6 +13,7 @@ interface Dannn {
     linux: boolean
   }
   mode: 'prod' | 'dev'
+  readFile: (path: string, encoding?: BufferEncoding) => Promise<string>
 }
 
 interface ConfigData {
