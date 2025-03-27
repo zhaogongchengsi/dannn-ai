@@ -30,6 +30,11 @@ export class Window extends EventEmitter<WindowEvents> {
 
   async createSettingWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
     await app.whenReady()
+
+    if (!this.window) {
+      throw new Error('Window is not created')
+    }
+
     const icon = nativeImage.createFromPath(logo)
     this.settingWindow = new BrowserWindow({
       width: width ?? 800,
@@ -37,6 +42,7 @@ export class Window extends EventEmitter<WindowEvents> {
       show: false,
       icon,
       frame: MODE === 'dev',
+      parent: this.window,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [`--name=setting`],
