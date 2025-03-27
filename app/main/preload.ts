@@ -20,7 +20,7 @@
     return fsSync.existsSync(dir)
   }
 
-  async function validate<T>(value: string) {
+  async function validate(value: string) {
     return await ipcRenderer.invoke('validate', value) as boolean
   }
 
