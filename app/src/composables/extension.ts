@@ -3,6 +3,7 @@ import { createGlobalState } from '@vueuse/core'
 import { join } from 'pathe'
 import { ref } from 'vue'
 import { template } from 'lodash'
+import { extensionSchema } from '@/utils/schema'
 
 const dannnConfigFile = 'dannn.json'
 
@@ -10,25 +11,23 @@ export const useExtension = createGlobalState(
   () => {
     const loading = ref(false)
     const extensions = ref<Extension[]>([])
-    const extensionsLoadings = ref<Record<string, boolean>>({})
-    const extensionsErrors = ref<Record<string, string>>({})
-    const extensionsInstances = ref<Record<string, any>>({})
+    const extensionsErrors = ref<Record<string, any>>({})
 
     async function init() {
       loading.value = true
-      extensions.value = await scanAvailableExtensions().catch((error) => {
+      const extensionInfo = await scanAvailableExtensions().catch((error) => {
         console.error(`Error getting extensions: ${error}`)
-        return []
+        return { extensions: [], errors: [] }
       })
+      extensions.value = extensionInfo.extensions
+      extensionsErrors.value = extensionInfo.errors
       loading.value = false
     }
 
     return {
       loading,
       extensions,
-      extensionsLoadings,
       extensionsErrors,
-      extensionsInstances,
       init,
     }
   },
@@ -38,6 +37,7 @@ async function scanAvailableExtensions() {
   const root = await getExtensionsRoot()
   const extensions = await window.dannn.readDir(root)
   const availableExtensions: Extension[] = []
+  const errors :Record<string, any>[] = []
 
   const cache = new Set<string>()
 
@@ -53,16 +53,24 @@ async function scanAvailableExtensions() {
     const config = await window.dannn.readFile(configPath).catch(() => undefined)
 
     if (!config) {
+      errors.push({
+        name: extension,
+        error: 'Error reading config file',
+      })
       continue
     }
 
-    // const ok = await window.dannn.validate(config).catch(() => false)
-
-    // if (!ok) {
-    //   continue
-    // }
-
     const configValue: Extension = JSON.parse(config)
+
+    const { success, error } = extensionSchema.safeParse(configValue)
+
+    if (!success) {
+      errors.push({
+        name: extension,
+        error: error,
+      })
+      continue
+    }
 
     const permissions = configValue.permissions || {}
     let env = {}
@@ -85,7 +93,8 @@ async function scanAvailableExtensions() {
     availableExtensions.push(value)
   }
 
-  console.log(availableExtensions)
-
-  return availableExtensions
+  return {
+    extensions: availableExtensions,
+    errors
+  }
 }
