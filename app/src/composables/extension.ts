@@ -15,10 +15,10 @@ export const useExtension = createGlobalState(
 
     async function init() {
       loading.value = true
-	  extensions.value = await scanAvailableExtensions().catch((error) => {
-		console.error(`Error getting extensions: ${error}`)
-		return []
-	  })
+      extensions.value = await scanAvailableExtensions().catch((error) => {
+        console.error(`Error getting extensions: ${error}`)
+        return []
+      })
       loading.value = false
     }
 
@@ -34,44 +34,43 @@ export const useExtension = createGlobalState(
 )
 
 async function scanAvailableExtensions() {
-	const root = await getExtensionsRoot();
-	const extensions = await window.dannn.readDir(root);
-	const availableExtensions: Extension[] = [];
+  const root = await getExtensionsRoot()
+  const extensions = await window.dannn.readDir(root)
+  const availableExtensions: Extension[] = []
 
-	const cache = new Set<string>();
+  const cache = new Set<string>()
 
-	for (const extension of extensions) {
-		const pluginDir = join(root, extension);
-		const configPath = join(pluginDir, dannnConfigFile);
-		if (!await window.dannn.exists(configPath)) {
-			continue;
-		}
+  for (const extension of extensions) {
+    const pluginDir = join(root, extension)
+    const configPath = join(pluginDir, dannnConfigFile)
+    if (!await window.dannn.exists(configPath)) {
+      continue
+    }
 
-		const config = await window.dannn.readFile(configPath).catch(() => undefined);
+    const config = await window.dannn.readFile(configPath).catch(() => undefined)
 
-		if (!config) {
-			continue;
-		}
+    if (!config) {
+      continue
+    }
 
-		const ok = await window.dannn.validate(config).catch(() => false);
+    // const ok = await window.dannn.validate(config).catch(() => false)
 
-		if (!ok) {
-			continue;
-		}
+    // if (!ok) {
+    //   continue
+    // }
 
-		const configValue = JSON.parse(config);
+    const configValue = JSON.parse(config)
 
-		if (cache.has(configValue.name)) {
-			availableExtensions.splice(
-				availableExtensions.findIndex(ext => ext.name === configValue.name),
-				1,
-			);
-			continue;
-		}
+    if (cache.has(configValue.name)) {
+      availableExtensions.splice(
+        availableExtensions.findIndex(ext => ext.name === configValue.name),
+        1,
+      )
+      continue
+    }
 
-		availableExtensions.push(JSON.parse(config));
-	}
+    availableExtensions.push(configValue)
+  }
 
-
-	return availableExtensions;
+  return availableExtensions
 }

@@ -20,10 +20,6 @@
     return fsSync.existsSync(dir)
   }
 
-  async function validate(value: string) {
-    return await ipcRenderer.invoke('validate', value) as boolean
-  }
-
   const is = {
     mac: process.platform === 'darwin',
     win: process.platform === 'win32',
@@ -43,7 +39,6 @@
     mode: MODE,
     readFile,
     readDir,
-    validate,
     exists,
   }
 

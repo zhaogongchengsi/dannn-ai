@@ -40,8 +40,5 @@ ipcMain.handle('constants.EXTENSIONS_ROOT', async () => {
   }
   return await mkdir(EXTENSIONS_ROOT, { recursive: true })
 })
-ipcMain.handle('validate', (_, value: string) => {
-  return validate(JSON.parse(value))
-})
 
 bootstrap()
