@@ -1,9 +1,9 @@
 import { getExtensionsRoot } from '@/lib/api'
+import { extensionSchema } from '@/utils/schema'
 import { createGlobalState } from '@vueuse/core'
+import { template } from 'lodash'
 import { join } from 'pathe'
 import { ref } from 'vue'
-import { template } from 'lodash'
-import { extensionSchema } from '@/utils/schema'
 
 const dannnConfigFile = 'dannn.json'
 
@@ -37,11 +37,11 @@ async function scanAvailableExtensions() {
   const root = await getExtensionsRoot()
   const extensions = await window.dannn.readDir(root)
   const availableExtensions: Extension[] = []
-  const errors :Record<string, any>[] = []
+  const errors: Record<string, any>[] = []
 
   const cache = new Set<string>()
 
-  const interpolate = /{{([\s\S]+?)}}/g
+  const interpolate = /\{\{([\s\S]+?)\}\}/g
 
   for (const extension of extensions) {
     const pluginDir = join(root, extension)
@@ -67,7 +67,7 @@ async function scanAvailableExtensions() {
     if (!success) {
       errors.push({
         name: extension,
-        error: error,
+        error,
       })
       continue
     }
@@ -95,6 +95,6 @@ async function scanAvailableExtensions() {
 
   return {
     extensions: availableExtensions,
-    errors
+    errors,
   }
 }

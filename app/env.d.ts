@@ -50,7 +50,7 @@ interface Dannn {
   readFile: (path: string, encoding?: BufferEncoding) => Promise<string>
   readDir: (path: string) => Promise<string[]>
   exists: (dir: string) => Promise<boolean>
-  getEnv(keys: string[]): Promise<Record<string, string | undefined>>
+  getEnv: (keys: string[]) => Promise<Record<string, string | undefined>>
   window: DannnWindow
 }
 
