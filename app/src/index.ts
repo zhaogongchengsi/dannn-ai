@@ -12,4 +12,4 @@ window.dannn.ipc.on('window.show', () => {
   })
 })
 
-window.dannn.ipc.send('ready')
+window.dannn.ipc.send('window.ready')

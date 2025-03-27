@@ -4,7 +4,6 @@ import process from 'node:process'
 import { ipcMain } from 'electron'
 import { EXTENSIONS_ROOT } from './constant'
 import { Config } from './lib/config'
-import { validate } from './lib/schema'
 import { Window } from './lib/window'
 import { createDannnProtocol } from './protocol'
 
@@ -26,7 +25,7 @@ async function bootstrap() {
   await window.show()
 }
 
-window.on('resized', async () => {
+window.on('window.resized', async () => {
   const { width, height } = window.getSize()
   await config.set('window', {
     width,

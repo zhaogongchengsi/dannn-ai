@@ -10,18 +10,50 @@ export interface WindowOptions {
 }
 
 export interface WindowEvents {
-  resized: []
+  'window.resized': []
+  'setting.resized': []
 }
 
 export class Window extends EventEmitter<WindowEvents> {
   window: BrowserWindow | null = null
-  name: string = 'Window'
+  settingWindow: BrowserWindow | null = null
+  name: string = 'window'
   isShow: boolean = false
   isReady: boolean = false
   waitReadyPromise: PromiseWithResolvers<void> | null = null
+  preload: string
   constructor(name?: string) {
     super()
     this.name = name || this.name
+    this.preload = resolve(dirname(fileURLToPath(import.meta.url)), './preload.js')
+  }
+
+  async createSettingWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
+    await app.whenReady()
+    const icon = nativeImage.createFromPath(logo)
+    this.settingWindow = new BrowserWindow({
+      width: width ?? 800,
+      height: height ?? 600,
+      show: false,
+      icon,
+      frame: MODE === 'dev',
+      webPreferences: {
+        nodeIntegration: true,
+        webSecurity: false,
+        preload: this.preload,
+      },
+    })
+
+    if (MODE === 'dev') {
+      this.settingWindow.loadURL('http://localhost:3001/setting.html')
+      this.settingWindow.webContents.openDevTools()
+    }
+    else {
+      this.settingWindow.loadFile('./setting.html')
+    }
+
+    this.initEvent('setting', this.settingWindow)
+    this.settingWindow.on('resized', () => this.emit('setting.resized'))
   }
 
   async createWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
@@ -36,9 +68,10 @@ export class Window extends EventEmitter<WindowEvents> {
       icon,
       frame: MODE === 'dev',
       webPreferences: {
+        additionalArguments: [`--name=${this.name}`],
         nodeIntegration: true,
         webSecurity: false,
-        preload: resolve(dirname(fileURLToPath(import.meta.url)), './preload.js'),
+        preload: this.preload,
       },
     })
 
@@ -54,58 +87,63 @@ export class Window extends EventEmitter<WindowEvents> {
       this.window?.show()
     })
 
-    ipcMain.once('ready', () => {
+    ipcMain.once('window.ready', () => {
       this.isReady = true
       this.waitReadyPromise?.resolve()
     })
 
-    ipcMain.on('minimize', () => {
-      this.window?.minimize()
+    this.initEvent('window', this.window)
+
+    this.window.on('resized', () => this.emit('window.resized'))
+  }
+
+  private initEvent(name: string, window: BrowserWindow) {
+    ipcMain.on(`${window}.minimize`, () => {
+      console.log(`${name}.minimize`)
+      window.minimize()
     })
 
-    ipcMain.on('unmaximize', () => {
-      this.window?.unmaximize()
+    ipcMain.on(`${name}.unmaximize`, () => {
+      window.unmaximize()
     })
 
-    ipcMain.handle('isMaximized', () => {
-      return this.window?.isMaximized() || false
+    ipcMain.handle(`${name}.isMaximized`, () => {
+      return window.isMaximized() || false
     })
 
-    ipcMain.on('maximize', () => {
-      if (this.window?.isMaximized()) {
-        this.window.unmaximize()
+    ipcMain.on(`${name}.maximize`, () => {
+      if (window.isMaximized()) {
+        window.unmaximize()
       }
       else {
-        this.window?.maximize()
+        window.maximize()
       }
     })
 
-    this.window.on('resize', () => {
+    const send = (channel: string, ...args: any[]) => {
+      this.send(`${name}.${channel}`, ...args)
+    }
+
+    window.on('resize', () => {
       const { width, height } = this.getSize()
-      this.send('window.resized', { width, height })
+      send('resize', { width, height })
     })
 
-    this.window.on('maximize', () => {
-      this.send('window.maximized')
+    window.on('maximize', () => {
+      send('maximized')
     })
 
-    this.window.on('unmaximize', () => {
-      this.send('window.unmaximized')
+    window.on('unmaximize', () => {
+      send('unmaximized')
     })
 
-    this.window.on('minimize', () => {
-      this.send('window.minimized')
+    window.on('minimize', () => {
+      send('minimized')
     })
 
-    this.window.on('restore', () => {
-      this.send('window.restored')
+    window.on('restore', () => {
+      send('restored')
     })
-
-    ipcMain.on('close', () => {
-      this.window?.close()
-    })
-
-    this.window.on('resized', () => this.emit('resized'))
   }
 
   getSize() {
@@ -133,7 +171,7 @@ export class Window extends EventEmitter<WindowEvents> {
     if (this.isReady) {
       this.send('window.show')
       this.window?.webContents.once('did-start-loading', () => {
-        ipcMain.once('ready', () => {
+        ipcMain.once('window.ready', () => {
           this.show()
         })
       })
@@ -143,7 +181,7 @@ export class Window extends EventEmitter<WindowEvents> {
       this.send('window.show')
       this.waitReadyPromise = null
       this.window?.webContents.once('did-start-loading', () => {
-        ipcMain.once('ready', () => {
+        ipcMain.once('window.ready', () => {
           this.show()
         })
       })

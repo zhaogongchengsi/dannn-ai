@@ -36,6 +36,7 @@ interface DannnWindow {
   minimize: () => void
   isMaximized: () => Promise<boolean>
   unmaximize: () => void
+  name: string
 }
 
 interface Dannn {

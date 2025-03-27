@@ -9,11 +9,14 @@ onMounted(async () => {
   const _isMaximized = await window.dannn.window.isMaximized()
   isMaximized.value = _isMaximized
   isMinimized.value = !_isMaximized
-  window.dannn.ipc.on('window.maximized', () => {
+
+  console.log(`name = ${window.dannn.window.name}`)
+
+  window.dannn.ipc.on(`${window.dannn.window.name}.maximized`, () => {
     isMaximized.value = true
     isMinimized.value = false
   })
-  window.dannn.ipc.on('window.unmaximized', () => {
+  window.dannn.ipc.on(`${window.dannn.window.name}.unmaximized`, () => {
     isMaximized.value = false
     isMinimized.value = true
   })

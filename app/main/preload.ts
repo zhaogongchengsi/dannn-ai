@@ -6,6 +6,8 @@
   const fs = await import('node:fs/promises')
   const fsSync = await import('node:fs')
 
+  const NAME = (process.argv.find(arg => arg.startsWith('--name='))?.split('=')[1] || '').toLocaleLowerCase()
+
   async function readFile(path: string, encoding: BufferEncoding = 'utf-8') {
     return await fs.readFile(path, { encoding })
   }
@@ -24,29 +26,30 @@
    * 关闭窗口
    */
   function close() {
-    ipcRenderer.send('close')
+    ipcRenderer.send(`${NAME}.close`)
   }
 
   /**
    * 放大窗口
    */
   function maximize() {
-    ipcRenderer.send('maximize')
+    ipcRenderer.send(`${NAME}.maximize`)
   }
 
   /**
    * 缩小窗口
    */
   function minimize() {
-    ipcRenderer.send('minimize')
+    console.log(`${NAME}.minimize`)
+    ipcRenderer.send(`${NAME}.minimize`)
   }
 
   function unmaximize() {
-    ipcRenderer.send('unmaximize')
+    ipcRenderer.send(`${NAME}.unmaximize`)
   }
 
   function isMaximized() {
-    return ipcRenderer.invoke('isMaximized')
+    return ipcRenderer.invoke(`${NAME}.isMaximized`)
   }
 
   const is = {
@@ -70,6 +73,7 @@
     readDir,
     exists,
     window: {
+      name: NAME,
       close,
       maximize,
       unmaximize,
