@@ -80,3 +80,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+:root {
+  --app-header-height: 38px;
+}

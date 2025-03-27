@@ -30,6 +30,14 @@ interface DannnEvent {
   }
 }
 
+interface DannnWindow {
+  close: () => void
+  maximize: () => void
+  minimize: () => void
+  isMaximized: () => Promise<boolean>
+  unmaximize: () => void
+}
+
 interface Dannn {
   ipc: DannnIpc<DannnEvent>
   is: {
@@ -41,6 +49,7 @@ interface Dannn {
   readFile: (path: string, encoding?: BufferEncoding) => Promise<string>
   readDir: (path: string) => Promise<string[]>
   exists: (dir: string) => Promise<boolean>
+  window: DannnWindow
 }
 
 interface ConfigData {

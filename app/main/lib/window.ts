@@ -63,6 +63,14 @@ export class Window extends EventEmitter<WindowEvents> {
       this.window?.minimize()
     })
 
+    ipcMain.on('unmaximize', () => {
+      this.window?.unmaximize()
+    })
+
+    ipcMain.handle('isMaximized', () => {
+      return this.window?.isMaximized() || false
+    })
+
     ipcMain.on('maximize', () => {
       if (this.window?.isMaximized()) {
         this.window.unmaximize()

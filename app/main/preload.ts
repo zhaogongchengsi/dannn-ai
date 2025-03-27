@@ -20,6 +20,35 @@
     return fsSync.existsSync(dir)
   }
 
+  /**
+   * 关闭窗口
+   */
+  function close() {
+    ipcRenderer.send('close')
+  }
+
+  /**
+   * 放大窗口
+   */
+  function maximize() {
+    ipcRenderer.send('maximize')
+  }
+
+  /**
+   * 缩小窗口
+   */
+  function minimize() {
+    ipcRenderer.send('minimize')
+  }
+
+  function unmaximize() {
+    ipcRenderer.send('unmaximize')
+  }
+
+  function isMaximized() {
+    return ipcRenderer.invoke('isMaximized')
+  }
+
   const is = {
     mac: process.platform === 'darwin',
     win: process.platform === 'win32',
@@ -40,6 +69,13 @@
     readFile,
     readDir,
     exists,
+    window: {
+      close,
+      maximize,
+      unmaximize,
+      minimize,
+      isMaximized,
+    },
   }
 
   contextBridge.exposeInMainWorld('dannn', dannn)

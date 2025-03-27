@@ -1,13 +1,15 @@
 <script setup lang='ts'>
+import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
+import WindowMenus from '@/components/window-menus.vue'
+import { useStorage } from '@vueuse/core'
+
 import { computed, ref } from 'vue'
 import SidebarProvider from './components/ui/sidebar/SidebarProvider.vue'
 import { useConfig } from './composables/config'
 import { useExtension } from './composables/extension'
 import AppSidebar from './views/AppSidebar.vue'
-import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
-import { useStorage } from '@vueuse/core'
 
-const isOpen = useStorage('app-sidebar',false)
+const isOpen = useStorage('app-sidebar', false)
 const isMobile = ref(false)
 
 useConfig().init()
@@ -20,15 +22,20 @@ const mainContentWidth = computed(() => {
   return isOpen.value ? 'calc(100vw - var(--sidebar-width))' : 'calc(100vw - var(--sidebar-width-icon))'
 })
 
+const isWindow = computed(() => window.dannn.is.win)
 </script>
 
 <template>
   <div class="w-screen h-screen">
     <SidebarProvider v-model:open="isOpen" v-model:is-mobile="isMobile">
       <AppSidebar />
-      <main class="main-content" :style="{ width: mainContentWidth }">
-        <header class="px-2 py-1">
-          <SidebarTrigger />
+      <main class="main-content ml-auto" :style="{ width: mainContentWidth }">
+        <header class="flex items-center" style="height: var(--app-header-height)">
+          <div class="px-2 py-1 ">
+            <SidebarTrigger />
+          </div>
+
+          <WindowMenus v-if="isWindow" />
         </header>
         <section>
           <router-view />
