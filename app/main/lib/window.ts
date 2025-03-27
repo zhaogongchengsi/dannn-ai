@@ -74,23 +74,23 @@ export class Window extends EventEmitter<WindowEvents> {
 
     this.window.on('resize', () => {
       const { width, height } = this.getSize()
-      this.send('window-resized', { width, height })
+      this.send('window.resized', { width, height })
     })
 
     this.window.on('maximize', () => {
-      this.send('window-maximized')
+      this.send('window.maximized')
     })
 
     this.window.on('unmaximize', () => {
-      this.send('window-unmaximized')
+      this.send('window.unmaximized')
     })
 
     this.window.on('minimize', () => {
-      this.send('window-minimized')
+      this.send('window.minimized')
     })
 
     this.window.on('restore', () => {
-      this.send('window-restored')
+      this.send('window.restored')
     })
 
     ipcMain.on('close', () => {
@@ -123,7 +123,7 @@ export class Window extends EventEmitter<WindowEvents> {
 
   async show() {
     if (this.isReady) {
-      this.send('show')
+      this.send('window.show')
       this.window?.webContents.once('did-start-loading', () => {
         ipcMain.once('ready', () => {
           this.show()
@@ -132,7 +132,7 @@ export class Window extends EventEmitter<WindowEvents> {
     }
     else if (this.waitReadyPromise) {
       await this.waitReadyPromise.promise
-      this.send('show')
+      this.send('window.show')
       this.waitReadyPromise = null
       this.window?.webContents.once('did-start-loading', () => {
         ipcMain.once('ready', () => {

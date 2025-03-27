@@ -1,12 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import './assets/index.css'
 import { router } from './router'
+import './assets/index.css'
 
 const app = createApp(App)
 app.use(router)
 
-window.dannn.ipc.on('show', () => {
+window.dannn.ipc.on('window.show', () => {
   document.startViewTransition(() => {
     app.mount('#app')
   })
