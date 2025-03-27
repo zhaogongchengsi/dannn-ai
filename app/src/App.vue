@@ -37,7 +37,7 @@ const isWindow = computed(() => window.dannn.is.win)
 
           <WindowMenus v-if="isWindow" />
         </header>
-        <section>
+        <section class="w-full overflow-auto" style="height: calc(100vh - var(--app-header-height));">
           <router-view />
         </section>
       </main>

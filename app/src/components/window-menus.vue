@@ -34,16 +34,16 @@ function onUnmaximize() {
 
 <template>
   <div class="h-full flex items-center space-x-1 ml-auto">
-    <button class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-200 hover:text-white" @click="onMinimize">
+    <button class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-200" @click="onMinimize">
       <Minus :size="24" />
     </button>
-    <button v-if="isMaximized" class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-100 hover:text-white" @click="onUnmaximize">
+    <button v-if="isMaximized" class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-100" @click="onUnmaximize">
       <Minimize :size="18" />
     </button>
-    <button v-if="isMinimized" class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-100 hover:text-white" @click="onMaximize">
+    <button v-if="isMinimized" class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-100" @click="onMaximize">
       <Expand :size="18" />
     </button>
-    <button class="flex items-center justify-center size-[--app-header-height] hover:bg-red-500 hover:text-white">
+    <button class="flex items-center justify-center size-[--app-header-height] hover:bg-red-500">
       <X :size="24" />
     </button>
   </div>
