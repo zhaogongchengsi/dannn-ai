@@ -39,6 +39,7 @@ export class Window extends EventEmitter<WindowEvents> {
       frame: MODE === 'dev',
       webPreferences: {
         nodeIntegration: true,
+        additionalArguments: [`--name=setting`],
         webSecurity: false,
         preload: this.preload,
       },
@@ -98,8 +99,7 @@ export class Window extends EventEmitter<WindowEvents> {
   }
 
   private initEvent(name: string, window: BrowserWindow) {
-    ipcMain.on(`${window}.minimize`, () => {
-      console.log(`${name}.minimize`)
+    ipcMain.on(`${name}.minimize`, () => {
       window.minimize()
     })
 
@@ -164,6 +164,16 @@ export class Window extends EventEmitter<WindowEvents> {
     else {
       await this.createWindow(opt)
       await this.display(opt)
+    }
+  }
+
+  async displaySetting(opt?: WindowOptions) {
+    if (this.settingWindow) {
+      this.settingWindow.show()
+    }
+    else {
+      await this.createSettingWindow(opt)
+      await this.displaySetting(opt)
     }
   }
 

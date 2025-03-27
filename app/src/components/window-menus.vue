@@ -10,8 +10,6 @@ onMounted(async () => {
   isMaximized.value = _isMaximized
   isMinimized.value = !_isMaximized
 
-  console.log(`name = ${window.dannn.window.name}`)
-
   window.dannn.ipc.on(`${window.dannn.window.name}.maximized`, () => {
     isMaximized.value = true
     isMinimized.value = false

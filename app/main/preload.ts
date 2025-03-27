@@ -40,7 +40,6 @@
    * 缩小窗口
    */
   function minimize() {
-    console.log(`${NAME}.minimize`)
     ipcRenderer.send(`${NAME}.minimize`)
   }
 
