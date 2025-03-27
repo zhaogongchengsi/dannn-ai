@@ -47,7 +47,7 @@ const extensions = useExtension()
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="right" align="start">
                       <DropdownMenuItem>
-                        <span>Edit Project</span>
+                        <span>文档</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <span>Delete Project</span>
