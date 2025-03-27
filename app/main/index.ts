@@ -40,4 +40,12 @@ ipcMain.handle('constants.EXTENSIONS_ROOT', async () => {
   return await mkdir(EXTENSIONS_ROOT, { recursive: true })
 })
 
+ipcMain.handle('env.get', async (_, keys: string[]) => {
+  const result: Record<string, string | undefined> = {}
+  for (const key of keys) {
+    result[key] = process.env[key]
+  }
+  return result
+})
+
 bootstrap()

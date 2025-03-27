@@ -28,6 +28,10 @@ const aiCollectionSchema = z.object({
     .describe('AI 可调用的函数定义'),
 })
 
+const extensionPermission = z.object({
+  env: z.array(z.string()).optional().describe('环境变量 Key 列表'),
+})
+
 // 定义主 Schema
 export const extensionSchema = z.object({
   name: z.string().describe('扩展名称'),
@@ -37,6 +41,7 @@ export const extensionSchema = z.object({
   author: z.string().optional().describe('扩展作者'),
   homepage: z.string().url().optional().describe('扩展主页 URL'),
   main: z.string().optional().describe('扩展的入口文件路径'),
+  permission: extensionPermission.optional().describe('扩展权限'),
   aiCollection: z.array(aiCollectionSchema)
     .optional()
     .describe('AI 集合'),

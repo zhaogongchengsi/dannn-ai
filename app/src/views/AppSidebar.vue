@@ -58,8 +58,8 @@ const extensions = useExtension()
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     <SidebarMenuItem v-for="ai in item.aiCollection" :key="ai.name">
-                      <SidebarMenuButton as-child>
-                        <span>{{ item.name }}</span>
+                      <SidebarMenuButton as-child :title="ai.description">
+                        <span>{{ ai.name }}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </SidebarMenuSub>

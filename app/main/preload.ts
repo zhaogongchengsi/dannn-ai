@@ -51,6 +51,10 @@
     return ipcRenderer.invoke(`${NAME}.isMaximized`)
   }
 
+  async function getEnv(keys: string[]): Promise<Record<string, string | undefined>> {
+    return ipcRenderer.invoke('env.get', keys)
+  }
+
   const is = {
     mac: process.platform === 'darwin',
     win: process.platform === 'win32',
@@ -71,6 +75,7 @@
     readFile,
     readDir,
     exists,
+    getEnv,
     window: {
       name: NAME,
       close,
