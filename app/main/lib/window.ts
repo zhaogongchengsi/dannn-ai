@@ -22,10 +22,12 @@ export class Window extends EventEmitter<WindowEvents> {
   isReady: boolean = false
   waitReadyPromise: PromiseWithResolvers<void> | null = null
   preload: string
+  icon: Electron.NativeImage
   constructor(name?: string) {
     super()
     this.name = name || this.name
     this.preload = resolve(dirname(fileURLToPath(import.meta.url)), './preload.js')
+    this.icon = nativeImage.createFromPath(logo)
   }
 
   async createSettingWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
@@ -35,12 +37,11 @@ export class Window extends EventEmitter<WindowEvents> {
       throw new Error('Window is not created')
     }
 
-    const icon = nativeImage.createFromPath(logo)
     this.settingWindow = new BrowserWindow({
       width: width ?? 800,
       height: height ?? 600,
       show: false,
-      icon,
+      icon: this.icon,
       frame: MODE === 'dev',
       parent: this.window,
       webPreferences: {
@@ -66,13 +67,12 @@ export class Window extends EventEmitter<WindowEvents> {
   async createWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
     this.isShow = false
     await app.whenReady()
-    const icon = nativeImage.createFromPath(logo)
 
     this.window = new BrowserWindow({
       width: width ?? 800,
       height: height ?? 600,
       show: false,
-      icon,
+      icon: this.icon,
       frame: MODE === 'dev',
       webPreferences: {
         additionalArguments: [`--name=${this.name}`],
