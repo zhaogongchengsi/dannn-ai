@@ -1,10 +1,11 @@
 import { resolve } from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import tailwind from 'tailwindcss'
+import VueRouter from 'unplugin-vue-router/vite'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), VueRouter({})],
   css: {
     postcss: {
       plugins: [tailwind()],

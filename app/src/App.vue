@@ -29,15 +29,15 @@ const isWindow = computed(() => window.dannn.is.win)
   <div class="w-screen h-screen">
     <SidebarProvider v-model:open="isOpen" v-model:is-mobile="isMobile">
       <AppSidebar />
-      <main class="main-content ml-auto" :style="{ width: mainContentWidth }">
-        <header class="flex items-center" style="height: var(--app-header-height)">
+      <main class="main-content ml-auto duration-200" :style="{ width: mainContentWidth }">
+        <header class="flex items-center border-b" style="height: var(--app-header-height)">
           <div class="px-2 py-1 ">
             <SidebarTrigger />
           </div>
 
           <WindowMenus v-if="isWindow" />
         </header>
-        <section class="w-full overflow-auto" style="height: calc(100vh - var(--app-header-height));">
+        <section class="w-full overflow-auto ml-auto" style="height: calc(100vh - var(--app-header-height));">
           <router-view />
         </section>
       </main>
