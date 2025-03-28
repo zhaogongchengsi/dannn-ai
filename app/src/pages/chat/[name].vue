@@ -12,6 +12,7 @@ const extension = useExtension()
 const ai = useAI()
 const error = ref<Error | null>(null)
 const loading = ref(false)
+const value = ref<string>('')
 
 function initAi() {
    if (!route.query.extension) {
@@ -36,10 +37,11 @@ function initAi() {
 }
 
 const aiAction = computedAsync(async () => {
-   loading.value = true
    if (ai.hasAI(route.params.name)) {
+      loading.value = false
       return ai.getAI(route.params.name)
    } else {
+      loading.value = true
       await extension.init()
       try {
          return initAi()
@@ -56,11 +58,11 @@ const aiAction = computedAsync(async () => {
    <div class="size-full overflow-auto">
       <div v-if="error && !loading" class="p-2 text-red-600"><pre><code>{{ error.message }}</code></pre></div>
       <div v-else-if="!aiAction && !loading">Ai 初始化失败 试试重启大法</div>
-      <div v-else-if="loading">loading...</div>
+      <div v-else-if="loading && !aiAction">loading...</div>
       <div v-else class="w-full flex flex-col h-full">
          <div class="flex-1 px-2">message list</div>
          <div class="p-2 border-t">
-            <Textarea class="size-full" placeholder="有什么可以帮您..." />
+            <Textarea v-model="value" class="size-full" placeholder="有什么可以帮您..." />
          </div>
       </div>
    </div>
