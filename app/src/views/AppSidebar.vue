@@ -58,7 +58,7 @@ const extensions = useExtension()
                   <SidebarMenuSub>
                     <SidebarMenuItem v-for="ai in item.aiCollection" :key="ai.name">
                       <SidebarMenuButton as-child :title="ai.description">
-                        <RouterLink :to="`/chat/${ai.name}?extension=${item.name}`">
+                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.name}`" :active-class="`bg-[hsl(var(--background-secondary))]`">
                           <span>{{ ai.name }}</span>
                         </RouterLink>
                       </SidebarMenuButton>

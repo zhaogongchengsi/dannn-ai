@@ -2,45 +2,50 @@
 import { useAI } from '@/composables/ai';
 import { useExtension } from '@/composables/extension';
 import { AI } from '@/lib/ai';
-import { computed, ref } from 'vue';
+import { computedAsync } from '@vueuse/core';
+import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute<'/chat/[name]'>()
-
 const extension = useExtension()
 const ai = useAI()
 const error = ref<Error | null>(null)
+const loading = ref(false)
 
-const aiAction = computed(() => {
+function initAi() {
+   if (!route.query.extension) {
+      throw new Error(`extension name not found`)
+   }
+
+   const extensionConfig = extension.findExtension(route.query.extension as string)
+
+   if (!extensionConfig) {
+      throw new Error(`extension not found`)
+   }
+
+   const config = extensionConfig.aiCollection?.find(ai => ai.name === route.params.name)
+
+   if (!config) {
+      throw new Error(`ai not found`)
+   }
+
+   ai.createAI(new AI(config))
+
+   return ai.getAI(route.params.name)
+}
+
+const aiAction = computedAsync(async () => {
+   loading.value = true
    if (ai.hasAI(route.params.name)) {
       return ai.getAI(route.params.name)
    } else {
-      if (!route.query.extension) {
-         error.value = new Error(`extension not found`)
-         return
-      }
-
-      const extensionConfig = extension.findExtension(route.query.extension as string)
-
-      if (!extensionConfig) {
-         error.value = new Error(`extension not found`)
-         return
-      }
-
-      const config = extensionConfig.aiCollection?.find(ai => ai.name === route.params.name)
-
-      if (!config) {
-         error.value = new Error(`ai not found`)
-         return
-      }
-
+      await extension.init()
       try {
-
-         ai.createAI(new AI(config))
-         
-         return ai.getAI(route.params.name)
+         return initAi()
       } catch (err: any) {
          error.value = err
+      } finally {
+         loading.value = false
       }
    }
 })
@@ -49,6 +54,6 @@ const aiAction = computed(() => {
 <template>
    <div class="size-full overflow-auto">
       <div v-if="error" class="p-2 text-red-600"><pre><code>{{ error.message }}</code></pre></div>
-      {{ aiAction?.name }}
+      <div v-else>{{ aiAction?.name }}</div>
    </div>
 </template>
