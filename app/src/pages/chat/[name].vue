@@ -6,13 +6,17 @@ import { computedAsync } from '@vueuse/core';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
+import Button from '@/components/ui/button/Button.vue';
+import { debounce } from 'lodash';
 
 const route = useRoute<'/chat/[name]'>()
 const extension = useExtension()
 const ai = useAI()
 const error = ref<Error | null>(null)
 const loading = ref(false)
-const value = ref<string>('')
+const messageValue = ref<string>('')
+const resultValue = ref<string>('')
+const waitAnswer = ref(false)
 
 function initAi() {
    if (!route.query.extension) {
@@ -52,6 +56,29 @@ const aiAction = computedAsync(async () => {
       }
    }
 })
+
+async function send() {
+   const message = messageValue.value.trim()
+
+   if (!message || !aiAction.value) {
+      return
+   }
+
+   waitAnswer.value = true
+   const response = await aiAction.value.sendTextMessage(message)
+   .finally(() => {
+      waitAnswer.value = false
+   })
+
+   console.log(response)
+
+   if (response) {
+      resultValue.value = response
+      messageValue.value = ''
+   }
+}
+
+const onSend = debounce(send, 500)
 </script>
 
 <template>
@@ -60,9 +87,15 @@ const aiAction = computedAsync(async () => {
       <div v-else-if="!aiAction && !loading">Ai 初始化失败 试试重启大法</div>
       <div v-else-if="loading && !aiAction">loading...</div>
       <div v-else class="w-full flex flex-col h-full">
-         <div class="flex-1 px-2">message list</div>
+         <div class="flex-1 px-2">
+            <div v-if="waitAnswer" class="p-2 text-center">正在思考中...</div>
+            <pre v-else class="text-sm">{{ resultValue }}</pre>
+         </div>
          <div class="p-2 border-t">
-            <Textarea v-model="value" class="size-full" placeholder="有什么可以帮您..." />
+            <Textarea :disabled="!aiAction || waitAnswer" v-model="messageValue" placeholder="有什么可以帮您..." />
+            <div class="w-full flex justify-end mt-2 gap-3">
+               <Button :loading="waitAnswer" :disabled="!aiAction || waitAnswer" @click="onSend">发送</Button>
+            </div>
          </div>
       </div>
    </div>

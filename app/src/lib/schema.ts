@@ -14,7 +14,6 @@ const aiCollectionSchema = z.object({
   presencePenalty: z.number().optional().describe('话题惩罚'),
   apiEndpoint: z.string().describe('AI API 端点'),
   apiKey: z.string().describe('API Key'),
-  customParams: z.record(z.any()).optional().describe('额外自定义参数'),
   functionCalls: z
     .array(
       z.object({
