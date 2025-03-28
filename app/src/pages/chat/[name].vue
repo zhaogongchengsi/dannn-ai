@@ -5,7 +5,7 @@ import { AI } from '@/lib/ai';
 import { computedAsync } from '@vueuse/core';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import Textarea from '@/components/textarea/Textarea.vue';
+import Textarea from '@/components/ui/textarea/Textarea.vue';
 
 const route = useRoute<'/chat/[name]'>()
 const extension = useExtension()
@@ -57,10 +57,10 @@ const aiAction = computedAsync(async () => {
       <div v-if="error && !loading" class="p-2 text-red-600"><pre><code>{{ error.message }}</code></pre></div>
       <div v-else-if="!aiAction && !loading">Ai 初始化失败 试试重启大法</div>
       <div v-else-if="loading">loading...</div>
-      <div v-else class="w-full">
-         <div>message list</div>
-         <div>
-            <Textarea />
+      <div v-else class="w-full flex flex-col h-full">
+         <div class="flex-1 px-2">message list</div>
+         <div class="p-2 border-t">
+            <Textarea class="size-full" placeholder="有什么可以帮您..." />
          </div>
       </div>
    </div>
