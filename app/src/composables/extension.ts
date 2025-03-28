@@ -27,10 +27,15 @@ export const useExtension = createGlobalState(
       loading.value = false
     }
 
+    function findExtension(name: string) {
+      return extensions.value.find(ext => ext.name === name)
+    }
+
     return {
       loading,
       extensions,
       init,
+      findExtension,
     }
   },
 )
