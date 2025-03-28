@@ -7,6 +7,7 @@ export interface AIPluginProvide {
 	getAI(name: string): AI
 	getAISafe(name: string): AI | undefined
 	createAI(ai: AI): void
+	hasAI: (name: string) => boolean
 }
 
 export function AIPlugin(): Plugin {
@@ -24,6 +25,10 @@ export function AIPlugin(): Plugin {
 				return aiPool.get(name)
 			}
 
+			function hasAI(name: string) {
+				return aiPool.has(name)
+			}
+
 			function createAI(ai: AI) {
 				aiPool.set(ai.name, ai)
 			}
@@ -31,7 +36,8 @@ export function AIPlugin(): Plugin {
 			const provide: AIPluginProvide = {
 				getAI,
 				getAISafe,
-				createAI
+				createAI,
+				hasAI
 			}
 
 			app.provide(AI_PROVIDE_KEY, provide)
