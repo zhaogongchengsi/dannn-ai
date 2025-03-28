@@ -15,7 +15,6 @@ const aiAction = computed(() => {
    if (ai.hasAI(route.params.name)) {
       return ai.getAI(route.params.name)
    } else {
-      console.log(route.query.extension, route.params.name)
       if (!route.query.extension) {
          error.value = new Error(`extension not found`)
          return
@@ -45,12 +44,11 @@ const aiAction = computed(() => {
       }
    }
 })
-
-console.log(aiAction.value)
 </script>
 
 <template>
-   <div>
+   <div class="size-full overflow-auto">
       <div v-if="error" class="p-2 text-red-600"><pre><code>{{ error.message }}</code></pre></div>
+      {{ aiAction?.name }}
    </div>
 </template>

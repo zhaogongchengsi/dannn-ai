@@ -1,4 +1,5 @@
 import { Event } from './event'
+import { Extension } from './schema'
 
 export interface ExtensionEvents {
   message: MessageEvent
