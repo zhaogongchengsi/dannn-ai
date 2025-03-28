@@ -5,7 +5,6 @@ import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import SidebarProvider from './components/ui/sidebar/SidebarProvider.vue'
 import { useConfig } from './composables/config'
-import { useExtension } from './composables/extension'
 import AppSidebar from './views/AppSidebar.vue'
 
 const isOpen = useStorage('app-sidebar', false)

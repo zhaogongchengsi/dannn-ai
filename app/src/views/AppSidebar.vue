@@ -20,7 +20,6 @@ import { useExtension } from '@/composables/extension'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 
 const extensionStore = useExtension()
-
 </script>
 
 <template>

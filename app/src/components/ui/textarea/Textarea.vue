@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useTemplateRef, type HTMLAttributes } from 'vue'
+import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
-import { useEventListener, useVModel } from '@vueuse/core'
+import { useVModel } from '@vueuse/core'
+import { useTemplateRef } from 'vue'
 
 const props = defineProps<{
   class?: HTMLAttributes['class']
@@ -9,12 +10,12 @@ const props = defineProps<{
   modelValue?: string | number
 }>()
 
-const textarea = useTemplateRef<HTMLTextAreaElement>('textarea')
-
 const emits = defineEmits<{
   (e: 'update:modelValue', payload: string | number): void
   (e: 'enter', payload: string): void
 }>()
+
+const textarea = useTemplateRef<HTMLTextAreaElement>('textarea')
 
 const modelValue = useVModel(props, 'modelValue', emits, {
   passive: true,

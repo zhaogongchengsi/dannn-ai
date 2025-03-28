@@ -3,7 +3,7 @@
 </script>
 
 <template>
-   <div>
-		default chat page
-   </div>
+  <div>
+    default chat page
+  </div>
 </template>
