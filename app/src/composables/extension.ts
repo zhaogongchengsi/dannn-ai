@@ -1,5 +1,5 @@
 import { getExtensionsRoot } from '@/lib/api'
-import { extensionSchema } from '@/utils/schema'
+import { extensionSchema } from '@/lib/schema'
 import { createGlobalState } from '@vueuse/core'
 import { compact, template } from 'lodash'
 import { join } from 'pathe'
