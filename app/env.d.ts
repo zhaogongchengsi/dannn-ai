@@ -69,6 +69,7 @@ interface Extension {
   description?: string
   author?: string
   homepage?: string
+  license?: string
   /**
    * The entry file
    */
