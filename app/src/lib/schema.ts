@@ -44,7 +44,10 @@ export const extensionSchema = z.object({
   homepage: z.string().url().optional().describe('扩展主页 URL'),
   main: z.string().optional().describe('扩展的入口文件路径'),
   permission: extensionPermission.optional().describe('扩展权限'),
+  license: z.string().optional().describe('扩展许可证'),
   aiCollection: z.array(aiCollectionSchema)
     .optional()
     .describe('AI 集合'),
 })
+
+export type Extension = z.infer<typeof extensionSchema>

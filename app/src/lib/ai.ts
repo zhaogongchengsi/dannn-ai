@@ -11,7 +11,8 @@ export class AI {
 	this.name = ai.name
     this.openai = new OpenAI({
 		baseURL: ai.apiEndpoint,
-		apiKey: ai.apiKey
+		apiKey: ai.apiKey,
+		dangerouslyAllowBrowser: true,
 	})
   }
 }

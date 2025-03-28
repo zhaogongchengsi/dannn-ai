@@ -51,9 +51,6 @@ const extensions = useExtension()
                           <span>文档</span>
                         </RouterLink>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <span>Delete Project</span>
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </CollapsibleTrigger>
@@ -61,7 +58,9 @@ const extensions = useExtension()
                   <SidebarMenuSub>
                     <SidebarMenuItem v-for="ai in item.aiCollection" :key="ai.name">
                       <SidebarMenuButton as-child :title="ai.description">
-                        <span>{{ ai.name }}</span>
+                        <RouterLink :to="`/chat/${ai.name}?extension=${item.name}`">
+                          <span>{{ ai.name }}</span>
+                        </RouterLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </SidebarMenuSub>
