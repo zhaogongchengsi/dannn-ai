@@ -12,8 +12,8 @@ const aiCollectionSchema = z.object({
   topP: z.number().min(0).max(1).optional().describe('采样概率'),
   frequencyPenalty: z.number().optional().describe('频率惩罚'),
   presencePenalty: z.number().optional().describe('话题惩罚'),
-  apiEndpoint: z.string().optional().describe('AI API 端点'),
-  apiKey: z.string().optional().describe('API Key'),
+  apiEndpoint: z.string().describe('AI API 端点'),
+  apiKey: z.string().describe('API Key'),
   customParams: z.record(z.any()).optional().describe('额外自定义参数'),
   functionCalls: z
     .array(
@@ -27,6 +27,8 @@ const aiCollectionSchema = z.object({
     .optional()
     .describe('AI 可调用的函数定义'),
 })
+
+export type AICollection = z.infer<typeof aiCollectionSchema>
 
 const extensionPermission = z.object({
   env: z.array(z.string()).optional().describe('环境变量 Key 列表'),
