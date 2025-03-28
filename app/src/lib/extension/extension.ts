@@ -1,5 +1,5 @@
-import { Event } from './event'
-import { Extension } from './schema'
+import type { Extension } from '../schemas/extension'
+import { Event } from '../event'
 
 export interface ExtensionEvents {
   message: MessageEvent

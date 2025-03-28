@@ -1,7 +1,3 @@
-export async function validateSchema(value: string) {
-  return await window.dannn.validate(value)
-}
-
 let root: string | null = null
 export async function getExtensionsRoot() {
   if (root) {

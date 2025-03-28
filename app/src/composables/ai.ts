@@ -1,11 +1,11 @@
-import { AI_PROVIDE_KEY, AIPluginProvide } from "@/plugin/ai"
-import { inject } from "vue"
-
+import type { AIPluginProvide } from '@/plugin/ai'
+import { AI_PROVIDE_KEY } from '@/plugin/ai'
+import { inject } from 'vue'
 
 export function useAI() {
   const ai = inject<AIPluginProvide>(AI_PROVIDE_KEY)
   if (!ai) {
-	throw new Error('AI plugin not found')
+    throw new Error('AI plugin not found')
   }
   return ai
 }

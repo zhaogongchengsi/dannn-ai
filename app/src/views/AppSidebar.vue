@@ -19,7 +19,8 @@ import {
 import { useExtension } from '@/composables/extension'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 
-const extensions = useExtension()
+const extensionStore = useExtension()
+
 </script>
 
 <template>
@@ -32,7 +33,7 @@ const extensions = useExtension()
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            <Collapsible v-for="item in extensions.extensions.value" :key="item.name" class="group/collapsible">
+            <Collapsible v-for="item in extensionStore.extensions" :key="item.name" class="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger as-child>
                   <SidebarMenuButton :tooltip="item.name">
@@ -58,7 +59,7 @@ const extensions = useExtension()
                   <SidebarMenuSub>
                     <SidebarMenuItem v-for="ai in item.aiCollection" :key="ai.name">
                       <SidebarMenuButton as-child :title="ai.description">
-                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.name}`" :active-class="`bg-[hsl(var(--background-secondary))]`">
+                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.name}`" active-class="bg-[hsl(var(--background-secondary))]">
                           <span>{{ ai.name }}</span>
                         </RouterLink>
                       </SidebarMenuButton>

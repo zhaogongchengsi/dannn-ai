@@ -13,7 +13,7 @@ app.use(router)
 app.use(AIPlugin())
 
 let ok = false
-window.dannn.ipc.on('window.show', () => {
+window.dannn.ipc.on('window.show', () => {  
   document.startViewTransition(() => {
     app.mount('#app')
     ok = true

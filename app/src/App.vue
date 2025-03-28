@@ -12,7 +12,6 @@ const isOpen = useStorage('app-sidebar', false)
 const isMobile = ref(false)
 
 useConfig().init()
-useExtension().init()
 
 const mainContentWidth = computed(() => {
   if (isMobile.value) {

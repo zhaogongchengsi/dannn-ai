@@ -50,3 +50,9 @@ export const extensionSchema = z.object({
 })
 
 export type Extension = z.infer<typeof extensionSchema>
+
+export interface ExtensionMeta extends Extension {
+  readme?: string
+  writable?: boolean
+  available?: boolean
+}
