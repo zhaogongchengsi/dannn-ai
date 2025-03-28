@@ -2,7 +2,6 @@
 import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import WindowMenus from '@/components/window-menus.vue'
 import { useStorage } from '@vueuse/core'
-
 import { computed, ref } from 'vue'
 import SidebarProvider from './components/ui/sidebar/SidebarProvider.vue'
 import { useConfig } from './composables/config'

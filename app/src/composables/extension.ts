@@ -1,33 +1,35 @@
 import { getExtensionsRoot } from '@/lib/api'
 import { extensionSchema } from '@/utils/schema'
 import { createGlobalState } from '@vueuse/core'
-import { template } from 'lodash'
+import { compact, template } from 'lodash'
 import { join } from 'pathe'
 import { ref } from 'vue'
 
 const dannnConfigFile = 'dannn.json'
 
+export interface ExtensionMeta extends Extension {
+  readme?: string
+  writable?: boolean
+  available?: boolean
+}
+
 export const useExtension = createGlobalState(
   () => {
     const loading = ref(false)
-    const extensions = ref<Extension[]>([])
-    const extensionsErrors = ref<Record<string, any>>({})
+    const extensions = ref<ExtensionMeta[]>([])
 
     async function init() {
       loading.value = true
-      const extensionInfo = await scanAvailableExtensions().catch((error) => {
+      extensions.value = await scanAvailableExtensions().catch((error) => {
         console.error(`Error getting extensions: ${error}`)
-        return { extensions: [], errors: [] }
+        return []
       })
-      extensions.value = extensionInfo.extensions
-      extensionsErrors.value = extensionInfo.errors
       loading.value = false
     }
 
     return {
       loading,
       extensions,
-      extensionsErrors,
       init,
     }
   },
@@ -36,8 +38,7 @@ export const useExtension = createGlobalState(
 async function scanAvailableExtensions() {
   const root = await getExtensionsRoot()
   const extensions = await window.dannn.readDir(root)
-  const availableExtensions: Extension[] = []
-  const errors: Record<string, any>[] = []
+  const availableExtensions: ExtensionMeta[] = []
 
   const cache = new Set<string>()
 
@@ -53,34 +54,45 @@ async function scanAvailableExtensions() {
     const config = await window.dannn.readFile(configPath).catch(() => undefined)
 
     if (!config) {
-      errors.push({
+      availableExtensions.push({
         name: extension,
-        error: 'Error reading config file',
+        available: false,
+        writable: false,
+        version: '0.0.0',
       })
       continue
     }
 
-    const configValue: Extension = JSON.parse(config)
+    const configValue: ExtensionMeta = JSON.parse(config)
 
-    const { success, error } = extensionSchema.safeParse(configValue)
+    const { success } = extensionSchema.safeParse(configValue)
 
     if (!success) {
-      errors.push({
+      availableExtensions.push({
         name: extension,
-        error,
+        available: false,
+        writable: false,
+        version: configValue?.version ?? '0.0.0',
       })
       continue
     }
 
-    const permissions = configValue.permissions || {}
+    const permissions = configValue.permission || {}
     let env = {}
     if (permissions.env) {
       env = await window.dannn.getEnv(permissions.env)
+        .catch(() => ({} as Record<string, string>))
     }
 
     const compiled = template(config, { interpolate })
 
-    const value = JSON.parse(compiled({ this: JSON.parse(config), process: { env } }))
+    let value = configValue
+    try {
+      value = JSON.parse(compiled({ this: JSON.parse(config), process: { env } }))
+    }
+    catch (error) {
+      console.error(`Error compiling config for ${extension}: ${error}`)
+    }
 
     if (cache.has(value.name)) {
       availableExtensions.splice(
@@ -90,11 +102,18 @@ async function scanAvailableExtensions() {
       continue
     }
 
+    const readme = compact(await Promise.all(['README.md', 'README.MD', 'readme.md', 'readme.MD'].map(async (file) => {
+      const readmePath = join(pluginDir, file)
+      if (await window.dannn.exists(readmePath)) {
+        return window.dannn.readFile(readmePath)
+      }
+      return undefined
+    })).catch(() => []))
+
+    value.readme = readme.at(0)
+
     availableExtensions.push(value)
   }
 
-  return {
-    extensions: availableExtensions,
-    errors,
-  }
+  return availableExtensions
 }

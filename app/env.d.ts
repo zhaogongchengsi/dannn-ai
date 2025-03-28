@@ -73,7 +73,7 @@ interface Extension {
    * The entry file
    */
   main?: string
-  permissions?: {
+  permission?: {
     env?: string[]
   }
   aiCollection?: CollectionAI[]
