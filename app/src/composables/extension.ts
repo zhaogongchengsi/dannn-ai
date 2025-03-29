@@ -1,38 +1,31 @@
-import type { PluginMetadata } from '@/lib/plugin'
-import type { Extension } from '@/lib/schemas/extension'
-import { dannnPlugin } from '@/lib/plugin'
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { DnApp } from "@/base/app/app";
+import { DnExtension } from "@/base/extension";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 
 export const useExtension = defineStore('dannn-extension', () => {
-  // 状态
-  const plugins = ref<PluginMetadata[]>([])
+  const extensions = ref<DnExtension[]>([])
 
-  // 方法
-  const registerPlugin = async (config: Extension, uri: string) => {
-    const id = await dannnPlugin.register(config, uri)
-    const newPlugin = dannnPlugin.getPlugin(id)!
-    plugins.value = [...plugins.value, newPlugin.metadata]
-    return id
-  }
+  const app = DnApp.getInstance()
 
-  plugins.value = dannnPlugin.getPlugins().map(plugin => plugin.metadata)
+  extensions.value =  app.getExtensions()
 
-  dannnPlugin.on('registered', (plugin) => {
-	plugins.value = [...plugins.value, plugin]
+  DnApp.getInstance().on('app:load-extension', (extension) => {
+    const existingExtension = extensions.value.find((ext) => ext.id === extension.id)
+    if (!existingExtension) {
+      extensions.value.push(extension)
+      return
+    } else {
+      extensions.value = extensions.value.map((ext) => {
+        if (ext.id === extension.id) {
+          return extension
+        }
+        return ext
+      })
+    }
   })
-
-  dannnPlugin.on('unregistered', (pluginId) => {
-	plugins.value = plugins.value.filter(plugin => plugin.id !== pluginId)
-  })
-
-  function findExtension(id: string) {
-    return plugins.value.find(plugin => plugin.id === id)
-  }
 
   return {
-    plugins,
-    registerPlugin,
-    findExtension,
+    extensions,
   }
 })

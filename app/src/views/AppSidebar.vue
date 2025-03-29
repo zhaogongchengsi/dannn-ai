@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DnApp } from '@/base/app/app'
 import ModeToggle from '@/components/mode-toggle.vue'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -19,7 +20,8 @@ import {
 import { useExtension } from '@/composables/extension'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 
-const extensionStore = useExtension()
+const extension = useExtension()
+
 </script>
 
 <template>
@@ -32,12 +34,12 @@ const extensionStore = useExtension()
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            <Collapsible v-for="item in extensionStore.plugins" :key="item.id" class="group/collapsible">
+            <Collapsible v-for="item in extension.extensions" :key="item.id" class="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger as-child>
-                  <SidebarMenuButton :tooltip="item.manifest.description">
-                    <img :src="item.manifest.icon" alt="icon" class="size-5 object-contain">
-                    <span>{{ item.manifest.name }}</span>
+                  <SidebarMenuButton :tooltip="item.config.description">
+                    <img :src="item.config.icon" alt="icon" class="size-5 object-contain">
+                    <span>{{ item.config.name }}</span>
                   </SidebarMenuButton>
                   <DropdownMenu>
                     <DropdownMenuTrigger as-child>
@@ -56,9 +58,9 @@ const extensionStore = useExtension()
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    <SidebarMenuItem v-for="ai in item.manifest.aiCollection" :key="ai.name">
+                    <SidebarMenuItem v-for="ai in item.config.aiCollection" :key="ai.name">
                       <SidebarMenuButton as-child :title="ai.description">
-                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.manifest.name}`" active-class="bg-[hsl(var(--background-secondary))]">
+                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.config.name}`" active-class="bg-[hsl(var(--background-secondary))]">
                           <span>{{ ai.name }}</span>
                         </RouterLink>
                       </SidebarMenuButton>

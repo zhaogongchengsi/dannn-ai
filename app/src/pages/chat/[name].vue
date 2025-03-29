@@ -2,7 +2,6 @@
 import Button from '@/components/ui/button/Button.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
 import { useExtension } from '@/composables/extension'
-import { computedAsync } from '@vueuse/core'
 import { debounce } from 'lodash'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'

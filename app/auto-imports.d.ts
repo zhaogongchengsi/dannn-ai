@@ -185,6 +185,7 @@ declare global {
   const useEventListener: typeof import('@vueuse/core')['useEventListener']
   const useEventSource: typeof import('@vueuse/core')['useEventSource']
   const useExtension: typeof import('./src/composables/extension')['useExtension']
+  const useExtensions: typeof import('./src/composables/extension')['useExtensions']
   const useEyeDropper: typeof import('@vueuse/core')['useEyeDropper']
   const useFavicon: typeof import('@vueuse/core')['useFavicon']
   const useFetch: typeof import('@vueuse/core')['useFetch']

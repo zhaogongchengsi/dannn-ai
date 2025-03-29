@@ -1,9 +1,9 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
-import { dannnPlugin } from './lib/plugin'
 import { router } from './router'
 import './assets/index.css'
+import { DnApp } from './base/app/app'
 
 const pinia = createPinia()
 const app = createApp(App)
@@ -13,7 +13,7 @@ app.use(router)
 
 let ok = false
 window.dannn.ipc.on('window.show', async () => {
-  dannnPlugin.loadLocalExtensions()
+  DnApp.getInstance().init()
   document.startViewTransition(() => {
     app.mount('#app')
     ok = true

@@ -1,50 +1,49 @@
 <script setup lang='ts'>
-import type { PluginMetadata } from '@/lib/plugin'
+import { DnApp } from '@/base/app/app'
+import { DnExtension } from '@/base/extension'
 import Button from '@/components/ui/button/Button.vue'
 import { Toggle } from '@/components/ui/toggle'
 import { useConfig } from '@/composables/config'
-import { dannnPlugin } from '@/lib/plugin'
+import { useExtension } from '@/composables/extension'
 import { markdownToHtml } from '@/lib/shiki'
 import { computedAsync } from '@vueuse/core'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const config = useConfig()
 
 const id = route.query.id as string
-
-const currenPlugin = ref<PluginMetadata>()
-watch(
-  () => id,
-  (newId) => {
-    if (!newId) {
-      return
-    }
-
-    const plugin = dannnPlugin.getPlugin(newId)
-
-    if (plugin) {
-      currenPlugin.value = plugin.metadata
-    }
-  },
-  { immediate: true },
-)
+const extension = useExtension()
+const currenPlugin = ref<DnExtension>()
 
 const metadata = computed(() => {
-  if (!currenPlugin.value) {
-    return null
+  const id = route.query.id as string
+  const extensions = extension.extensions
+  if (!id) {
+    return
   }
-  return currenPlugin.value.manifest
+
+  const plugin = extensions.find((item) => item.id === id)
+  if (!plugin) {
+    return
+  }
+
+  return {
+    ...plugin.config,
+    readme: plugin.readme,
+    permission: plugin.config.permission,
+  }
 })
+
+
 const theme = computed(() => config.mode.value === 'dark' ? 'vitesse-dark' : 'vitesse-light')
 
 const readme = computedAsync(async () => {
-  if (!currenPlugin.value || !currenPlugin.value.readme) {
+  if (!metadata.value || !metadata.value.readme) {
     return ''
   }
-
-  const html = await markdownToHtml(currenPlugin.value.readme, theme.value)
+  const html = await markdownToHtml(metadata.value.readme, theme.value)
     .catch((err) => {
       console.error(err)
       return `Failed to load readme for ${id} ${err.message}`
@@ -52,18 +51,6 @@ const readme = computedAsync(async () => {
 
   return html
 }, '')
-
-function updatePlugin(plugin: PluginMetadata) {
-  if (plugin.id === id) {
-    currenPlugin.value = plugin
-  }
-}
-
-dannnPlugin.on('registered', updatePlugin)
-
-onUnmounted(() => {
-  dannnPlugin.off('registered', updatePlugin)
-})
 </script>
 
 <template>
@@ -106,7 +93,7 @@ onUnmounted(() => {
             <p class="text-sm text-zinc-500">
               插件需要以下权限才能正常工作
             </p>
-            <ul class="list-disc pl-4" v-if="metadata.permission.env">
+            <ul v-if="metadata.permission.env" class="list-disc pl-4">
               <li v-for="(env, index) in metadata.permission.env" :key="index">
                 {{ env }}
               </li>
