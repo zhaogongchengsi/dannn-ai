@@ -1,6 +1,6 @@
-import type { PluginMetadata } from '@/lib/rxjs/plugin'
+import type { PluginMetadata } from '@/lib/plugin'
 import type { Extension } from '@/lib/schemas/extension'
-import { dannnPlugin } from '@/lib/rxjs/plugin'
+import { dannnPlugin } from '@/lib/plugin'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -18,12 +18,12 @@ export const useExtension = defineStore('dannn-extension', () => {
 
   plugins.value = dannnPlugin.getPlugins().map(plugin => plugin.metadata)
 
-  // 监听全局事件
-  dannnPlugin.getPluginEvents()?.subscribe((event) => {
-    event
-    if (event.type === 'registered') {
-      plugins.value = [...plugins.value, event.plugin]
-    }
+  dannnPlugin.on('registered', (plugin) => {
+	plugins.value = [...plugins.value, plugin]
+  })
+
+  dannnPlugin.on('unregistered', (pluginId) => {
+	plugins.value = plugins.value.filter(plugin => plugin.id !== pluginId)
   })
 
   function findExtension(id: string) {

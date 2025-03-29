@@ -1,7 +1,7 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
-import { dannnPlugin } from './lib/rxjs/plugin'
+import { dannnPlugin } from './lib/plugin'
 import { router } from './router'
 import './assets/index.css'
 

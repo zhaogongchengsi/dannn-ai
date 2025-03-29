@@ -1,12 +1,12 @@
 <script setup lang='ts'>
-import type { PluginEvent, PluginMetadata } from '@/lib/rxjs/plugin'
+import type { PluginEvent, PluginMetadata } from '@/lib/plugin'
 import Button from '@/components/ui/button/Button.vue'
 import { Toggle } from '@/components/ui/toggle'
 import { useConfig } from '@/composables/config'
-import { dannnPlugin } from '@/lib/rxjs/plugin'
+import { dannnPlugin } from '@/lib/plugin'
 import { markdownToHtml } from '@/lib/shiki'
 import { computedAsync } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -53,13 +53,17 @@ const readme = computedAsync(async () => {
   return html
 }, '')
 
-function updatePlugin(plugin: PluginEvent) {
-  if (plugin.type === 'registered' && plugin.plugin.id === id) {
-    currenPlugin.value = plugin.plugin
+function updatePlugin(plugin: PluginMetadata) {
+  if (plugin.id === id) {
+    currenPlugin.value = plugin
   }
 }
 
-dannnPlugin.getPluginEvents()?.subscribe(updatePlugin)
+dannnPlugin.on('registered', updatePlugin)
+
+onUnmounted(() => {
+  dannnPlugin.off('registered', updatePlugin)
+})
 </script>
 
 <template>

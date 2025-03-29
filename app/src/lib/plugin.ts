@@ -1,13 +1,13 @@
 import type { z } from 'zod'
-import type { Extension } from '../schemas/extension'
+import type { Extension } from './schemas/extension'
 import { generatePluginId } from '@/utils/plugin-id'
 import { compileWithTemplate } from '@/utils/template'
 import { compact } from 'lodash'
 import { join } from 'pathe'
 import { ReplaySubject } from 'rxjs/internal/ReplaySubject'
-import { Subject } from 'rxjs/internal/Subject'
-import { getExtensionsRoot } from '../api'
-import { extensionSchema } from '../schemas/extension'
+import { getExtensionsRoot } from './api'
+import { extensionSchema } from './schemas/extension'
+import { DannnEvent } from './event'
 
 const dannnConfigFile = 'dannn.json'
 
@@ -36,10 +36,17 @@ export type PluginEvent =
   | { type: 'config-updated', changes: Partial<PluginMetadata> }
   | { type: 'error', error: Error }
 
-export class DannnPlugin {
+export interface PluginEvents {
+  registered: PluginMetadata
+  unregistered: string
+  'status-changed': PluginStatus
+  'config-updated': Partial<PluginMetadata>
+  error: Error
+}
+
+export class DannnPlugin extends DannnEvent<PluginEvents> {
   private static instance: DannnPlugin
   private plugins = new Map<string, PluginRecord>()
-  private globalEvents = new Subject<PluginEvent>()
   static getInstance() {
     return this.instance ??= new DannnPlugin()
   }
@@ -115,14 +122,7 @@ export class DannnPlugin {
     try {
       await this.initPlugin(record)
       this.plugins.set(record.id, record)
-      this.emitEvent(pluginId, {
-        type: 'registered',
-        plugin: metadata,
-      })
-      this.globalEvents.next({
-        type: 'registered',
-        plugin: metadata,
-      })
+      this.emit('registered', record.metadata)
       return pluginId
     }
     catch (err: any) {
@@ -145,17 +145,8 @@ export class DannnPlugin {
 
     // 同时发送到插件专属总线和全局总线
     record.subject.next(event)
-
-    // this.globalEvents.next({
-    //   ...event,
-    //   // @ts-ignore
-    //   _$plugin: pluginId, // 元标记
-    // })
   }
 
-  emitGlobalEvent(event: PluginEvent) {
-    this.globalEvents.next(event)
-  }
 
   async unregister(pluginId: string) {
     const record = this.plugins.get(pluginId)
@@ -179,10 +170,7 @@ export class DannnPlugin {
     this.plugins.delete(pluginId)
 
     // 发送卸载事件
-    this.globalEvents.next({
-      type: 'unregistered',
-      pluginId,
-    })
+    this.emit('unregistered', pluginId)
 
     return true
   }
@@ -197,12 +185,6 @@ export class DannnPlugin {
 
   getPlugins() {
     return Array.from(this.plugins.values())
-  }
-
-  getPluginEvents(pluginId?: string) {
-    return pluginId
-      ? this.plugins.get(pluginId)?.subject.asObservable()
-      : this.globalEvents.asObservable()
   }
 
   async loadLocalExtensions() {
