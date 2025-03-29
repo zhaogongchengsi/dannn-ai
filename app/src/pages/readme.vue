@@ -1,13 +1,12 @@
 <script setup lang='ts'>
-import { DnApp } from '@/base/app/app'
-import { DnExtension } from '@/base/extension'
+import type { DnExtension } from '@/base/extension'
 import Button from '@/components/ui/button/Button.vue'
 import { Toggle } from '@/components/ui/toggle'
 import { useConfig } from '@/composables/config'
 import { useExtension } from '@/composables/extension'
 import { markdownToHtml } from '@/lib/shiki'
 import { computedAsync } from '@vueuse/core'
-import { computed, onUnmounted, ref, watch, watchEffect } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -24,7 +23,7 @@ const metadata = computed(() => {
     return
   }
 
-  const plugin = extensions.find((item) => item.id === id)
+  const plugin = extensions.find(item => item.id === id)
   if (!plugin) {
     return
   }
@@ -35,7 +34,6 @@ const metadata = computed(() => {
     permission: plugin.config.permission,
   }
 })
-
 
 const theme = computed(() => config.mode.value === 'dark' ? 'vitesse-dark' : 'vitesse-light')
 

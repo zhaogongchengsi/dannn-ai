@@ -37,13 +37,14 @@ describe('dnExtension', () => {
     options = {
       pluginDir: '/path/to/plugin',
       lazyLoad: true,
+      dirname: 'test-extension',
     }
 
     dnExtension = new DnExtension(config, options)
   })
 
   it('should initialize with correct values', () => {
-	expect(dnExtension.config).toEqual(config)
+    expect(dnExtension.config).toEqual(config)
     expect(dnExtension.dir).toBe(options.pluginDir)
     expect(dnExtension.options).toEqual(options)
     expect(dnExtension.disabled).toBe(false)

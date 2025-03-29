@@ -4,8 +4,10 @@ import { compileWithTemplate } from '@/utils/template'
 import { compact } from 'lodash'
 import { join } from 'pathe'
 import { z } from 'zod'
+import { AI } from '../ai/ai'
 import { DnEvent } from '../common/event'
 import { formatZodError } from '../common/zod'
+import { DnWorker } from '../worker/worker'
 
 export class DnExtension extends DnEvent<PluginEvents> {
   /**
@@ -25,12 +27,16 @@ export class DnExtension extends DnEvent<PluginEvents> {
   id: string
   rawConfig: Extension
   dir: string
+  dirname: string
+  aihub: AI[] = []
+  worker?: DnWorker
 
   constructor(config: Extension, options: CreateExtensionOptions) {
     super()
     this.rawConfig = config
     this.config = config
     this.dir = options.pluginDir
+    this.dirname = options.dirname
     this.options = options
     this.disabled = false
     this.readme = ''
@@ -70,6 +76,18 @@ export class DnExtension extends DnEvent<PluginEvents> {
       const compiled = compileWithTemplate(config, { process: { env }, self: config })
 
       this.config = compiled
+
+      if (compiled.aiCollection) {
+        for (const aiConfig of compiled.aiCollection) {
+          const ai = new AI(aiConfig)
+          this.aihub.push(ai)
+        }
+      }
+
+      if (compiled.main) {
+        const worker = new DnWorker(this.dirname, compiled.main)
+        this.worker = worker
+      }
 
       const readme = compact(await Promise.all(['README.md', 'README.MD', 'readme.md', 'readme.MD'].map(async (file) => {
         const readmePath = join(this.dir, file)

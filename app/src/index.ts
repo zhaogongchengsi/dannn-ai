@@ -1,9 +1,9 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
+import { DnApp } from './base/app/app'
 import { router } from './router'
 import './assets/index.css'
-import { DnApp } from './base/app/app'
 
 const pinia = createPinia()
 const app = createApp(App)

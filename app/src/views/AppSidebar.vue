@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { DnApp } from '@/base/app/app'
 import ModeToggle from '@/components/mode-toggle.vue'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -21,7 +20,6 @@ import { useExtension } from '@/composables/extension'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 
 const extension = useExtension()
-
 </script>
 
 <template>

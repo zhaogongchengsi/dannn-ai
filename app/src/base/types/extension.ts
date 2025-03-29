@@ -22,4 +22,5 @@ export interface CreateExtensionOptions {
    * 插件目录
    */
   pluginDir: string
+  dirname: string
 }

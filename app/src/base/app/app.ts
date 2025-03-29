@@ -1,9 +1,7 @@
-import type { ShallowRef } from 'vue'
 import type { Extension } from '../schemas/extension'
 import type { AppEvents } from '../types/app'
 import { getExtensionsRoot } from '@/lib/api'
 import { join } from 'pathe'
-import { ref, shallowRef } from 'vue'
 import { DnEvent } from '../common/event'
 import { formatZodError } from '../common/zod'
 import { DnExtension } from '../extension'
@@ -31,11 +29,11 @@ export class DnApp extends DnEvent<AppEvents> {
   }
 
   findExtension(id: string) {
-	return this.extensions.find((ext) => ext.id === id)
+    return this.extensions.find(ext => ext.id === id)
   }
 
   getExtensions() {
-	return this.extensions
+    return this.extensions
   }
 
   async loadLocalExtensions() {
@@ -69,11 +67,12 @@ export class DnApp extends DnEvent<AppEvents> {
         continue
       }
 
-      const dnExtension = new DnExtension(data, { pluginDir })
-		dnExtension.once('loaded', () => {
-			this.extensions.push(dnExtension)
-			this.emit('app:load-extension', dnExtension)
-		})
+      console.log({ extension })
+      const dnExtension = new DnExtension(data, { pluginDir, dirname: extension })
+      dnExtension.once('loaded', () => {
+        this.extensions.push(dnExtension)
+        this.emit('app:load-extension', dnExtension)
+      })
     }
   }
 }
