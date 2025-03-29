@@ -1,9 +1,7 @@
 <script setup lang='ts'>
 import Button from '@/components/ui/button/Button.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
-import { useAI } from '@/composables/ai'
 import { useExtension } from '@/composables/extension'
-import { AI } from '@/lib/rxjs/aihub'
 import { computedAsync } from '@vueuse/core'
 import { debounce } from 'lodash'
 import { ref } from 'vue'
@@ -11,7 +9,6 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute<'/chat/[name]'>()
 const extension = useExtension()
-const ai = useAI()
 const error = ref<Error | null>(null)
 const loading = ref(false)
 const messageValue = ref<string>('')
@@ -39,26 +36,6 @@ function initAi() {
 
   return ai.getAI(route.params.name)
 }
-
-const aiAction = computedAsync(async () => {
-  if (ai.hasAI(route.params.name)) {
-    loading.value = false
-    return ai.getAI(route.params.name)
-  }
-  else {
-    loading.value = true
-    await extension.init()
-    try {
-      return initAi()
-    }
-    catch (err: any) {
-      error.value = err
-    }
-    finally {
-      loading.value = false
-    }
-  }
-})
 
 async function send() {
   const message = messageValue.value.trim()
