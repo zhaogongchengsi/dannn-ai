@@ -4,7 +4,6 @@ import { generatePluginId } from '@/utils/plugin-id'
 import { compileWithTemplate } from '@/utils/template'
 import { compact } from 'lodash'
 import { join } from 'pathe'
-import { ReplaySubject } from 'rxjs/internal/ReplaySubject'
 import { getExtensionsRoot } from './api'
 import { extensionSchema } from './schemas/extension'
 import { DannnEvent } from './event'
@@ -17,7 +16,6 @@ export interface PluginRecord {
   id: string
   manifest: Extension
   status: PluginStatus
-  subject: ReplaySubject<PluginEvent>
   cleanup?: () => Promise<void>
   metadata: PluginMetadata
 }
@@ -28,13 +26,6 @@ export interface PluginMetadata {
   uri: string
   readme?: string | undefined
 }
-
-export type PluginEvent =
-  | { type: 'registered', plugin: PluginMetadata }
-  | { type: 'unregistered', pluginId: string }
-  | { type: 'status-changed', status: PluginStatus }
-  | { type: 'config-updated', changes: Partial<PluginMetadata> }
-  | { type: 'error', error: Error }
 
 export interface PluginEvents {
   registered: PluginMetadata
@@ -62,14 +53,6 @@ export class DannnPlugin extends DannnEvent<PluginEvents> {
         ? issue.received
         : undefined,
     }))
-  }
-
-  private async initPlugin(record: PluginRecord) {
-    record.status = 'active'
-    this.emitEvent(record.id, {
-      type: 'status-changed',
-      status: 'active',
-    })
   }
 
   async register(manifest: Extension, pluginUri: string) {
@@ -116,35 +99,19 @@ export class DannnPlugin extends DannnEvent<PluginEvents> {
       manifest: compiled,
       status: 'loading',
       metadata,
-      subject: new ReplaySubject<PluginEvent>(1),
     }
 
     try {
-      await this.initPlugin(record)
       this.plugins.set(record.id, record)
       this.emit('registered', record.metadata)
       return pluginId
     }
     catch (err: any) {
       record.status = 'error'
-
-      this.emitEvent(pluginId, {
-        type: 'error',
-        error: err instanceof Error ? err : new Error(String(err)),
-      })
-
+      this.emit('error', err instanceof Error ? err : new Error(String(err)))
       this.plugins.delete(pluginId)
       throw err
     }
-  }
-
-  private emitEvent(pluginId: string, event: PluginEvent) {
-    const record = this.plugins.get(pluginId)
-    if (!record)
-      return
-
-    // 同时发送到插件专属总线和全局总线
-    record.subject.next(event)
   }
 
 
@@ -153,10 +120,7 @@ export class DannnPlugin extends DannnEvent<PluginEvents> {
     if (!record)
       return false
     // 触发卸载前事件
-    this.emitEvent(pluginId, {
-      type: 'status-changed',
-      status: 'inactive',
-    })
+    this.emit('status-changed', 'inactive')
 
     try {
       await record.cleanup?.()
@@ -165,8 +129,6 @@ export class DannnPlugin extends DannnEvent<PluginEvents> {
       console.error(`Error during plugin cleanup: ${err}`)
     }
 
-    // 移除引用
-    record.subject.complete()
     this.plugins.delete(pluginId)
 
     // 发送卸载事件
@@ -209,10 +171,7 @@ export class DannnPlugin extends DannnEvent<PluginEvents> {
 
       this.register(configValue, pluginDir)
         .catch((error) => {
-          this.emitEvent(configValue.name, {
-            type: 'error',
-            error: error instanceof Error ? error : new Error(String(error)),
-          })
+          this.emit('error', error instanceof Error ? error : new Error(String(error)))
         })
     }
   }

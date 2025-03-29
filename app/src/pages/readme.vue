@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { PluginEvent, PluginMetadata } from '@/lib/plugin'
+import type { PluginMetadata } from '@/lib/plugin'
 import Button from '@/components/ui/button/Button.vue'
 import { Toggle } from '@/components/ui/toggle'
 import { useConfig } from '@/composables/config'
