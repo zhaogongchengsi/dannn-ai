@@ -1,7 +1,7 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
-import { extensionSubject } from './lib/rxjs/extension'
+import { dannnPlugin } from './lib/rxjs/plugin'
 import { router } from './router'
 import './assets/index.css'
 
@@ -12,8 +12,8 @@ app.use(pinia)
 app.use(router)
 
 let ok = false
-window.dannn.ipc.on('window.show', () => {
-  extensionSubject.loadExtensions()
+window.dannn.ipc.on('window.show', async () => {
+  dannnPlugin.loadLocalExtensions()
   document.startViewTransition(() => {
     app.mount('#app')
     ok = true

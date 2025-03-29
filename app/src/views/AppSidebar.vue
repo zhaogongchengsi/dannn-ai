@@ -32,12 +32,12 @@ const extensionStore = useExtension()
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            <Collapsible v-for="item in extensionStore.extensions" :key="item.name" class="group/collapsible">
+            <Collapsible v-for="item in extensionStore.plugins" :key="item.id" class="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger as-child>
-                  <SidebarMenuButton :tooltip="item.name">
-                    <img :src="item.icon" alt="icon" class="size-5 object-contain">
-                    <span>{{ item.name }}</span>
+                  <SidebarMenuButton :tooltip="item.manifest.description">
+                    <img :src="item.manifest.icon" alt="icon" class="size-5 object-contain">
+                    <span>{{ item.manifest.name }}</span>
                   </SidebarMenuButton>
                   <DropdownMenu>
                     <DropdownMenuTrigger as-child>
@@ -47,7 +47,7 @@ const extensionStore = useExtension()
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="right" align="start">
                       <DropdownMenuItem>
-                        <RouterLink :to="`readme?name=${item.name}`">
+                        <RouterLink :to="`readme?id=${item.id}`">
                           <span>文档</span>
                         </RouterLink>
                       </DropdownMenuItem>
@@ -56,9 +56,9 @@ const extensionStore = useExtension()
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    <SidebarMenuItem v-for="ai in item.aiCollection" :key="ai.name">
+                    <SidebarMenuItem v-for="ai in item.manifest.aiCollection" :key="ai.name">
                       <SidebarMenuButton as-child :title="ai.description">
-                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.name}`" active-class="bg-[hsl(var(--background-secondary))]">
+                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.manifest.name}`" active-class="bg-[hsl(var(--background-secondary))]">
                           <span>{{ ai.name }}</span>
                         </RouterLink>
                       </SidebarMenuButton>

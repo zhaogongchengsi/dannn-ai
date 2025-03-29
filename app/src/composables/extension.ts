@@ -1,26 +1,38 @@
-import type { ExtensionMeta } from '@/lib/schemas/extension'
-import { extensionSubject } from '@/lib/rxjs/extension'
+import type { PluginMetadata } from '@/lib/rxjs/plugin'
+import type { Extension } from '@/lib/schemas/extension'
+import { dannnPlugin } from '@/lib/rxjs/plugin'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useExtension = defineStore('dannn-extension', () => {
-  const extensions = ref<ExtensionMeta[]>([])
-  extensionSubject.subscribe({
-    error(err) {},
-    next(value) {
-      extensions.value = [...extensions.value, value]
-    },
-    complete() {
-      extensions.value = extensions.value.sort((a, b) => a.name.localeCompare(b.name))
-    },
+  // 状态
+  const plugins = ref<PluginMetadata[]>([])
+
+  // 方法
+  const registerPlugin = async (config: Extension, uri: string) => {
+    const id = await dannnPlugin.register(config, uri)
+    const newPlugin = dannnPlugin.getPlugin(id)!
+    plugins.value = [...plugins.value, newPlugin.metadata]
+    return id
+  }
+
+  plugins.value = dannnPlugin.getPlugins().map(plugin => plugin.metadata)
+
+  // 监听全局事件
+  dannnPlugin.getPluginEvents()?.subscribe((event) => {
+    event
+    if (event.type === 'registered') {
+      plugins.value = [...plugins.value, event.plugin]
+    }
   })
 
-  function findExtension(name: string) {
-    return extensions.value.find(ext => ext.name === name)
+  function findExtension(id: string) {
+    return plugins.value.find(plugin => plugin.id === id)
   }
 
   return {
-    extensions,
+    plugins,
+    registerPlugin,
     findExtension,
   }
 })
