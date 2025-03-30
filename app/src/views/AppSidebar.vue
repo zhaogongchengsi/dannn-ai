@@ -18,10 +18,10 @@ import {
   SidebarMenuSub,
 } from '@/components/ui/sidebar'
 import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
-import { useExtension } from '@/composables/extension'
+import { useSidebarStore } from '@/stores/sidebar'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 
-const extension = useExtension()
+const sidebar = useSidebarStore()
 const isMac = window.dannn.is.mac
 </script>
 
@@ -33,47 +33,60 @@ const isMac = window.dannn.is.mac
     </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>
-        <SidebarGroupLabel>AI</SidebarGroupLabel>
+        <SidebarGroupLabel>Dannn AI</SidebarGroupLabel>
         <SidebarGroupAction>
           <Plus />
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            <Collapsible v-for="item in extension.extensions" :key="item.id" class="group/collapsible">
-              <SidebarMenuItem>
-                <CollapsibleTrigger as-child>
-                  <SidebarMenuButton :tooltip="item.config.description">
-                    <img :src="item.config.icon" alt="icon" class="size-5 object-contain">
-                    <span>{{ item.config.name }}</span>
-                  </SidebarMenuButton>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger as-child>
-                      <SidebarMenuAction>
-                        <MoreHorizontal />
-                      </SidebarMenuAction>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="right" align="start">
-                      <DropdownMenuItem>
-                        <RouterLink :to="`readme?id=${item.id}`">
-                          <span>文档</span>
+            <template v-for="item in sidebar.sidebar" :key="item.id" class="group/collapsible">
+              <Collapsible v-if="item.children && item.children.length">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger as-child>
+                    <SidebarMenuButton :tooltip="item.tooltip ?? item.title">
+                      <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
+                      <span>{{ item.title }}</span>
+                    </SidebarMenuButton>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger as-child>
+                        <SidebarMenuAction>
+                          <MoreHorizontal />
+                        </SidebarMenuAction>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem>
+                          <RouterLink :to="`readme?id=${item.id}`">
+                            <span>文档</span>
+                          </RouterLink>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuItem v-for="ci in item.children" :key="ci.id">
+                      <SidebarMenuButton as-child :title="ci.tooltip ?? ci.title">
+                        <RouterLink v-if="ci.link" :to="ci.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+                          <span>{{ ci.title }}</span>
                         </RouterLink>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    <!-- <SidebarMenuItem v-for="ai in item.config.aiCollection" :key="ai.name">
-                      <SidebarMenuButton as-child :title="ai.description">
-                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.id}`" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
-                          <span>{{ ai.title ?? ai.name }}</span>
-                        </RouterLink>
+                        <div v-else>
+                          <span>{{ ci.title }}</span>
+                        </div>
                       </SidebarMenuButton>
-                    </SidebarMenuItem> -->
-                  </SidebarMenuSub>
-                </CollapsibleContent>
+                    </SidebarMenuItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+              <SidebarMenuItem v-if="item.link">
+                <SidebarMenuButton as-child :tooltip="item.tooltip ?? item.title">
+                  <RouterLink :to="item.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+                    <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
+                    <span>{{ item.title }}</span>
+                  </RouterLink>
+                </SidebarMenuButton>
               </SidebarMenuItem>
-            </Collapsible>
+            </template>
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>

@@ -24,6 +24,7 @@ export default defineConfig({
         './src/composables',
         './src/libs',
         './src/utils',
+        './src/stores',
       ],
     }),
   ],

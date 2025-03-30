@@ -21,6 +21,7 @@ export type WorkerEvent = {
 }
 
 export class BaseWorker<Event> extends Event<WorkerEvent & Event> {
+	// @ts-ignore
 	private promiserMap = new Map<string, PromiseWithResolvers<any>>()
 	private handlers = new Map<string, (...args: any[]) => void>()
 	constructor() {
@@ -29,6 +30,7 @@ export class BaseWorker<Event> extends Event<WorkerEvent & Event> {
 	}
 
 	expose(name: string, handler: (arg1: any, ...args: any[]) => void) {
+		this.postMessage({ type: 'module', name: name })
 		this.handlers.set(name, handler)
 	}
 
@@ -87,6 +89,7 @@ export class BaseWorker<Event> extends Event<WorkerEvent & Event> {
 
 	invoke<T>(method: string, ...args: any[]): Promise<T> {
 		const id = this.generateId()
+		// @ts-ignore
 		const promiser =  Promise.withResolvers<T>()
 		this.promiserMap.set(id, promiser)
 		this.postMessage({
@@ -96,5 +99,11 @@ export class BaseWorker<Event> extends Event<WorkerEvent & Event> {
 			args,
 		})
 		return promiser.promise
+	}
+
+	done() {
+		this.postMessage({
+			type: 'done',
+		})
 	}
 }

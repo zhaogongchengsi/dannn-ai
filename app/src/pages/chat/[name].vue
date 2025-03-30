@@ -39,7 +39,7 @@ async function send() {
 
   for await (const chunk of response) {
     console.log(chunk)
-    const content = chunk.choices[0]?.delta?.content || '';
+    const content = chunk.choices[0]?.delta?.content || ''
     resultValue.value += content
   }
 

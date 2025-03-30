@@ -16,7 +16,7 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
     super()
     this.name = name
     this.url = url
-    this.worker = new Worker(`dannn://loader.extension/${url}?name=${name}`, {
+    this.worker = new Worker(`dannn://import.extension/${url}?name=${name}`, {
       type: 'module',
     })
     this.worker.onmessage = (e) => {
@@ -31,6 +31,15 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
     this.worker.onmessageerror = (e) => {
       this.emit('worker:messageerror', e)
     }
+
+    this.expose('log', (level: keyof Console, ...messages: any[]) => {
+      const func = level in console ? (console[level] as (...args: any[]) => void) : undefined
+      if (func) {
+        func.apply(console, messages)
+      } else {
+        console.log(level, ...messages)
+      }
+    })
   }
 
   terminate() {
@@ -153,8 +162,9 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
     if (!this.isReady) {
       this.donePromiser = Promise.withResolvers<void>()
       return await this.donePromiser.promise
-    } else {
-      return this.invoke<void>('activate')
+    }
+    else {
+      return await this.invoke<void>('activate')
     }
   }
 }

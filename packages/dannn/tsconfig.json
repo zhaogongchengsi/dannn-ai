@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "module": "preserve",
+    "module": "Preserve",
     "target": "ESNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "lib": [
       "es2020",
       "webworker"

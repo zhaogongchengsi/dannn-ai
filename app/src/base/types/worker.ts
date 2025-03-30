@@ -34,4 +34,8 @@ export interface DnWorkerEvents {
   'worker:message': WorkerMessage
   'worker:error': any
   'worker:messageerror': any
+  'worker:log': {
+    level: keyof Console
+    messages: string[]
+  }
 }
