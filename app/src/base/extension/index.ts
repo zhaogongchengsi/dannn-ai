@@ -4,7 +4,6 @@ import { compileWithTemplate } from '@/utils/template'
 import { compact } from 'lodash'
 import { join } from 'pathe'
 import { z } from 'zod'
-import { AI } from '../ai/ai'
 import { InstallEvent } from '../common/install-event'
 import { formatZodError } from '../common/zod'
 import { DnWorker } from '../worker/worker'
@@ -28,7 +27,6 @@ export class DnExtension extends InstallEvent<Extension> {
   rawConfig: Extension
   dir: string
   dirname: string
-  aihub: AI[] = []
   worker?: DnWorker
 
   constructor(config: Extension, options: CreateExtensionOptions) {
@@ -59,10 +57,6 @@ export class DnExtension extends InstallEvent<Extension> {
     return normalized
   }
 
-  findAI(name: string) {
-    return this.aihub.find(ai => ai.name === name)
-  }
-
   async load() {
     const config = this.rawConfig
 
@@ -80,15 +74,6 @@ export class DnExtension extends InstallEvent<Extension> {
       const compiled = compileWithTemplate(config, { process: { env }, self: config })
 
       this.config = compiled
-
-      if (compiled.aiCollection) {
-        compiled.aiCollection = compiled.aiCollection.map((aiConfig) => {
-          const newConfig = { ...aiConfig, name: this.generateId(aiConfig.name) }
-          const ai = new AI(newConfig)
-          this.aihub.push(ai)
-          return newConfig
-        })
-      }
 
       if (compiled.main) {
         const worker = new DnWorker(this.dirname, compiled.main)

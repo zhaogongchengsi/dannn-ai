@@ -63,13 +63,13 @@ const isMac = window.dannn.is.mac
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    <SidebarMenuItem v-for="ai in item.config.aiCollection" :key="ai.name">
+                    <!-- <SidebarMenuItem v-for="ai in item.config.aiCollection" :key="ai.name">
                       <SidebarMenuButton as-child :title="ai.description">
                         <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.id}`" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
                           <span>{{ ai.title ?? ai.name }}</span>
                         </RouterLink>
                       </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    </SidebarMenuItem> -->
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>

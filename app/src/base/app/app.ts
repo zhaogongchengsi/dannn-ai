@@ -36,10 +36,6 @@ export class DnApp extends DnEvent<AppEvents> {
     return this.extensions
   }
 
-  findAI(extName: string, name: string) {
-    return this.findExtension(extName)?.findAI(name)
-  }
-
   async loadLocalExtensions() {
     const root = await getExtensionsRoot()
     const extensions = await window.dannn.readDir(root)
