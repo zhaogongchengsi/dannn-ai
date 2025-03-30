@@ -39,10 +39,6 @@ export class DnExtension extends InstallEvent<Extension> {
     this.disabled = false
     this.readme = ''
     this.id = this.generateId(config.name)
-
-    if (!this.options.lazyLoad) {
-      this.load()
-    }
   }
 
   private generateId(name: string) {
@@ -78,6 +74,9 @@ export class DnExtension extends InstallEvent<Extension> {
       if (compiled.main) {
         const worker = new DnWorker(this.dirname, compiled.main)
         this.worker = worker
+        worker.once('loaded', () => {
+          worker.activate()
+        })
       }
 
       const readme = compact(await Promise.all(['README.md', 'README.MD', 'readme.md', 'readme.MD'].map(async (file) => {

@@ -1,0 +1,12 @@
+{
+	"name": "DeepSeek",
+	"version": "1.0.0",
+	"icon": "https://chat.deepseek.com/favicon.svg",
+	"description": "DeepSeek AI 扩展，提供文本、图像、音频和视频 AI 服务。",
+	"author": "DeepSeek Team",
+	"homepage": "https://deepseek.com",
+	"main": "./dist/index.js",
+	"permission": {
+		"env": ["DEEPSEEK_API_KEY"]
+	}
+}

@@ -194,6 +194,16 @@ importers:
         specifier: ^0.25.1
         version: 0.25.1
 
+  packages/dannn: {}
+
+  packages/deepseek:
+    dependencies:
+      '@dannn/core':
+        specifier: workspace:^
+        version: link:../dannn
+
+  packages/event: {}
+
 packages:
 
   '@alloc/quick-lru@5.2.0':

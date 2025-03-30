@@ -70,6 +70,7 @@ export class DnApp extends DnEvent<AppEvents> {
         }
 
         const dnExtension = new DnExtension(data, { pluginDir, dirname: extension })
+        dnExtension.load()
         dnExtension.once('loaded', () => {
           this.extensions.push(dnExtension)
           this.emit('app:load-extension', dnExtension)

@@ -2,6 +2,7 @@ import { builtinModules } from 'node:module'
 import process from 'node:process'
 import { build as esbuild } from 'esbuild'
 import { readPackageJson } from './utils'
+import consola from 'consola'
 
 export interface BuildOptions {
   /**
@@ -22,7 +23,7 @@ export async function build({ entry, dir, mode }: BuildOptions) {
     ...mode ? { 'process.env.MODE': JSON.stringify(mode), MODE: JSON.stringify(mode) } : {},
   }
 
-  return await esbuild({
+  const res = await esbuild({
     entryPoints: Array.isArray(entry) ? entry : [entry],
     outdir: dir || 'dist',
     bundle: true,
@@ -44,4 +45,6 @@ export async function build({ entry, dir, mode }: BuildOptions) {
     format: packageJson?.type === 'module' ? 'esm' : 'cjs',
     define,
   })
+
+  consola.log('Output files:', res.outputFiles?.map(file => file.path).join(', '))
 }

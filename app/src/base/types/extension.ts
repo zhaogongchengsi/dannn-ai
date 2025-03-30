@@ -8,7 +8,6 @@ export interface ExtensionMetadata {
 }
 
 export interface CreateExtensionOptions {
-  lazyLoad?: boolean
   /**
    * 插件目录
    */
