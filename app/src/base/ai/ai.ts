@@ -1,9 +1,9 @@
 import type { AIConfig } from '../schemas/ai'
-import type { AIEvents, CreateAIOptions } from '../types/ai'
+import type { CreateAIOptions } from '../types/ai'
 import { OpenAI } from 'openai'
-import { DnEvent } from '../common/event'
+import { InstallEvent } from '../common/install-event'
 
-export class AI extends DnEvent<AIEvents> {
+export class AI extends InstallEvent<AI> {
   config: AIConfig
   options: CreateAIOptions
   openai?: OpenAI | null = null
@@ -25,12 +25,8 @@ export class AI extends DnEvent<AIEvents> {
       timeout: 10000,
       dangerouslyAllowBrowser: true,
     })
-    this.emit('status-changed', 'active')
+    this.emit('status-changed', 'ready')
     this.emit('loaded', this)
     this.isLoaded = true
-  }
-
-  destroy() {
-    console.log('AI destroyed')
   }
 }

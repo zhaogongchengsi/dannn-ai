@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import type { DnWorkerEvents, WorkerMessage } from '../types/worker'
 import { DnEvent } from '../common/event'
 
@@ -30,6 +31,14 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
     }
   }
 
+  terminate() {
+    if (this.worker) {
+      this.worker.terminate()
+      this.worker = null
+      this.emit('unloaded', undefined)
+    }
+  }
+
   private onMessage(message: any) {
     if (!('type' in message.data)) {
       return
@@ -52,16 +61,16 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
           promiserError.reject(new Error(message.data.error))
         }
         break
-	case 'module':
-		this.readyMethodsName.add(message.data.name)
-		break
+      case 'module':
+        this.readyMethodsName.add(message.data.name)
+        break
     }
   }
 
   invoke<T>(name: string, ...args: any[]) {
-	if (!this.readyMethodsName.has(name)) {
-	  return Promise.reject(new Error(`Method ${name} not ready`))
-	}
+    if (!this.readyMethodsName.has(name)) {
+      return Promise.reject(new Error(`Method ${name} not ready`))
+    }
 
     const id = this.generateId()
     if (!this.isReady) {
@@ -92,6 +101,10 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
 
   get isWorkerReady() {
     return this.isReady
+  }
+
+  get isWorkerLoaded() {
+    return this.worker !== null
   }
 
   postMessage(message: any) {

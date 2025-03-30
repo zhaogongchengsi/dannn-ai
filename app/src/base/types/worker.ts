@@ -20,8 +20,8 @@ export interface WorkerCallErrorMessage {
 }
 
 export interface WorkerModuleMessage {
-	type: 'module',
-	name: string
+  type: 'module'
+  name: string
 }
 
 export type WorkerMessage = WorkerDoneMessage | WorkerErrorMessage | WorkerCallResultMessage | WorkerCallErrorMessage | WorkerModuleMessage

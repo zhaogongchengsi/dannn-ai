@@ -4,13 +4,13 @@ type EventKey<T extends EventMap> = keyof T
 type EventCallback<T> = (payload: T) => void | Promise<void>
 
 export class DnEvent<T extends EventMap> {
-  private events: Map<EventKey<T>, EventCallback<any>[]> = new Map()
+  private events: Map<EventKey<T>, Set<EventCallback<any>>> = new Map()
 
   on<K extends EventKey<T>>(event: K, callback: EventCallback<T[K]>): void {
     if (!this.events.has(event)) {
-      this.events.set(event, [])
+      this.events.set(event, new Set())
     }
-    this.events.get(event)!.push(callback)
+    this.events.get(event)!.add(callback)
   }
 
   once<K extends EventKey<T>>(event: K, callback: EventCallback<T[K]>): void {
@@ -25,9 +25,9 @@ export class DnEvent<T extends EventMap> {
     if (!this.events.has(event))
       return
     const callbacks = this.events.get(event)!
-    const index = callbacks.indexOf(callback)
-    if (index !== -1) {
-      callbacks.splice(index, 1)
+    callbacks.delete(callback)
+    if (callbacks.size === 0) {
+      this.events.delete(event)
     }
   }
 

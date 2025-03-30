@@ -1,15 +1,15 @@
 import type { Extension } from '../schemas/extension'
-import type { CreateExtensionOptions, PluginEvents } from '../types/extension'
+import type { CreateExtensionOptions } from '../types/extension'
 import { compileWithTemplate } from '@/utils/template'
 import { compact } from 'lodash'
 import { join } from 'pathe'
 import { z } from 'zod'
 import { AI } from '../ai/ai'
-import { DnEvent } from '../common/event'
+import { InstallEvent } from '../common/install-event'
 import { formatZodError } from '../common/zod'
 import { DnWorker } from '../worker/worker'
 
-export class DnExtension extends DnEvent<PluginEvents> {
+export class DnExtension extends InstallEvent<Extension> {
   /**
    * 插件配置
    */
@@ -101,10 +101,10 @@ export class DnExtension extends DnEvent<PluginEvents> {
 
       // 触发加载成功事件
       this.emit('loaded', compiled)
-      this.emit('status-changed', 'active')
+      this.emit('status-changed', 'ready')
     }
     catch (err: any) {
-      this.emit('error', err)
+      this.emit('load-error', err)
       this.emit('status-changed', 'error')
       if (err instanceof z.ZodError) {
         console.error('Zod validation errors:', formatZodError(err))
