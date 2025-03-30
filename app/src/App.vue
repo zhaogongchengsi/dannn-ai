@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import WindowMenus from '@/components/window-menus.vue'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'

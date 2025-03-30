@@ -6,7 +6,10 @@ const modules = await import('dannn://import.extension' + '{{url}}')
 Object.keys(modules).forEach((key) => {
 	self.postMessage({ type: 'module', name: key })
 })
-self.onmessage = (event) => {
+self.addEventListener('message', (event) => {
+	if (event.source !== self) return
+	if (!event.data) return
+	if (!event.data.type) return
 	const { type, data } = event.data
 	if (type === 'call') {
 		const { name, args, id } = data
@@ -22,5 +25,5 @@ self.onmessage = (event) => {
 			self.postMessage({ type: 'error', id, error: 'Module not found' })
 		}
 	}
-}
+})
 self.postMessage({ type: 'done' })
