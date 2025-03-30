@@ -1,0 +1,1 @@
+export const APP_PROVIDE_RX_KEY = 'APP_PROVIDE_RX_KEY'

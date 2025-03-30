@@ -1,10 +1,12 @@
-import type { DnExtension } from '@/base/extension'
 import type { Sidebar } from '@/base/types/sidebar'
+import { useAppRx } from '@/base/rxjs/hook'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { unionBy } from 'lodash'
 
 export const useSidebarStore = defineStore('dannn-sidebar', () => {
   const sidebar = ref<Sidebar[]>([])
+  const rx = useAppRx()
 
   function addSidebar(data: Sidebar) {
     const oldSidebar = sidebar.value.filter(item => item.id === data.id)
@@ -14,24 +16,9 @@ export const useSidebarStore = defineStore('dannn-sidebar', () => {
     ]
   }
 
-  sidebar.value = window.dnapp.getExtensions().map((ext) => {
-    return {
-      title: ext.config.name,
-      id: ext.id,
-      icon: ext.config.icon,
-    }
+  rx.onSidebarReady((...data: Sidebar[]) => {
+    sidebar.value = unionBy(sidebar.value, data, 'id')
   })
-
-  window.dnapp.on('app:load-extension', (data: DnExtension) => {
-    const ext = data
-    addSidebar({
-      title: ext.config.name,
-      id: ext.id,
-      icon: ext.config.icon,
-    })
-  })
-
-  window.dnapp.on('app:create-sidebar', (data: Sidebar) => addSidebar(data))
 
   return {
     sidebar,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAppRx } from '@/base/rxjs/hook'
 import ModeToggle from '@/components/mode-toggle.vue'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -20,6 +21,19 @@ import {
 import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { useSidebarStore } from '@/stores/sidebar'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
+import { onMounted } from 'vue'
+
+const rx = useAppRx()
+
+onMounted(() => {
+  rx.sidebarReady()
+  // try {
+
+  // }
+  // catch (e) {
+  //   console.error('Sidebar ready error:', e)
+  // }
+})
 
 const sidebar = useSidebarStore()
 const isMac = window.dannn.is.mac
