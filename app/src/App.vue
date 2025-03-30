@@ -24,7 +24,7 @@ const isWindow = computed(() => window.dannn.is.win)
 
 <template>
   <div class="w-screen h-screen">
-    <SidebarProvider v-model:open="isOpen" v-model:is-mobile="isMobile">
+    <SidebarProvider v-model:open="isOpen" v-model:is-mobile="isMobile" class="h-screen w-screen">
       <AppSidebar />
       <section class="overflow-auto ml-auto h-screen" :style="{ width: mainContentWidth }">
         <WindowMenus v-if="isWindow" />

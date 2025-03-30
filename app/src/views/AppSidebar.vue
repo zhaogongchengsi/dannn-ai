@@ -27,8 +27,9 @@ const isMac = window.dannn.is.mac
 
 <template>
   <Sidebar :collapsible="isMac ? 'none' : 'icon'">
-    <SidebarHeader class="items-end">
-      <SidebarTrigger />
+    <SidebarHeader class="items-end" :class="{ dragging: isMac }">
+      <SidebarTrigger v-if="!isMac" />
+      <div v-else class="h-4" />
     </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>

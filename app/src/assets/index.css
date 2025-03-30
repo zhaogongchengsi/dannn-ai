@@ -86,3 +86,10 @@
 :root {
   --app-header-height: 38px;
 }
+
+.dragging {
+  -webkit-app-region: drag;
+}
+.dragging * {
+  -webkit-app-region: no-drag;
+}

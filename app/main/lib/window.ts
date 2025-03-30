@@ -2,6 +2,7 @@ import EventEmitter from 'node:events'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { app, BrowserWindow, ipcMain, nativeImage } from 'electron'
+import { isMacOS } from 'std-env'
 import logo from '../../public/logo.png'
 
 export interface WindowOptions {
@@ -42,8 +43,10 @@ export class Window extends EventEmitter<WindowEvents> {
       height: height ?? 600,
       show: false,
       icon: this.icon,
-      frame: MODE === 'dev',
+      frame: isMacOS ? true : MODE === 'dev',
       parent: this.window,
+      titleBarStyle: isMacOS ? 'hidden' : undefined,
+      titleBarOverlay: isMacOS,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [`--name=setting`],
@@ -73,7 +76,9 @@ export class Window extends EventEmitter<WindowEvents> {
       height: height ?? 600,
       show: false,
       icon: this.icon,
-      frame: MODE === 'dev',
+      frame: isMacOS ? true : MODE === 'dev',
+      titleBarStyle: isMacOS ? 'hidden' : undefined,
+      titleBarOverlay: isMacOS,
       webPreferences: {
         additionalArguments: [`--name=${this.name}`],
         nodeIntegration: true,
