@@ -81,4 +81,14 @@ declare global {
   }
 }
 
-window.dnapp = new DnApp()
+const dnapp = new DnApp()
+
+Object.defineProperty(window, 'dnapp', {
+  get() {
+    return dnapp
+  },
+  set() {
+    throw new Error('Cannot set dannn property')
+  },
+  configurable: false,
+})

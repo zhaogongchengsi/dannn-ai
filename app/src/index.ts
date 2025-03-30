@@ -14,9 +14,10 @@ app.use(router)
 let ok = false
 window.dannn.ipc.on('window.show', async () => {
   document.startViewTransition(() => {
-    if (!ok)
+    if (!ok) {
       app.mount('#app')
-    ok = true
+      ok = true
+    }
   })
 })
 

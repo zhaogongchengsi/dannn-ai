@@ -20,18 +20,9 @@ import {
 import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { useSidebarStore } from '@/stores/sidebar'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
-import { watch } from 'vue'
 
 const sidebar = useSidebarStore()
 const isMac = window.dannn.is.mac
-
-watch(
-  () => sidebar.sidebar,
-  (newVal) => {
-    console.log('sidebar', newVal)
-  },
-  { immediate: true },
-)
 </script>
 
 <template>
@@ -48,8 +39,8 @@ watch(
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            <template v-for="item in sidebar.sidebar" :key="item.id" class="group/collapsible">
-              <Collapsible v-if="item.children && item.children.length">
+            <template v-for="item in sidebar.sidebar" :key="item.id">
+              <Collapsible v-if="item.children && item.children.length" class="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger as-child>
                     <SidebarMenuButton :tooltip="item.tooltip ?? item.title">

@@ -33,11 +33,13 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
     }
 
     this.expose('log', (level: keyof Console, ...messages: any[]) => {
+      // eslint-disable-next-line no-console
       const func = level in console ? (console[level] as (...args: any[]) => void) : undefined
       if (func) {
         func.apply(console, messages)
       }
       else {
+        // eslint-disable-next-line no-console
         console.log(level, ...messages)
       }
     })
