@@ -39,39 +39,45 @@ export class DnApp extends DnEvent<AppEvents> {
   async loadLocalExtensions() {
     const root = await getExtensionsRoot()
     const extensions = await window.dannn.readDir(root)
-    for (const extension of extensions) {
-      const pluginDir = join(root, extension)
-      const configPath = join(pluginDir, dannnConfigFile)
-      if (!await window.dannn.exists(configPath)) {
-        continue
-      }
+    extensions.forEach(async (extension) => {
+      try {
+        const pluginDir = join(root, extension)
+        const configPath = join(pluginDir, dannnConfigFile)
 
-      const config = await window.dannn.readFile(configPath).catch(() => {
-        return undefined
-      })
+        if (!await window.dannn.exists(configPath)) {
+          return
+        }
 
-      if (!config) {
-        continue
-      }
-
-      const configValue: Extension = JSON.parse(config)
-
-      const { success, data, error } = extensionSchema.safeParse(configValue)
-
-      if (!success) {
-        console.error('Invalid extension config:', formatZodError(error))
-        this.emit('app:load-error', {
-          name: extension,
-          error: formatZodError(error),
+        const config = await window.dannn.readFile(configPath).catch(() => {
+          return undefined
         })
-        continue
-      }
 
-      const dnExtension = new DnExtension(data, { pluginDir, dirname: extension })
-      dnExtension.once('loaded', () => {
-        this.extensions.push(dnExtension)
-        this.emit('app:load-extension', dnExtension)
-      })
-    }
+        if (!config) {
+          return
+        }
+
+        const configValue: Extension = JSON.parse(config)
+
+        const { success, data, error } = extensionSchema.safeParse(configValue)
+
+        if (!success) {
+          console.error('Invalid extension config:', formatZodError(error))
+          this.emit('app:load-error', {
+            name: extension,
+            error: formatZodError(error),
+          })
+          return
+        }
+
+        const dnExtension = new DnExtension(data, { pluginDir, dirname: extension })
+        dnExtension.once('loaded', () => {
+          this.extensions.push(dnExtension)
+          this.emit('app:load-extension', dnExtension)
+        })
+      }
+      catch (error) {
+        console.error('Error loading extension:', error)
+      }
+    })
   }
 }

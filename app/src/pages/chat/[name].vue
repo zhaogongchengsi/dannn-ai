@@ -4,6 +4,7 @@ import Textarea from '@/components/ui/textarea/Textarea.vue'
 import { debounce } from 'lodash'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { toast } from 'vue-sonner'
 
 const route = useRoute<'/chat/[name]'>()
 const error = ref<Error | null>(null)
@@ -18,6 +19,10 @@ async function send() {
     return
 
   console.log('message', message)
+
+  toast(`正在发送消息...${message}`, {
+    description: '请稍等片刻',
+  })
   messageValue.value = ''
 }
 

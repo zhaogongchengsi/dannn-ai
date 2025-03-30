@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import { Toaster } from '@/components/ui/sonner'
 import WindowMenus from '@/components/window-menus.vue'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
@@ -9,7 +10,9 @@ import AppSidebar from './views/AppSidebar.vue'
 const isOpen = useStorage('app-sidebar', false)
 const isMobile = ref(false)
 
-useConfig().init()
+const config = useConfig()
+
+config.init()
 
 const mainContentWidth = computed(() => {
   if (isMobile.value) {
@@ -19,6 +22,14 @@ const mainContentWidth = computed(() => {
 })
 
 const isWindow = computed(() => window.dannn.is.win)
+
+const toasterTheme = computed(() => {
+  const mode = config.mode.value
+  if (mode === 'auto') {
+    return 'system'
+  }
+  return mode === 'dark' ? 'dark' : 'light'
+})
 </script>
 
 <template>
@@ -30,5 +41,6 @@ const isWindow = computed(() => window.dannn.is.win)
         <router-view />
       </section>
     </SidebarProvider>
+    <Toaster :theme="toasterTheme" />
   </div>
 </template>
