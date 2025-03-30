@@ -1,60 +1,24 @@
 <script setup lang='ts'>
 import Button from '@/components/ui/button/Button.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
-import { useExtension } from '@/composables/extension'
 import { debounce } from 'lodash'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute<'/chat/[name]'>()
-const extension = useExtension()
 const error = ref<Error | null>(null)
 const loading = ref(false)
 const messageValue = ref<string>('')
 const resultValue = ref<string>('')
 const waitAnswer = ref(false)
 
-function initAi() {
-  if (!route.query.extension) {
-    throw new Error(`extension name not found`)
-  }
-
-  const extensionConfig = extension.findExtension(route.query.extension as string)
-
-  if (!extensionConfig) {
-    throw new Error(`extension not found`)
-  }
-
-  const config = extensionConfig.aiCollection?.find(ai => ai.name === route.params.name)
-
-  if (!config) {
-    throw new Error(`ai not found`)
-  }
-
-  ai.createAI(new AI(config))
-
-  return ai.getAI(route.params.name)
-}
-
 async function send() {
   const message = messageValue.value.trim()
-
-  if (!message || !aiAction.value) {
+  if (!message)
     return
-  }
 
-  waitAnswer.value = true
-  const response = await aiAction.value.sendTextMessage(message)
-    .finally(() => {
-      waitAnswer.value = false
-    })
-
-  console.log(response)
-
-  if (response) {
-    resultValue.value = response
-    messageValue.value = ''
-  }
+  console.log('message', message)
+  messageValue.value = ''
 }
 
 const onSend = debounce(send, 500)
@@ -65,23 +29,14 @@ const onSend = debounce(send, 500)
     <div v-if="error && !loading" class="p-2 text-red-600">
       <pre><code>{{ error.message }}</code></pre>
     </div>
-    <div v-else-if="!aiAction && !loading">
-      Ai 初始化失败 试试重启大法
-    </div>
-    <div v-else-if="loading && !aiAction">
-      loading...
-    </div>
     <div v-else class="w-full flex flex-col h-full">
-      <div class="flex-1 px-2">
-        <div v-if="waitAnswer" class="p-2 text-center">
-          正在思考中...
-        </div>
-        <pre v-else class="text-sm">{{ resultValue }}</pre>
+      <div class="flex-1 overflow-auto">
+        {{ route.params.name }} / {{ route.query.extension }}
       </div>
       <div class="p-2 border-t">
-        <Textarea v-model="messageValue" :disabled="!aiAction || waitAnswer" placeholder="有什么可以帮您..." />
+        <Textarea v-model="messageValue" :disabled="waitAnswer" placeholder="有什么可以帮您..." />
         <div class="w-full flex justify-end mt-2 gap-3">
-          <Button :loading="waitAnswer" :disabled="!aiAction || waitAnswer" @click="onSend">
+          <Button :loading="waitAnswer" :disabled="waitAnswer" @click="onSend">
             发送
           </Button>
         </div>

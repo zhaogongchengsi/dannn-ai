@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export const aiConfig = z.object({
+  title: z.string().optional().describe('AI 标题'),
   name: z.string().describe('AI 名称'),
   description: z.string().optional().describe('AI 介绍'),
   role: z.string().optional().describe('AI 角色'),

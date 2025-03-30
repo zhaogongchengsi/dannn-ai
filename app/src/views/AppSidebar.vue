@@ -65,8 +65,8 @@ const isMac = window.dannn.is.mac
                   <SidebarMenuSub>
                     <SidebarMenuItem v-for="ai in item.config.aiCollection" :key="ai.name">
                       <SidebarMenuButton as-child :title="ai.description">
-                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.config.name}`" active-class="bg-[hsl(var(--background-secondary))]">
-                          <span>{{ ai.name }}</span>
+                        <RouterLink :to="`/chat/${encodeURI(ai.name)}?extension=${item.config.name}`" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+                          <span>{{ ai.title ?? ai.name }}</span>
                         </RouterLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

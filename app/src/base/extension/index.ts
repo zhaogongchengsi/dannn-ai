@@ -78,10 +78,12 @@ export class DnExtension extends InstallEvent<Extension> {
       this.config = compiled
 
       if (compiled.aiCollection) {
-        for (const aiConfig of compiled.aiCollection) {
-          const ai = new AI(aiConfig)
+        compiled.aiCollection = compiled.aiCollection.map((aiConfig) => {
+          const newConfig = { ...aiConfig, name: this.generateId(aiConfig.name) }
+          const ai = new AI(newConfig)
           this.aihub.push(ai)
-        }
+          return newConfig
+        })
       }
 
       if (compiled.main) {

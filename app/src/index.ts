@@ -15,7 +15,8 @@ let ok = false
 window.dannn.ipc.on('window.show', async () => {
   DnApp.getInstance().init()
   document.startViewTransition(() => {
-    app.mount('#app')
+    if (!ok)
+      app.mount('#app')
     ok = true
   })
 })
