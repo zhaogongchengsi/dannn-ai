@@ -36,7 +36,8 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
       const func = level in console ? (console[level] as (...args: any[]) => void) : undefined
       if (func) {
         func.apply(console, messages)
-      } else {
+      }
+      else {
         console.log(level, ...messages)
       }
     })

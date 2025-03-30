@@ -10,17 +10,9 @@ import { extensionSchema } from '../schemas/extension'
 const dannnConfigFile = 'dannn.json'
 
 export class DnApp extends DnEvent<AppEvents> {
-  private static instance: DnApp | null = null
   public extensions: DnExtension[] = []
-  private constructor() {
+  constructor() {
     super()
-  }
-
-  public static getInstance(): DnApp {
-    if (this.instance === null) {
-      this.instance = new DnApp()
-    }
-    return this.instance
   }
 
   public init() {
@@ -82,3 +74,11 @@ export class DnApp extends DnEvent<AppEvents> {
     })
   }
 }
+
+declare global {
+  interface Window {
+    dnapp: DnApp
+  }
+}
+
+window.dnapp = new DnApp()

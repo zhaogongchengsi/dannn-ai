@@ -20,9 +20,18 @@ import {
 import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { useSidebarStore } from '@/stores/sidebar'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
+import { watch } from 'vue'
 
 const sidebar = useSidebarStore()
 const isMac = window.dannn.is.mac
+
+watch(
+  () => sidebar.sidebar,
+  (newVal) => {
+    console.log('sidebar', newVal)
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -65,25 +74,29 @@ const isMac = window.dannn.is.mac
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       <SidebarMenuItem v-for="ci in item.children" :key="ci.id">
-                      <SidebarMenuButton as-child :title="ci.tooltip ?? ci.title">
-                        <RouterLink v-if="ci.link" :to="ci.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
-                          <span>{{ ci.title }}</span>
-                        </RouterLink>
-                        <div v-else>
-                          <span>{{ ci.title }}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
+                        <SidebarMenuButton as-child :title="ci.tooltip ?? ci.title">
+                          <RouterLink v-if="ci.link" :to="ci.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+                            <span>{{ ci.title }}</span>
+                          </RouterLink>
+                          <div v-else>
+                            <span>{{ ci.title }}</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              <SidebarMenuItem v-if="item.link">
-                <SidebarMenuButton as-child :tooltip="item.tooltip ?? item.title">
-                  <RouterLink :to="item.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+              <SidebarMenuItem v-else>
+                <SidebarMenuButton v-if="item.link" as-child :tooltip="item.tooltip ?? item.title">
+                  <RouterLink v-if="item.link" :to="item.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
                     <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
                     <span>{{ item.title }}</span>
                   </RouterLink>
+                </SidebarMenuButton>
+                <SidebarMenuButton v-else>
+                  <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
+                  <span>{{ item.title }}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </template>
