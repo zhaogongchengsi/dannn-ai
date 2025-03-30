@@ -2,6 +2,7 @@
 const modules = await import('dannn://import.extension' + '{{url}}')
 .catch((error) => {
 	self.postMessage({ type: 'error', error: 'Module loading failed' + '{{url}}' + String(error) })
+	return {}
 })
 Object.keys(modules).forEach((key) => {
 	self.postMessage({ type: 'module', name: key })
