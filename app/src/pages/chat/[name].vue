@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import { DnApp } from '@/base/app/app'
 import Button from '@/components/ui/button/Button.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
 import { debounce } from 'lodash'
@@ -18,11 +19,32 @@ async function send() {
   if (!message)
     return
 
-  console.log('message', message)
+  const ai = DnApp.getInstance().findAI(route.query.extension as string, route.params.name)
 
-  toast(`正在发送消息...${message}`, {
-    description: '请稍等片刻',
-  })
+  console.log('AI', ai)
+
+  if (!ai) {
+    error.value = new Error('AI not found')
+    return
+  }
+
+  if (waitAnswer.value) {
+    toast.error('请等待上一个请求完成')
+    return
+  }
+
+  const response = await ai.chat(messageValue.value)
+
+  console.log(response)
+
+  for await (const chunk of response) {
+    console.log(chunk)
+    const content = chunk.choices[0]?.delta?.content || '';
+    resultValue.value += content
+  }
+
+  waitAnswer.value = false
+
   messageValue.value = ''
 }
 
@@ -36,7 +58,7 @@ const onSend = debounce(send, 500)
     </div>
     <div v-else class="w-full flex flex-col h-full">
       <div class="flex-1 overflow-auto">
-        {{ route.params.name }} / {{ route.query.extension }}
+        {{ resultValue }}
       </div>
       <div class="p-2 border-t">
         <Textarea v-model="messageValue" :disabled="waitAnswer" placeholder="有什么可以帮您..." />

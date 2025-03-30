@@ -59,6 +59,10 @@ export class DnExtension extends InstallEvent<Extension> {
     return normalized
   }
 
+  findAI(name: string) {
+    return this.aihub.find(ai => ai.name === name)
+  }
+
   async load() {
     const config = this.rawConfig
 
