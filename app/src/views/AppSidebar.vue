@@ -10,20 +10,26 @@ import {
   SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
 } from '@/components/ui/sidebar'
+import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { useExtension } from '@/composables/extension'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 
 const extension = useExtension()
+const isMac = window.dannn.is.mac
 </script>
 
 <template>
-  <Sidebar collapsible="icon">
+  <Sidebar :collapsible="isMac ? 'none' : 'icon'">
+    <SidebarHeader class="items-end">
+      <SidebarTrigger />
+    </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>
         <SidebarGroupLabel>AI</SidebarGroupLabel>

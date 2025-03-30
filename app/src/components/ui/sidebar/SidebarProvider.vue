@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HTMLAttributes, Ref } from 'vue'
 import { cn } from '@/lib/utils'
-import { useEventListener, useMediaQuery, useVModel } from '@vueuse/core'
+import { useEventListener, useVModel } from '@vueuse/core'
 import { TooltipProvider } from 'reka-ui'
 import { computed, ref, watch } from 'vue'
 import { provideSidebarContext, SIDEBAR_COOKIE_MAX_AGE, SIDEBAR_COOKIE_NAME, SIDEBAR_KEYBOARD_SHORTCUT, SIDEBAR_WIDTH, SIDEBAR_WIDTH_ICON } from './utils'
@@ -20,7 +20,8 @@ const emits = defineEmits<{
   'update:is-mobile': [isMobile: boolean]
 }>()
 
-const isMobile = useMediaQuery('(max-width: 768px)')
+// const isMobile = useMediaQuery('(max-width: 768px)')
+const isMobile = ref(false)
 const openMobile = ref(false)
 
 watch(isMobile, (value) => {

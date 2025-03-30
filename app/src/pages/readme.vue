@@ -1,12 +1,11 @@
 <script setup lang='ts'>
-import type { DnExtension } from '@/base/extension'
 import Button from '@/components/ui/button/Button.vue'
 import { Toggle } from '@/components/ui/toggle'
 import { useConfig } from '@/composables/config'
 import { useExtension } from '@/composables/extension'
 import { markdownToHtml } from '@/lib/shiki'
 import { computedAsync } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -14,7 +13,6 @@ const config = useConfig()
 
 const id = route.query.id as string
 const extension = useExtension()
-const currenPlugin = ref<DnExtension>()
 
 const metadata = computed(() => {
   const id = route.query.id as string

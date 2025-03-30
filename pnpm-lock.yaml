@@ -113,6 +113,9 @@ importers:
       shiki:
         specifier: ^3.2.1
         version: 3.2.1
+      std-env:
+        specifier: ^3.8.1
+        version: 3.8.1
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.0.2
