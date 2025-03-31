@@ -1,8 +1,8 @@
 import type { Sidebar } from '@/base/types/sidebar'
 import { useAppRx } from '@/base/rxjs/hook'
+import { unionBy } from 'lodash'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { unionBy } from 'lodash'
 
 export const useSidebarStore = defineStore('dannn-sidebar', () => {
   const sidebar = ref<Sidebar[]>([])

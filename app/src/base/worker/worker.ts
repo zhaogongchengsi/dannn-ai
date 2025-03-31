@@ -1,8 +1,7 @@
-/* eslint-disable no-case-declarations */
-import type { DnWorkerEvents, WorkerMessage } from '../types/worker'
-import { DnEvent } from '../common/event'
+import type { WorkerCallErrorMessage, WorkerCallMessage, WorkerCallResultMessage, WorkerMessage, WorkerModuleMessage } from '../types/worker'
+import { filter, Subject } from 'rxjs'
 
-export class DnWorker extends DnEvent<DnWorkerEvents> {
+export class WorkerBridge extends Subject<WorkerMessage> {
   private worker: Worker | null = null
   private isReady = false
   name: string
@@ -19,89 +18,100 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
     this.worker = new Worker(`dannn://import.extension/${url}?name=${name}`, {
       type: 'module',
     })
+
     this.worker.onmessage = (e) => {
-      this.emit('worker:message', e.data)
-      this.onMessage(e)
+      this.next(e.data)
     }
 
     this.worker.onerror = (e) => {
-      this.emit('worker:error', e)
+      this.next({
+        type: 'error',
+        error: e.message,
+      })
     }
 
     this.worker.onmessageerror = (e) => {
-      this.emit('worker:messageerror', e)
+      this.next({
+        type: 'error',
+        error: e.data,
+      })
     }
 
-    this.expose('log', (level: keyof Console, ...messages: any[]) => {
-      // eslint-disable-next-line no-console
-      const func = level in console ? (console[level] as (...args: any[]) => void) : undefined
-      if (func) {
-        func.apply(console, messages)
-      }
-      else {
-        // eslint-disable-next-line no-console
-        console.log(level, ...messages)
-      }
-    })
+    this.pipe(filter(message => 'type' in message)).subscribe(this.onMessage.bind(this))
   }
 
   terminate() {
     if (this.worker) {
       this.worker.terminate()
       this.worker = null
-      this.emit('unloaded', undefined)
     }
   }
 
-  private onMessage(message: any) {
-    if (!('type' in message.data)) {
-      return
+  private handleDone() {
+    this.isReady = true
+    if (this.donePromiser) {
+      this.donePromiser.resolve()
+      this.donePromiser = null
     }
-    message = message as WorkerMessage
-    switch (message.data.type) {
+  }
+
+  private handleCallResult(message: WorkerCallResultMessage) {
+    const promiser = this.promiserMap.get(message.id)
+    if (promiser) {
+      promiser.resolve(message.result)
+    }
+  }
+
+  private handleError(message: WorkerCallErrorMessage) {
+    const promiser = this.promiserMap.get(message.id)
+    if (promiser) {
+      promiser.reject(new Error(message.error))
+    }
+  }
+
+  private handleModule(message: WorkerModuleMessage) {
+    this.readyMethodsName.add(message.name)
+  }
+
+  private handleCall(message: WorkerCallMessage) {
+    const { id, args, name } = message
+    const handler = this.handlers.get(name)
+    if (handler) {
+      Promise.resolve(handler.apply(this, [args[0], ...args.slice(1)]))
+        .then((result) => {
+          this.postMessage({
+            type: 'call-result-from-window',
+            id,
+            result,
+          })
+        })
+        .catch((error) => {
+          this.postMessage({
+            type: 'call-result-from-window',
+            id,
+            error: error.message,
+          })
+        })
+    }
+  }
+
+  private onMessage(message: WorkerMessage) {
+    switch (message.type) {
       case 'done':
-        this.isReady = true
-        this.emit('loaded', this.name)
-        if (this.donePromiser) {
-          this.donePromiser.resolve()
-          this.donePromiser = null
-        }
+        this.handleDone()
         break
       case 'call-result':
-        const promiser = this.promiserMap.get(message.data.id)
-        if (promiser) {
-          promiser.resolve(message.data.result)
-        }
+        this.handleCallResult(message)
         break
       case 'call-error':
-        const promiserError = this.promiserMap.get(message.data.id)
-        if (promiserError) {
-          promiserError.reject(new Error(message.data.error))
-        }
+        this.handleError(message)
         break
       case 'module':
-        this.readyMethodsName.add(message.data.name)
+        this.handleModule(message)
         break
       case 'call':
-        const { id, args, name } = message.data
-        const handler = this.handlers.get(name)
-        if (handler) {
-          Promise.resolve(handler.apply(this, args))
-            .then((result) => {
-              this.postMessage({
-                type: 'call-result-from-window',
-                id,
-                result,
-              })
-            })
-            .catch((error) => {
-              this.postMessage({
-                type: 'call-result-from-window',
-                id,
-                error: error.message,
-              })
-            })
-        }
+        this.handleCall(message)
+        break
     }
   }
 
@@ -143,7 +153,7 @@ export class DnWorker extends DnEvent<DnWorkerEvents> {
     this.handlers.set(name, handler)
   }
 
-  generateId(): string {
+  private generateId(): string {
     return `${this.name}-${Date.now()}-${Math.random().toString(36)}`
   }
 

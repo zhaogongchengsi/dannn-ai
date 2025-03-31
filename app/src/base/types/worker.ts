@@ -24,18 +24,16 @@ export interface WorkerModuleMessage {
   name: string
 }
 
-export type WorkerMessage = WorkerDoneMessage | WorkerErrorMessage | WorkerCallResultMessage | WorkerCallErrorMessage | WorkerModuleMessage
-
-export interface DnWorkerEvents {
-  'error': Error
-  'loaded': string
-  'unloaded': void
-  'status-changed': string
-  'worker:message': WorkerMessage
-  'worker:error': any
-  'worker:messageerror': any
-  'worker:log': {
-    level: keyof Console
-    messages: string[]
-  }
+export interface WorkerCallMessage {
+  type: 'call'
+  id: string
+  name: string
+  args: any[]
 }
+
+export type WorkerMessage = WorkerCallMessage |
+  WorkerDoneMessage |
+  WorkerErrorMessage |
+  WorkerCallResultMessage |
+  WorkerCallErrorMessage |
+  WorkerModuleMessage
