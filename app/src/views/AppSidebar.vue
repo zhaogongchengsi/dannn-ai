@@ -19,6 +19,7 @@ import {
   SidebarMenuSub,
 } from '@/components/ui/sidebar'
 import { useSidebarStore } from '@/stores/sidebar'
+import { cloneDeep } from 'lodash'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 import { onMounted, onUnmounted } from 'vue'
 
@@ -43,6 +44,12 @@ rx.onExtensionLoaded((extension) => {
     tooltip: extension.description,
     fromExtended: true,
     isRoot: true,
+  })
+
+  const data = cloneDeep(sidebar.sidebar)
+
+  extension.expose('getAllSidebar', () => {
+    return data
   })
 })
 </script>
