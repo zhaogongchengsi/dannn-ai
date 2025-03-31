@@ -1,7 +1,8 @@
 import type { Extension, ExtensionPermissions } from '../schemas/extension'
 import type { CreateExtensionOptions, ExtensionNeedModule } from '../types/extension'
+import type { Sidebar } from '../types/sidebar'
 import { compact, join } from 'lodash'
-import { filter } from 'rxjs'
+import { filter, ReplaySubject } from 'rxjs'
 import { WorkerBridge } from './bridge'
 
 export class ExtensionWorker extends WorkerBridge {
@@ -19,6 +20,8 @@ export class ExtensionWorker extends WorkerBridge {
 
   readme: string | undefined
 
+  ready$ = new ReplaySubject<boolean>(1)
+
   constructor(config: Extension, options: CreateExtensionOptions) {
     super(config.name, config.main)
     this.dir = options.pluginDir
@@ -33,6 +36,7 @@ export class ExtensionWorker extends WorkerBridge {
     this.toMessageObservable().pipe(filter(message => message.type === 'done')).subscribe(async () => {
       await this.initEnv(config.permissions)
       await this.activate()
+      this.ready$.next(true)
     })
   }
 
@@ -89,6 +93,12 @@ export class ExtensionWorker extends WorkerBridge {
   implementation(module: ExtensionNeedModule) {
     Object.keys(module).forEach((key) => {
       this.expose(key, module[key as keyof ExtensionNeedModule])
+    })
+  }
+
+  sidebarReady() {
+    this.ready$.subscribe(() => {
+      this.emitToWorker('sidebar-ready')
     })
   }
 }

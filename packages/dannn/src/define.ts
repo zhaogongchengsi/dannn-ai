@@ -32,6 +32,5 @@ export function defineExtension(func: (ctx: ExtensionContext) => void) {
 
 	baseWorker.expose('activate',activate)
 	baseWorker.expose('deactivate',deactivate)
-
 	baseWorker.done()
 }

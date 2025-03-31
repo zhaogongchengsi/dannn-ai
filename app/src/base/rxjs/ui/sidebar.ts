@@ -15,6 +15,6 @@ export function sidebarDestroy() {
   sidebarReady$.unsubscribe()
 }
 
-export function onSidebarReady(func: (...data: Sidebar[]) => void) {
-  return sidebarStore$.subscribe((data: Sidebar[]) => func(...data))
+export function onSidebarReady(func: () => void) {
+  return sidebarReady$.subscribe(func)
 }

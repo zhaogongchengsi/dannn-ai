@@ -5,6 +5,7 @@ import { formatZodError } from '../common/zod'
 import { extensionSchema } from '../schemas/extension'
 import { ExtensionWorker } from '../worker/worker'
 import { APP_EXTENSION_CONFIG_NAME } from './constant'
+import { onSidebarReady } from './ui/sidebar'
 
 const workers: Map<string, ExtensionWorker> = new Map()
 export const extensionWorkerSubject = new Subject<ExtensionWorker>()
@@ -40,6 +41,7 @@ export function extensionDestroy() {
 export async function loadLocalExtensions() {
   const root = await getExtensionsRoot()
   const extensions = await window.dannn.readDir(root)
+
   extensions.forEach(async (extension) => {
     try {
       const pluginDir = join(root, extension)
@@ -67,6 +69,9 @@ export async function loadLocalExtensions() {
       const extensionWorker = new ExtensionWorker(data, { pluginDir, dirname: extension })
       workers.set(extensionWorker.id, extensionWorker)
       extensionWorkerSubject.next(extensionWorker)
+      onSidebarReady(() => {
+        extensionWorker.sidebarReady()
+      })
     }
     catch (error) {
       console.error('Error loading extension:', error)

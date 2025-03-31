@@ -1,10 +1,14 @@
 import { defineExtension } from '../../dannn/src/define';
 
-defineExtension((ctx) => {
-	ctx.logger.log('DeepSeek extension activated');
+defineExtension(({ logger, window }) => {
+	logger.log('DeepSeek extension activated');
 
-	ctx.window.onSidebarReady((data) => {
+	window.onSidebarReady(async (data) => {
 		console.log('Sidebar ready:', data);
+
+		const list = await window.getAllSidebars()	
+
+		console.log('All sidebars:', list);
 	})
 })
 

@@ -27,7 +27,7 @@ import { onMounted, onUnmounted } from 'vue'
 const isMac = window.dannn.is.mac
 
 const rx = useAppRx()
-const sidebar = useSidebarStore()
+const sidebarStore = useSidebarStore()
 
 onMounted(() => {
   rx.sidebarReady()
@@ -38,7 +38,7 @@ onUnmounted(() => {
 })
 
 rx.onExtensionLoaded((extension) => {
-  sidebar.addSidebar({
+  sidebarStore.addSidebar({
     id: extension.id,
     title: extension.name,
     icon: extension.icon,
@@ -48,13 +48,13 @@ rx.onExtensionLoaded((extension) => {
   })
 
   extension.implementation({
-    getAllSidebars: async () => cloneDeep(sidebar.sidebar),
+    getAllSidebars: async () => cloneDeep(sidebarStore.sidebar),
     createSidebar: async (sidebarItem: SidebarType) => {
-      sidebar.addSidebar(sidebarItem)
+      sidebarStore.addSidebar(sidebarItem)
       return sidebarItem
     },
     getSidebar: async (id: string) => {
-      const sidebarItem = sidebar.getSidebar(id)
+      const sidebarItem = sidebarStore.getSidebar(id)
       if (!sidebarItem) {
         return undefined
       }
@@ -77,7 +77,7 @@ rx.onExtensionLoaded((extension) => {
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            <template v-for="item in sidebar.sidebar" :key="item.id">
+            <template v-for="item in sidebarStore.sidebar" :key="item.id">
               <Collapsible v-if="item.children && item.children.length" class="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger as-child>

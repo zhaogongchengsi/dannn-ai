@@ -14,13 +14,16 @@ export type WorkerFromWindowCallMessage = {
 	args: any[]
 }
 
-export type WorkerFromWindowMessage = WorkerFromWindowResultMessage | WorkerFromWindowCallMessage
-
-export type WorkerEvent = {
-	'message': WorkerFromWindowMessage
+export type WorkerFromWindowEventMessage = {
+	name: string
+	type: 'event'
+	args: any
 }
 
-export class BaseWorker<Event> extends Event<WorkerEvent & Event> {
+export type WorkerFromWindowMessage = WorkerFromWindowEventMessage | WorkerFromWindowResultMessage | WorkerFromWindowCallMessage
+
+
+export class BaseWorker<E> extends Event<WorkerFromWindowMessage & E> {
 	// @ts-ignore
 	private promiserMap = new Map<string, PromiseWithResolvers<any>>()
 	private handlers = new Map<string, (...args: any[]) => void>()
@@ -35,11 +38,16 @@ export class BaseWorker<Event> extends Event<WorkerEvent & Event> {
 	}
 
 	private onMessage(message: any) {
-		const data = message.data as WorkerFromWindowMessage
+		const data = message.data as any
+
 		if (!('type' in message.data)) {
 			return
 		}
-		
+
+		if (data.type === 'event') {
+			this.emit(data.name, data.args)
+		}
+
 		if (data.type === 'call-result-from-window') {
 			const { id, result, error } = data
 			const promiser = this.promiserMap.get(id)

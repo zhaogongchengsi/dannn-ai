@@ -11,6 +11,7 @@ export class WorkerBridge {
   donePromiser: PromiseWithResolvers<void> | null = null
   handlers: Map<string, (arg1: any, ...args: any[]) => void> = new Map()
   subject: Subject<WorkerMessage> = new Subject()
+  waitResolved: Set<WorkerCallMessage> = new Set()
 
   constructor(name: string, url: string) {
     this.name = name
@@ -79,7 +80,7 @@ export class WorkerBridge {
 
   private handleCall(message: WorkerCallMessage) {
     const { id, args, name } = message
-    const handler = this.handlers.get(name)
+    const handler = this.handlers.get(name.trim())
     if (handler) {
       Promise.resolve(handler.apply(this, [args[0], ...args.slice(1)]))
         .then((result) => {
@@ -96,6 +97,12 @@ export class WorkerBridge {
             error: error.message,
           })
         })
+        .finally(() => {
+          this.waitResolved.delete(message)
+        })
+    }
+    else {
+      this.waitResolved.add(message)
     }
   }
 
@@ -165,6 +172,9 @@ export class WorkerBridge {
       })
     }
     this.handlers.set(name, handler)
+    this.waitResolved.forEach((message) => {
+      this.handleCall(message)
+    })
   }
 
   private generateId(): string {
@@ -182,6 +192,16 @@ export class WorkerBridge {
   postMessage(message: any) {
     if (this.worker) {
       this.worker.postMessage(message)
+    }
+  }
+
+  emitToWorker(name: string, event?: any) {
+    if (this.worker) {
+      this.worker.postMessage({
+        type: 'event',
+        name,
+        args: event,
+      })
     }
   }
 }
