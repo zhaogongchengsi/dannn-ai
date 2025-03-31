@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/sonner'
 import WindowMenus from '@/components/window-menus.vue'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
+import { useAppRx } from './base/rxjs/hook'
 import SidebarProvider from './components/ui/sidebar/SidebarProvider.vue'
 import { useConfig } from './composables/config'
 import AppSidebar from './views/AppSidebar.vue'
@@ -11,6 +12,7 @@ const isOpen = useStorage('app-sidebar', false)
 const isMobile = ref(false)
 
 const config = useConfig()
+const rx = useAppRx()
 
 config.init()
 
@@ -29,6 +31,10 @@ const toasterTheme = computed(() => {
     return 'system'
   }
   return mode === 'dark' ? 'dark' : 'light'
+})
+
+rx.onToasterReady((config) => {
+  console.log('Toaster ready', config)
 })
 </script>
 

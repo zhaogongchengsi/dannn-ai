@@ -1,4 +1,4 @@
-import type { formatZodError } from '../common/zod'
+import type { formatZodError } from './zod'
 
 export class PluginValidationError extends Error {
   public readonly details: Array<{

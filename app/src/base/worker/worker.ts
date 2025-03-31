@@ -1,174 +1,71 @@
-import type { WorkerCallErrorMessage, WorkerCallMessage, WorkerCallResultMessage, WorkerMessage, WorkerModuleMessage } from '../types/worker'
-import { filter, Subject } from 'rxjs'
+import type { Extension, ExtensionPermissions } from '../schemas/extension'
+import type { CreateExtensionOptions } from '../types/extension'
+import { compact, join } from 'lodash'
+import { WorkerBridge } from './bridge'
 
-export class WorkerBridge extends Subject<WorkerMessage> {
-  private worker: Worker | null = null
-  private isReady = false
+export class ExtensionWorker extends WorkerBridge {
   name: string
   url: string
-  promiserMap: Map<string, PromiseWithResolvers<any>> = new Map()
-  readyMethodsName: Set<string> = new Set()
-  donePromiser: PromiseWithResolvers<void> | null = null
-  handlers: Map<string, (arg1: any, ...args: any[]) => void> = new Map()
+  version: string
+  icon: string | undefined
+  description: string | undefined
+  id: string
 
-  constructor(name: string, url: string) {
-    super()
-    this.name = name
-    this.url = url
-    this.worker = new Worker(`dannn://import.extension/${url}?name=${name}`, {
-      type: 'module',
+  permissions: ExtensionPermissions | undefined
+  env: Record<string, string> = {}
+  dir: string
+  dirname: string
+
+  readme: string | undefined
+
+  constructor(config: Extension, options: CreateExtensionOptions) {
+    super(config.name, config.main)
+    this.dir = options.pluginDir
+    this.dirname = options.dirname
+    this.id = this.generateExtensionId(config.name)
+    this.name = config.name
+    this.url = config.main
+    this.version = config.version
+    this.icon = config.icon
+    this.description = config.description
+    this.initReadme()
+    this.toMessageObservable().subscribe(async (message) => {
+      if (message.type === 'done') {
+        await this.initEnv(config.permissions)
+        this.activate()
+      }
     })
-
-    this.worker.onmessage = (e) => {
-      this.next(e.data)
-    }
-
-    this.worker.onerror = (e) => {
-      this.next({
-        type: 'error',
-        error: e.message,
-      })
-    }
-
-    this.worker.onmessageerror = (e) => {
-      this.next({
-        type: 'error',
-        error: e.data,
-      })
-    }
-
-    this.pipe(filter(message => 'type' in message)).subscribe(this.onMessage.bind(this))
   }
 
-  terminate() {
-    if (this.worker) {
-      this.worker.terminate()
-      this.worker = null
+  private generateExtensionId(name: string) {
+    const normalized = name
+      .toLowerCase()
+      // 替换连续非字母数字字符为单个连字符
+      .replace(/[^a-z0-9]+/g, '-')
+      // 移除首尾连字符
+      .replace(/^-+|-+$/g, '')
+      // 截断至合理长度
+      .slice(0, 50)
+    return normalized
+  }
+
+  private async initEnv(permissions?: ExtensionPermissions) {
+    if (!permissions?.env) {
+      return {}
     }
+    return await window.dannn.getEnv(permissions.env)
+      .catch(() => ({} as Record<string, string>))
   }
 
-  private handleDone() {
-    this.isReady = true
-    if (this.donePromiser) {
-      this.donePromiser.resolve()
-      this.donePromiser = null
-    }
-  }
-
-  private handleCallResult(message: WorkerCallResultMessage) {
-    const promiser = this.promiserMap.get(message.id)
-    if (promiser) {
-      promiser.resolve(message.result)
-    }
-  }
-
-  private handleError(message: WorkerCallErrorMessage) {
-    const promiser = this.promiserMap.get(message.id)
-    if (promiser) {
-      promiser.reject(new Error(message.error))
-    }
-  }
-
-  private handleModule(message: WorkerModuleMessage) {
-    this.readyMethodsName.add(message.name)
-  }
-
-  private handleCall(message: WorkerCallMessage) {
-    const { id, args, name } = message
-    const handler = this.handlers.get(name)
-    if (handler) {
-      Promise.resolve(handler.apply(this, [args[0], ...args.slice(1)]))
-        .then((result) => {
-          this.postMessage({
-            type: 'call-result-from-window',
-            id,
-            result,
-          })
-        })
-        .catch((error) => {
-          this.postMessage({
-            type: 'call-result-from-window',
-            id,
-            error: error.message,
-          })
-        })
-    }
-  }
-
-  private onMessage(message: WorkerMessage) {
-    switch (message.type) {
-      case 'done':
-        this.handleDone()
-        break
-      case 'call-result':
-        this.handleCallResult(message)
-        break
-      case 'call-error':
-        this.handleError(message)
-        break
-      case 'module':
-        this.handleModule(message)
-        break
-      case 'call':
-        this.handleCall(message)
-        break
-    }
-  }
-
-  invoke<T>(name: string, ...args: any[]) {
-    if (!this.readyMethodsName.has(name)) {
-      return Promise.reject(new Error(`Method ${name} not ready`))
-    }
-
-    const id = this.generateId()
-    if (!this.isReady) {
-      return Promise.reject(new Error('Worker not ready'))
-    }
-
-    const promiser = Promise.withResolvers<T>()
-
-    this.promiserMap.set(id, promiser)
-
-    this.postMessage({
-      type: 'call',
-      name,
-      args,
-      id,
-    })
-
-    promiser.promise.finally(() => {
-      this.promiserMap.delete(id)
-    })
-
-    return promiser.promise
-  }
-
-  expose(name: string, handler: (arg1: any, ...args: any[]) => void) {
-    if (this.isWorkerLoaded) {
-      this.postMessage({
-        type: 'expose',
-        name,
-      })
-    }
-    this.handlers.set(name, handler)
-  }
-
-  private generateId(): string {
-    return `${this.name}-${Date.now()}-${Math.random().toString(36)}`
-  }
-
-  get isWorkerReady() {
-    return this.isReady
-  }
-
-  get isWorkerLoaded() {
-    return this.worker !== null
-  }
-
-  postMessage(message: any) {
-    if (this.worker) {
-      this.worker.postMessage(message)
-    }
+  private async initReadme() {
+    const readme = compact(await Promise.all(['README.md', 'README.MD', 'readme.md', 'readme.MD'].map(async (file) => {
+      const readmePath = join(this.dir, file)
+      if (await window.dannn.exists(readmePath)) {
+        return window.dannn.readFile(readmePath)
+      }
+      return undefined
+    })).catch(() => []))
+    this.readme = readme.join('\n')
   }
 
   async activate() {
