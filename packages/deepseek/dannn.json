@@ -6,7 +6,7 @@
 	"author": "DeepSeek Team",
 	"homepage": "https://deepseek.com",
 	"main": "./index.js",
-	"permission": {
+	"permissions": {
 		"env": ["DEEPSEEK_API_KEY"]
 	}
 }
