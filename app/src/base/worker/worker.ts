@@ -5,6 +5,9 @@ import { WorkerBridge } from './bridge'
 import { filter } from 'rxjs'
 
 export class ExtensionWorker extends WorkerBridge {
+  destroy() {
+    throw new Error('Method not implemented.')
+  }
   name: string
   url: string
   version: string

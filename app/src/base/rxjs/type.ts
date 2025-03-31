@@ -19,4 +19,6 @@ export interface AppRx {
   onSidebarReady: (func: (...data: Sidebar[]) => void) => Subscription
   onToasterReady: (func: (data: Toaster) => void) => Subscription
   toasterReady: () => void
+  extensionDestroy: () => void
+  onExtensionLoaded: (callback: (worker: ExtensionWorker) => void) => Subscription
 }
