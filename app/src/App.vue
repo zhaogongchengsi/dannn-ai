@@ -2,7 +2,7 @@
 import { Toaster } from '@/components/ui/sonner'
 import WindowMenus from '@/components/window-menus.vue'
 import { useStorage } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { useAppRx } from './base/rxjs/hook'
 import SidebarProvider from './components/ui/sidebar/SidebarProvider.vue'
@@ -34,9 +34,11 @@ const toasterTheme = computed(() => {
   return mode === 'dark' ? 'dark' : 'light'
 })
 
+onMounted(() => rx.toasterReady())
+
 rx.onToasterReady((config) => {
   console.log('Toaster ready', config)
-  toast('', {})
+  // toast('', {})
 })
 </script>
 

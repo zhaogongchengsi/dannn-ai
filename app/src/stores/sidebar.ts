@@ -16,9 +16,9 @@ export const useSidebarStore = defineStore('dannn-sidebar', () => {
     ]
   }
 
-  rx.onSidebarReady((...data: Sidebar[]) => {
-    sidebar.value = unionBy(sidebar.value, data, 'id')
-  })
+  // rx.onSidebarReady((...data: Sidebar[]) => {
+  //   sidebar.value = unionBy(sidebar.value, data, 'id')
+  // })
 
   return {
     sidebar,

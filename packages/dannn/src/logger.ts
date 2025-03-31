@@ -7,19 +7,18 @@ export class Logger extends BaseWorker<any> {
 	}
 
 	log(... messages : string[]) {
-		this.invoke('log', 'log', ...messages)
+		console.log(...messages)
 	}
 
 	info(... messages : string[]) {
-		this.invoke('log', 'info', ...messages)
+		console.info(...messages)
 	}
 
 	warn(... messages : string[]) {
-		this.invoke('log', 'warn', ...messages)
+		console.warn(...messages)
 	}
 
 	error(... messages : string[]) {
-		this.invoke('log', 'error', ...messages)
+		console.error(...messages)
 	}
-
 }

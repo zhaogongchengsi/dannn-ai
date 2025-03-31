@@ -1,7 +1,7 @@
 import type { WorkerCallErrorMessage, WorkerCallMessage, WorkerCallResultMessage, WorkerMessage, WorkerModuleMessage } from '../types/worker'
 import { filter, Subject } from 'rxjs'
 
-export class WorkerBridge extends Subject<WorkerMessage> {
+export class WorkerBridge {
   private worker: Worker | null = null
   isReady = false
   name: string
@@ -10,9 +10,9 @@ export class WorkerBridge extends Subject<WorkerMessage> {
   readyMethodsName: Set<string> = new Set()
   donePromiser: PromiseWithResolvers<void> | null = null
   handlers: Map<string, (arg1: any, ...args: any[]) => void> = new Map()
+  subject: Subject<WorkerMessage> = new Subject()
 
   constructor(name: string, url: string) {
-    super()
     this.name = name
     this.url = url
     this.worker = new Worker(`dannn://import.extension/${url}?name=${name}`, {
@@ -20,28 +20,28 @@ export class WorkerBridge extends Subject<WorkerMessage> {
     })
 
     this.worker.onmessage = (e) => {
-      this.next(e.data)
+      this.subject.next(e.data)
     }
 
     this.worker.onerror = (e) => {
-      this.next({
+      this.subject.next({
         type: 'error',
         error: e.message,
       })
     }
 
     this.worker.onmessageerror = (e) => {
-      this.next({
+      this.subject.next({
         type: 'error',
         error: e.data,
       })
     }
 
-    this.pipe(filter(message => 'type' in message)).subscribe(this.onMessage.bind(this))
+    this.subject.pipe(filter(message => 'type' in message)).subscribe(this.onMessage.bind(this))
   }
 
   toMessageObservable() {
-    return this.pipe(filter(message => 'type' in message))
+    return this.subject.pipe(filter(message => 'type' in message))
   }
 
   terminate() {

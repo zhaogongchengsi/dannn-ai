@@ -20,18 +20,16 @@ import {
 } from '@/components/ui/sidebar'
 import { useSidebarStore } from '@/stores/sidebar'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 
 const rx = useAppRx()
 
 onMounted(() => {
   rx.sidebarReady()
-  // try {
+})
 
-  // }
-  // catch (e) {
-  //   console.error('Sidebar ready error:', e)
-  // }
+onUnmounted(() => {
+  rx.sidebarDestroy()
 })
 
 const sidebar = useSidebarStore()

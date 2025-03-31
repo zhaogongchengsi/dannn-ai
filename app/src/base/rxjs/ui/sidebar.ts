@@ -10,6 +10,11 @@ export function sidebarReady() {
   sidebarReady$.next(true)
 }
 
+export function sidebarDestroy() {
+  sidebarSubject.unsubscribe()
+  sidebarReady$.unsubscribe()
+}
+
 export function onSidebarReady(func: (...data: Sidebar[]) => void) {
   return sidebarStore$.subscribe((data: Sidebar[]) => func(...data))
 }

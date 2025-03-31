@@ -4,14 +4,15 @@ import { combineLatest } from 'rxjs'
 import { appMount, appMount$, appReady$, onAppReady } from './app'
 import { APP_PROVIDE_RX_KEY } from './constant'
 import { extensionWorkerSubject, getExtensionWorker, getExtensionWorkers } from './extensions'
-import { onSidebarReady, sidebarReady, sidebarReady$, sidebarStore$ } from './ui/sidebar'
-import { onToasterReady, toasterReady$ } from './ui/toaster'
+import { onSidebarReady, sidebarReady, sidebarReady$, sidebarStore$, sidebarDestroy } from './ui/sidebar'
+import { onToasterReady, toasterReady, toasterReady$ } from './ui/toaster'
+
+combineLatest([appMount$, sidebarReady$, toasterReady$]).subscribe(() => {
+  console.log('all ready')
+  appReady$.next(true)
+})
 
 export function createRx(): Plugin {
-  combineLatest([appMount$, sidebarReady$, toasterReady$]).subscribe(() => {
-    appReady$.next(true)
-  })
-
   const $rx = {
     appMount$,
     appReady$,
@@ -22,9 +23,11 @@ export function createRx(): Plugin {
     getExtensionWorkers,
     appMount,
     sidebarReady,
+    sidebarDestroy,
     onAppReady,
     onSidebarReady,
     onToasterReady,
+    toasterReady
   }
 
   return {

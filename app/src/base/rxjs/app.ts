@@ -10,7 +10,7 @@ export function appMount() {
 }
 
 export function onAppReady(func: () => void) {
-  return appReady$.asObservable().subscribe(func)
+  return appReady$.subscribe(func)
 }
 
 onAppReady(() => {

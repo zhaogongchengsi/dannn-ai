@@ -12,9 +12,11 @@ export interface AppRx {
   extensionWorkerSubject: Subject<ExtensionWorker>
   getExtensionWorker: (id: string) => ExtensionWorker | undefined
   getExtensionWorkers: () => ExtensionWorker[]
+  sidebarDestroy: () => void
   appMount: () => void
   sidebarReady: () => void
   onAppReady: (func: () => void) => Subscription
   onSidebarReady: (func: (...data: Sidebar[]) => void) => Subscription
   onToasterReady: (func: (data: Toaster) => void) => Subscription
+  toasterReady: () => void
 }

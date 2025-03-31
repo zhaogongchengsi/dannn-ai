@@ -2,6 +2,7 @@ import type { Extension, ExtensionPermissions } from '../schemas/extension'
 import type { CreateExtensionOptions } from '../types/extension'
 import { compact, join } from 'lodash'
 import { WorkerBridge } from './bridge'
+import { filter } from 'rxjs'
 
 export class ExtensionWorker extends WorkerBridge {
   name: string
@@ -29,11 +30,9 @@ export class ExtensionWorker extends WorkerBridge {
     this.icon = config.icon
     this.description = config.description
     this.initReadme()
-    this.toMessageObservable().subscribe(async (message) => {
-      if (message.type === 'done') {
-        await this.initEnv(config.permissions)
-        this.activate()
-      }
+    this.toMessageObservable().pipe(filter(message => message.type === 'done')).subscribe(async () => {
+      await this.initEnv(config.permissions)
+      await this.activate()
     })
   }
 
