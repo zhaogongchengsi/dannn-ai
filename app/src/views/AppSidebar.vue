@@ -22,7 +22,10 @@ import { useSidebarStore } from '@/stores/sidebar'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 import { onMounted, onUnmounted } from 'vue'
 
+const isMac = window.dannn.is.mac
+
 const rx = useAppRx()
+const sidebar = useSidebarStore()
 
 onMounted(() => {
   rx.sidebarReady()
@@ -32,8 +35,6 @@ onUnmounted(() => {
   rx.sidebarDestroy()
 })
 
-const sidebar = useSidebarStore()
-const isMac = window.dannn.is.mac
 </script>
 
 <template>

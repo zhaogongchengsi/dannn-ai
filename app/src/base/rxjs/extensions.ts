@@ -17,6 +17,26 @@ export function getExtensionWorkers() {
   return Array.from(workers.values())
 }
 
+export function onExtensionLoaded(callback: (worker: ExtensionWorker) => void) {
+  return extensionWorkerSubject.subscribe(callback)
+}
+
+export function removeExtensionWorker(id: string) {
+  const worker = workers.get(id)
+  if (worker) {
+    worker.destroy()
+    workers.delete(id)
+  }
+}
+
+export function extensionDestroy() {
+  workers.forEach((worker) => {
+    worker.destroy()
+  })
+  workers.clear()
+  extensionWorkerSubject.complete()
+}
+
 export async function loadLocalExtensions() {
   const root = await getExtensionsRoot()
   const extensions = await window.dannn.readDir(root)
