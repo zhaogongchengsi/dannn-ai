@@ -36,9 +36,11 @@ const toasterTheme = computed(() => {
   <div class="w-screen h-screen">
     <SidebarProvider v-model:open="isOpen" v-model:is-mobile="isMobile" class="h-screen w-screen">
       <AppSidebar />
-      <section class="overflow-auto ml-auto h-screen" :style="{ width: mainContentWidth }">
-        <WindowMenus v-if="isWindow" />
-        <router-view />
+      <section class="ml-auto h-screen relative" :style="{ width: mainContentWidth }">
+        <WindowMenus v-if="isWindow" class="w-full p-1" />
+        <main class="w-full overflow-auto" :style="{ height: isWindow ? 'calc(100vh - 36px)' : '0px' }">
+          <router-view />
+        </main>
       </section>
     </SidebarProvider>
     <Toaster :theme="toasterTheme" />

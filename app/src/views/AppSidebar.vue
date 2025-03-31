@@ -18,7 +18,6 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
 } from '@/components/ui/sidebar'
-import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { useSidebarStore } from '@/stores/sidebar'
 import { MoreHorizontal, Plus } from 'lucide-vue-next'
 import { onMounted } from 'vue'
@@ -41,9 +40,8 @@ const isMac = window.dannn.is.mac
 
 <template>
   <Sidebar :collapsible="isMac ? 'none' : 'icon'">
-    <SidebarHeader class="items-end" :class="{ dragging: isMac }">
-      <SidebarTrigger v-if="!isMac" />
-      <div v-else class="h-4" />
+    <SidebarHeader v-if="isMac" class="items-end" :class="{ dragging: isMac }">
+      <div class="h-4" />
     </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>

@@ -1,4 +1,6 @@
 <script setup lang='ts'>
+import { Button } from '@/components/ui/button'
+import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { Expand, Minimize, Minus, X } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 
@@ -31,21 +33,41 @@ function onMaximize() {
 function onUnmaximize() {
   window.dannn.window.unmaximize()
 }
+
+const isMac = window.dannn.is.mac
+// bg-[hsl(var(--background))]
 </script>
 
 <template>
-  <div class="h-full flex items-center space-x-1 ml-auto">
-    <button class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-200" @click="onMinimize">
+  <div class="flex items-center justify-end space-x-1">
+    <SidebarTrigger v-if="!isMac" />
+    <Button
+      variant="ghost" size="icon"
+      class="size-7"
+      @click="onMinimize"
+    >
       <Minus :size="24" />
-    </button>
-    <button v-if="isMaximized" class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-100" @click="onUnmaximize">
+    </Button>
+    <Button
+      v-if="isMaximized" variant="ghost" size="icon"
+      class="size-7"
+      @click="onUnmaximize"
+    >
       <Minimize :size="18" />
-    </button>
-    <button v-if="isMinimized" class="flex items-center justify-center size-[--app-header-height] hover:bg-zinc-100" @click="onMaximize">
+    </Button>
+    <Button
+      v-if="isMinimized" variant="ghost" size="icon"
+      class="size-7"
+      @click="onMaximize"
+    >
       <Expand :size="18" />
-    </button>
-    <button class="flex items-center justify-center size-[--app-header-height] hover:bg-red-500">
+    </Button>
+    <Button
+      variant="ghost"
+      size="icon"
+      class="size-7"
+    >
       <X :size="24" />
-    </button>
+    </Button>
   </div>
 </template>

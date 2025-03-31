@@ -11,3 +11,7 @@ export function appMount() {
 export function onAppReady(func: () => void) {
   return appReady$.asObservable().subscribe(func)
 }
+
+onAppReady(() => {
+  console.log('App is ready')
+})
