@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Sidebar as SidebarType } from '@/base/types/sidebar'
 import { useAppRx } from '@/base/rxjs/hook'
 import ModeToggle from '@/components/mode-toggle.vue'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -46,10 +47,19 @@ rx.onExtensionLoaded((extension) => {
     isRoot: true,
   })
 
-  const data = cloneDeep(sidebar.sidebar)
-
-  extension.expose('getAllSidebar', () => {
-    return data
+  extension.implementation({
+    getAllSidebars: async () => cloneDeep(sidebar.sidebar),
+    createSidebar: async (sidebarItem: SidebarType) => {
+      sidebar.addSidebar(sidebarItem)
+      return sidebarItem
+    },
+    getSidebar: async (id: string) => {
+      const sidebarItem = sidebar.getSidebar(id)
+      if (!sidebarItem) {
+        return undefined
+      }
+      return cloneDeep(sidebarItem)
+    },
   })
 })
 </script>

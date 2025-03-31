@@ -1,4 +1,5 @@
 import type { Extension } from '../schemas/extension'
+import type { Sidebar } from './sidebar'
 
 export interface ExtensionMetadata {
   id: string
@@ -14,3 +15,11 @@ export interface CreateExtensionOptions {
   pluginDir: string
   dirname: string
 }
+
+export interface SidebarModules {
+  getAllSidebars: () => Promise<Sidebar[]>
+  getSidebar: (id: string) => Promise<Sidebar | undefined>
+  createSidebar: (sidebar: Sidebar) => Promise<Sidebar>
+}
+
+export type ExtensionNeedModule = SidebarModules

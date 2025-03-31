@@ -13,6 +13,10 @@ export const useSidebarStore = defineStore('dannn-sidebar', () => {
     ]
   }
 
+  function getSidebar(id: string) {
+    return sidebar.value.find(item => item.id === id)
+  }
+
   // rx.onSidebarReady((...data: Sidebar[]) => {
   //   sidebar.value = unionBy(sidebar.value, data, 'id')
   // })
@@ -20,5 +24,6 @@ export const useSidebarStore = defineStore('dannn-sidebar', () => {
   return {
     sidebar,
     addSidebar,
+    getSidebar
   }
 })
