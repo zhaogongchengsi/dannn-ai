@@ -1,13 +1,10 @@
 import type { Extension, ExtensionPermissions } from '../schemas/extension'
 import type { CreateExtensionOptions } from '../types/extension'
 import { compact, join } from 'lodash'
-import { WorkerBridge } from './bridge'
 import { filter } from 'rxjs'
+import { WorkerBridge } from './bridge'
 
 export class ExtensionWorker extends WorkerBridge {
-  destroy() {
-    throw new Error('Method not implemented.')
-  }
   name: string
   url: string
   version: string
@@ -78,5 +75,14 @@ export class ExtensionWorker extends WorkerBridge {
     else {
       return await this.invoke<void>('activate')
     }
+  }
+
+  destroy() {
+    this.postMessage({
+      type: 'destroy',
+    })
+    this.donePromiser?.resolve()
+    this.donePromiser = null
+    this.subject.complete()
   }
 }
