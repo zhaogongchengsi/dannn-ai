@@ -3,6 +3,7 @@ import type { AppRx } from './type'
 import { combineLatest } from 'rxjs'
 import { appMount, appMount$, appReady$, onAppReady } from './app'
 import { APP_PROVIDE_RX_KEY } from './constant'
+import { extensionWorkerSubject, getExtensionWorker, getExtensionWorkers } from './extensions'
 import { onSidebarReady, sidebarReady, sidebarReady$, sidebarStore$ } from './ui/sidebar'
 import { onToasterReady, toasterReady$ } from './ui/toaster'
 
@@ -16,6 +17,9 @@ export function createRx(): Plugin {
     appReady$,
     sidebarReady$,
     sidebarStore$,
+    extensionWorkerSubject,
+    getExtensionWorker,
+    getExtensionWorkers,
     appMount,
     sidebarReady,
     onAppReady,

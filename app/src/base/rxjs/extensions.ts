@@ -1,11 +1,21 @@
 import { getExtensionsRoot } from '@/lib/api'
 import { join } from 'pathe'
+import { Subject } from 'rxjs'
 import { formatZodError } from '../common/zod'
 import { extensionSchema } from '../schemas/extension'
 import { ExtensionWorker } from '../worker/worker'
 import { APP_EXTENSION_CONFIG_NAME } from './constant'
 
 const workers: Map<string, ExtensionWorker> = new Map()
+export const extensionWorkerSubject = new Subject<ExtensionWorker>()
+
+export function getExtensionWorker(id: string) {
+  return workers.get(id)
+}
+
+export function getExtensionWorkers() {
+  return Array.from(workers.values())
+}
 
 export async function loadLocalExtensions() {
   const root = await getExtensionsRoot()
@@ -35,8 +45,8 @@ export async function loadLocalExtensions() {
       }
 
       const extensionWorker = new ExtensionWorker(data, { pluginDir, dirname: extension })
-
       workers.set(extensionWorker.id, extensionWorker)
+      extensionWorkerSubject.next(extensionWorker)
     }
     catch (error) {
       console.error('Error loading extension:', error)
