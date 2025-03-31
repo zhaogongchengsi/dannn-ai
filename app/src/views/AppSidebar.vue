@@ -35,6 +35,16 @@ onUnmounted(() => {
   rx.sidebarDestroy()
 })
 
+rx.onExtensionLoaded((extension) => {
+  sidebar.addSidebar({
+    id: extension.id,
+    title: extension.name,
+    icon: extension.icon,
+    tooltip: extension.description,
+    fromExtended: true,
+    isRoot: true,
+  })
+})
 </script>
 
 <template>
