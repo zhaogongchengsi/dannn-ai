@@ -1,4 +1,4 @@
-import { defineExtension } from '../../dannn/src/define';
+import { defineExtension } from '@dannn/core';
 
 defineExtension(({ logger, window }) => {
 	logger.log('DeepSeek extension activated');

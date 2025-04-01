@@ -1,9 +1,8 @@
-import type { Toaster } from '@/base/types/toaster'
+import type { Toaster } from '@dannn/types'
 import { ReplaySubject, Subject } from 'rxjs'
 
 export const toasterReady$ = new ReplaySubject<boolean>()
 export const toasterSubject = new Subject<Toaster>()
-
 
 export function toasterReady() {
   toasterReady$.next(true)

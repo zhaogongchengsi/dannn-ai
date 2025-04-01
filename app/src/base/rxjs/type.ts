@@ -1,7 +1,6 @@
+import type { Sidebar, Toaster } from '@dannn/types'
 import type { Observable, Subject, Subscription } from 'rxjs'
 import type { ReplaySubject } from 'rxjs/internal/ReplaySubject'
-import type { Sidebar } from '../types/sidebar'
-import type { Toaster } from '../types/toaster'
 import type { ExtensionWorker } from '../worker/worker'
 
 export interface AppRx {

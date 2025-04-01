@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Sidebar as SidebarType } from '@/base/types/sidebar'
+import type { Sidebar as SidebarType } from '@dannn/types'
 import { useAppRx } from '@/base/rxjs/hook'
 import ModeToggle from '@/components/mode-toggle.vue'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'

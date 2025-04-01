@@ -1,6 +1,5 @@
 import type { Extension, ExtensionPermissions } from '../schemas/extension'
 import type { CreateExtensionOptions, ExtensionNeedModule } from '../types/extension'
-import type { Sidebar } from '../types/sidebar'
 import { compact, join } from 'lodash'
 import { filter, ReplaySubject } from 'rxjs'
 import { WorkerBridge } from './bridge'

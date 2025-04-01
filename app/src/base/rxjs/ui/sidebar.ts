@@ -1,4 +1,4 @@
-import type { Sidebar } from '@/base/types/sidebar'
+import type { Sidebar } from '@dannn/types'
 import { bufferWhen, ReplaySubject, Subject } from 'rxjs'
 
 export const sidebarReady$ = new ReplaySubject<boolean>(1)

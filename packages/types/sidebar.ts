@@ -17,3 +17,4 @@ export interface SidebarNode {
   link?: string
   icon?: string
 }
+

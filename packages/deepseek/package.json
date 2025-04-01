@@ -7,11 +7,13 @@
   "scripts": {
     "build:code": "dannn build -i ./src/index.ts -d ../../app/extensions/deepseek -m prod",
     "copy": "cp dannn.json ../../app/extensions/deepseek/dannn.json && cp README.md ../../app/extensions/deepseek/README.md",
-    "build": "pnpm build:code && pnpm copy",
-    "postinstall": "npm run build"
+    "build": "pnpm build:code && pnpm copy"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.7.0"
+  "packageManager": "pnpm@10.7.0",
+  "dependencies": {
+    "@dannn/core": "workspace:^"
+  }
 }

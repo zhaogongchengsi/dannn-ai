@@ -1,0 +1,26 @@
+{
+  "name": "@dannn/types",
+  "version": "0.0.1",
+  "description": "Dannn Ai mono repo types",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "require": "./index.ts"
+    },
+    "./*": {
+      "import": "./*.ts",
+      "require": "./*.ts"
+    }
+  },
+  "keywords": [
+    "dannn",
+    "ai",
+    "types",
+    "typescript",
+    "monorepo"
+  ],
+  "author": "zhaozunhong"
+}

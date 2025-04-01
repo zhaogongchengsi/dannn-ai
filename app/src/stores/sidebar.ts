@@ -1,4 +1,4 @@
-import type { Sidebar } from '@/base/types/sidebar'
+import type { Sidebar } from '@/base/types/_sidebar'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

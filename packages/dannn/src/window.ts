@@ -1,33 +1,8 @@
-import { BaseWorker } from './worker';
+import { BaseWorker } from './worker'; 
+import { Sidebar, SidebarModules } from '@dannn/types'
 
 export type WindowEvent = {
 	'sidebar-ready': any[]
-}
-
-export interface Sidebar {
-	id: string
-	title: string
-	name?: string
-	link?: string
-	icon?: string
-	tooltip?: string
-	children?: SidebarNode[]
-	fromExtended?: boolean
-	isRoot?: boolean
-}
-
-export interface SidebarNode {
-	id: string
-	tooltip?: string
-	title: string
-	link?: string
-	icon?: string
-}
-
-export interface SidebarModules {
-	getAllSidebars: () => Promise<Sidebar[]>
-	getSidebar: (id: string) => Promise<Sidebar | undefined>
-	createSidebar: (sidebar: Sidebar) => Promise<Sidebar>
 }
 
 export class Window extends BaseWorker<WindowEvent> implements SidebarModules {
