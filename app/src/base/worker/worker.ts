@@ -1,5 +1,6 @@
+import type { ExtensionNeedModule } from '@dannn/types'
 import type { Extension, ExtensionPermissions } from '../schemas/extension'
-import type { CreateExtensionOptions, ExtensionNeedModule } from '../types/extension'
+import type { CreateExtensionOptions } from '../types/extension'
 import { compact, join } from 'lodash'
 import { filter, ReplaySubject } from 'rxjs'
 import { WorkerBridge } from './bridge'
