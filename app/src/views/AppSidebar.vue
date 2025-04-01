@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Sidebar as SidebarType } from '@dannn/types'
+import type { SidebarNode, Sidebar as SidebarType } from '@dannn/types'
 import { useAppRx } from '@/base/rxjs/hook'
+import { ExtensionWorker } from '@/base/worker/worker'
 import ModeToggle from '@/components/mode-toggle.vue'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -53,12 +54,16 @@ rx.onExtensionLoaded((extension) => {
       sidebarStore.addSidebar(sidebarItem)
       return sidebarItem
     },
-    getSidebar: async (id: string) => {
+    async getSidebar(id: string) {
       const sidebarItem = sidebarStore.getSidebar(id)
       if (!sidebarItem) {
         return undefined
       }
       return cloneDeep(sidebarItem)
+    },
+    async appendSidebar(sidebarItem: SidebarNode) {
+      sidebarStore.appendSidebarNode((this as any).id, sidebarItem)
+      return true
     },
   })
 })

@@ -1,4 +1,4 @@
-import type { Sidebar } from '@dannn/types'
+import type { Sidebar, SidebarNode } from '@dannn/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -17,13 +17,18 @@ export const useSidebarStore = defineStore('dannn-sidebar', () => {
     return sidebar.value.find(item => item.id === id)
   }
 
-  // rx.onSidebarReady((...data: Sidebar[]) => {
-  //   sidebar.value = unionBy(sidebar.value, data, 'id')
-  // })
+  function appendSidebarNode(id: string, node: SidebarNode) {
+    const sidebarItem = getSidebar(id)
+    if (sidebarItem) {
+      const oldChildren = sidebarItem.children || []
+      sidebarItem.children = [...oldChildren, node]
+    }
+  }
 
   return {
     sidebar,
     addSidebar,
     getSidebar,
+    appendSidebarNode,
   }
 })

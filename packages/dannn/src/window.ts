@@ -1,5 +1,5 @@
 import { BaseWorker } from './worker'; 
-import { Sidebar, SidebarModules } from '@dannn/types'
+import { Sidebar, SidebarModules, SidebarNode } from '@dannn/types'
 
 export type WindowEvent = {
 	'sidebar-ready': any[]
@@ -16,6 +16,10 @@ export class Window extends BaseWorker<WindowEvent> implements SidebarModules {
 
 	async createSidebar(sidebar: Sidebar) {
 		return await this.invoke<Sidebar>('createSidebar', sidebar)
+	}
+
+	async appendSidebar(sidebar: SidebarNode) {
+		return await this.invoke<boolean>('appendSidebar', sidebar)
 	}
 
 	onSidebarReady(callback: (data: Sidebar[]) => void) {
