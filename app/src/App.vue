@@ -37,8 +37,12 @@ const toasterTheme = computed(() => {
 onMounted(() => rx.toasterReady())
 
 rx.onToasterReady((config) => {
-  console.log('Toaster ready', config)
-  // toast('', {})
+  if (!config.content.trim()) {
+    return
+  }
+
+  // TODO: add a type for config
+  toast(config.content)
 })
 </script>
 
