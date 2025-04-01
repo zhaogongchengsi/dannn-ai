@@ -1,4 +1,4 @@
-import type { Sidebar } from '@/base/types/_sidebar'
+import type { Sidebar } from '@dannn/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -24,6 +24,6 @@ export const useSidebarStore = defineStore('dannn-sidebar', () => {
   return {
     sidebar,
     addSidebar,
-    getSidebar
+    getSidebar,
   }
 })

@@ -85,7 +85,7 @@ rx.onExtensionLoaded((extension) => {
                       <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
                       <span>{{ item.title }}</span>
                     </SidebarMenuButton>
-                    <DropdownMenu>
+                    <!-- <DropdownMenu>
                       <DropdownMenuTrigger as-child>
                         <SidebarMenuAction>
                           <MoreHorizontal />
@@ -93,23 +93,20 @@ rx.onExtensionLoaded((extension) => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="right" align="start">
                         <DropdownMenuItem>
-                          <RouterLink :to="`readme?id=${item.id}`">
+                          <RouterLink :to="`/readme?id=${item.id}`">
                             <span>文档</span>
                           </RouterLink>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
-                    </DropdownMenu>
+                    </DropdownMenu> -->
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       <SidebarMenuItem v-for="ci in item.children" :key="ci.id">
                         <SidebarMenuButton as-child :title="ci.tooltip ?? ci.title">
-                          <RouterLink v-if="ci.link" :to="ci.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+                          <RouterLink :to="`/${ci.type ?? 'chat'}/${ci.id}`" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
                             <span>{{ ci.title }}</span>
                           </RouterLink>
-                          <div v-else>
-                            <span>{{ ci.title }}</span>
-                          </div>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     </SidebarMenuSub>
@@ -117,15 +114,15 @@ rx.onExtensionLoaded((extension) => {
                 </SidebarMenuItem>
               </Collapsible>
               <SidebarMenuItem v-else>
-                <SidebarMenuButton v-if="item.link" as-child :tooltip="item.tooltip ?? item.title">
-                  <RouterLink v-if="item.link" :to="item.link" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+                <SidebarMenuButton as-child :tooltip="item.tooltip ?? item.title">
+                  <div v-if="item.isRoot">
+                    <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
+                    <span>{{ item.title }}</span>
+                  </div>
+                  <RouterLink v-else :to="`/chat/${item.id}`" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
                     <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
                     <span>{{ item.title }}</span>
                   </RouterLink>
-                </SidebarMenuButton>
-                <SidebarMenuButton v-else>
-                  <img v-if="item.icon" :src="item.icon" alt="icon" class="size-5 object-contain">
-                  <span>{{ item.title }}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </template>

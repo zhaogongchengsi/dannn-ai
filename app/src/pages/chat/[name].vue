@@ -1,13 +1,9 @@
 <script setup lang='ts'>
-import { DnApp } from '@/base/app/app'
 import Button from '@/components/ui/button/Button.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
 import { debounce } from 'lodash'
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { toast } from 'vue-sonner'
 
-const route = useRoute<'/chat/[name]'>()
 const error = ref<Error | null>(null)
 const loading = ref(false)
 const messageValue = ref<string>('')
@@ -19,31 +15,7 @@ async function send() {
   if (!message)
     return
 
-  const ai = DnApp.getInstance().findAI(route.query.extension as string, route.params.name)
-
-  console.log('AI', ai)
-
-  if (!ai) {
-    error.value = new Error('AI not found')
-    return
-  }
-
-  if (waitAnswer.value) {
-    toast.error('请等待上一个请求完成')
-    return
-  }
-
-  const response = await ai.chat(messageValue.value)
-
-  console.log(response)
-
-  for await (const chunk of response) {
-    console.log(chunk)
-    const content = chunk.choices[0]?.delta?.content || ''
-    resultValue.value += content
-  }
-
-  waitAnswer.value = false
+  console.log('send', message)
 
   messageValue.value = ''
 }

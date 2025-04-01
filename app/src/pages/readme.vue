@@ -2,7 +2,6 @@
 import Button from '@/components/ui/button/Button.vue'
 import { Toggle } from '@/components/ui/toggle'
 import { useConfig } from '@/composables/config'
-import { useExtension } from '@/composables/extension'
 import { markdownToHtml } from '@/lib/shiki'
 import { computedAsync } from '@vueuse/core'
 import { computed } from 'vue'
@@ -12,7 +11,6 @@ const route = useRoute()
 const config = useConfig()
 
 const id = route.query.id as string
-const extension = useExtension()
 
 const metadata = computed(() => {
   const id = route.query.id as string
