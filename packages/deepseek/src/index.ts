@@ -1,5 +1,4 @@
 import { defineExtension } from '@dannn/core';
-import { type } from './../../../app/auto-imports.d';
 
 defineExtension(({ logger, window }) => {
 	logger.log('DeepSeek extension activated');
