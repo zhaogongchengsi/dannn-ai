@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build:code": "dannn build -i ./src/index.ts -d ../../app/extensions/deepseek -m prod",
-    "copy": "cp dannn.json ../../app/extensions/deepseek/dannn.json && cp README.md ../../app/extensions/deepseek/README.md",
+    "copy": "node ../../scripts/copy.mjs dannn.json ../../app/extensions/deepseek/dannn.json && node ../../scripts/copy.mjs README.md ../../app/extensions/deepseek/README.md",
     "build": "pnpm build:code && pnpm copy"
   },
   "keywords": [],
