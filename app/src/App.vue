@@ -52,7 +52,7 @@ rx.onToasterReady((config) => {
       <AppSidebar />
       <section class="ml-auto h-screen relative" :style="{ width: mainContentWidth }">
         <WindowMenus v-if="isWindow" class="w-full p-1" />
-        <main class="w-full overflow-auto" :style="{ height: isWindow ? 'calc(100vh - 36px)' : '0px' }">
+        <main class="w-full overflow-auto" :style="{ height: isWindow ? 'calc(100vh - 36px)' : '100vh' }">
           <router-view />
         </main>
       </section>
