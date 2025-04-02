@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/sidebar'
 import { useSidebarStore } from '@/stores/sidebar'
 import { cloneDeep } from 'lodash'
-import { MoreHorizontal, Plus } from 'lucide-vue-next'
+import { Plus } from 'lucide-vue-next'
 import { onMounted, onUnmounted } from 'vue'
 
 const isMac = window.dannn.is.mac
@@ -109,7 +109,7 @@ rx.onExtensionLoaded((extension) => {
                     <SidebarMenuSub>
                       <SidebarMenuItem v-for="ci in item.children" :key="ci.id">
                         <SidebarMenuButton as-child :title="ci.tooltip ?? ci.title">
-                          <RouterLink :to="`/${ci.type ?? 'chat'}/${ci.id}`" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
+                          <RouterLink :to="`/${ci.type ?? 'chat'}/${item.id}?id=${ci.id}`" active-class="bg-sidebar-accent text-sidebar-accent-foreground">
                             <span>{{ ci.title }}</span>
                           </RouterLink>
                         </SidebarMenuButton>

@@ -3,12 +3,16 @@ import Button from '@/components/ui/button/Button.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
 import { debounce } from 'lodash'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 const error = ref<Error | null>(null)
 const loading = ref(false)
 const messageValue = ref<string>('')
 const resultValue = ref<string>('')
 const waitAnswer = ref(false)
+const route = useRoute()
+
+console.log('route', route.params, route.query)
 
 async function send() {
   const message = messageValue.value.trim()

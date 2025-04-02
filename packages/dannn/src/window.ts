@@ -19,6 +19,14 @@ export class Window extends BaseWorker<WindowEvent> implements SidebarModules {
 	}
 
 	async appendSidebar(sidebar: SidebarNode) {
+		if (!sidebar.id) {
+			throw new Error('Sidebar id is required')
+		}
+		const idPattern = /^[a-zA-Z0-9_-]+$/;
+		if (!idPattern.test(sidebar.id)) {
+			throw new Error('Sidebar id contains invalid characters. Only alphanumeric characters, underscores, and hyphens are allowed.');
+		}
+
 		return await this.invoke<boolean>('appendSidebar', sidebar)
 	}
 
