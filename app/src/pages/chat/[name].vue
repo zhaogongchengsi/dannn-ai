@@ -1,8 +1,10 @@
 <script setup lang='ts'>
+import { useAppRx } from '@/base/rxjs/hook'
+import { ExtensionWorker } from '@/base/worker/worker'
 import Button from '@/components/ui/button/Button.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
 import { debounce } from 'lodash'
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const error = ref<Error | null>(null)
@@ -10,16 +12,40 @@ const loading = ref(false)
 const messageValue = ref<string>('')
 const resultValue = ref<string>('')
 const waitAnswer = ref(false)
-const route = useRoute()
+const route = useRoute<'/chat/[name]'>()
+const rx = useAppRx()
 
-console.log('route', route.params, route.query)
+let extension = ref<ExtensionWorker>()
+
+watchEffect(() => {
+  extension.value = rx.getExtensionWorker(route.params.name)
+})
+
+rx.onExtensionLoaded(() => {
+  extension.value = rx.getExtensionWorker(route.params.name)
+})
+
+watchEffect(() => {
+  if (extension.value) {
+    extension.value.onWorkerEvent('reply-question', (data: { id: string, answer: string }) => {
+        console.log('reply-question', data)
+    })
+  }
+})
 
 async function send() {
   const message = messageValue.value.trim()
   if (!message)
     return
 
-  console.log('send', message)
+  console.log(rx.getExtensionWorkers(), route.params.name)
+
+  if (!extension.value) {
+    console.error('extension not found', route.params.name)
+    return
+  }
+
+  extension.value.emitSendMessage('asdasd', message)
 
   messageValue.value = ''
 }

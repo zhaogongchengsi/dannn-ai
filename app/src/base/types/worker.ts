@@ -31,9 +31,20 @@ export interface WorkerCallMessage {
   args: any[]
 }
 
+export interface WorkerEventMessage {
+  type: 'event'
+  name: keyof WorkerEventFromWorker
+  event: WorkerEventFromWorker[keyof WorkerEventFromWorker]
+}
+
+export interface WorkerEventFromWorker {
+  'reply-question': {id: string, answer: string}
+}
+
 export type WorkerMessage = WorkerCallMessage |
   WorkerDoneMessage |
   WorkerErrorMessage |
   WorkerCallResultMessage |
   WorkerCallErrorMessage |
-  WorkerModuleMessage
+  WorkerModuleMessage |
+  WorkerEventMessage

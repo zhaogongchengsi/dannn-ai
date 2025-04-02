@@ -3,6 +3,7 @@ import { Sidebar, SidebarModules, SidebarNode } from '@dannn/types'
 
 export type WindowEvent = {
 	'sidebar-ready': any[]
+	'question': { id: string, message: string }
 }
 
 export class Window extends BaseWorker<WindowEvent> implements SidebarModules {
@@ -32,5 +33,14 @@ export class Window extends BaseWorker<WindowEvent> implements SidebarModules {
 
 	onSidebarReady(callback: (data: Sidebar[]) => void) {
 		this.on('sidebar-ready', callback)
+	}
+
+	onQuestion(callback: (data: { id: string, message : string}) => void) {
+		this.on('question', callback)
+	}
+
+
+	replyQuestion(id: string, answer: string) {
+		return this.emitEventToWindow('reply-question', { id, answer })
 	}
 }

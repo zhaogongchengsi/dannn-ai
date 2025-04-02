@@ -3,7 +3,7 @@ type EventMap = Record<string, any>
 type EventKey<T extends EventMap> = keyof T
 type EventCallback<T> = (payload: T) => void | Promise<void>
 
-export class DnEvent<T extends EventMap> {
+export class Event<T extends EventMap> {
   private events: Map<EventKey<T>, Set<EventCallback<any>>> = new Map()
 
   on<K extends EventKey<T>>(event: K, callback: EventCallback<T[K]>): void {

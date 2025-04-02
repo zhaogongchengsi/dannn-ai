@@ -101,4 +101,8 @@ export class ExtensionWorker extends WorkerBridge {
       this.emitToWorker('sidebar-ready')
     })
   }
+
+  emitSendMessage(id: string,message: string){
+    this.emitToWorker('question', {message, id})
+  }
 }

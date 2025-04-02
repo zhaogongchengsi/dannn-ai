@@ -11,5 +11,10 @@ defineExtension(({ logger, window }) => {
 		})
 		console.log('Append sidebar:', ok);
 	})
+
+	window.onQuestion((question) => {
+		console.log('Received question:', question);
+		window.replyQuestion(question.id, question.message + 'This is a reply to your question.');
+	})
 })
 

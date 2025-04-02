@@ -1,5 +1,6 @@
-import type { WorkerCallErrorMessage, WorkerCallMessage, WorkerCallResultMessage, WorkerMessage, WorkerModuleMessage } from '../types/worker'
+import type { WorkerCallErrorMessage, WorkerCallMessage, WorkerCallResultMessage, WorkerEventFromWorker, WorkerEventMessage, WorkerMessage, WorkerModuleMessage } from '../types/worker'
 import { filter, Subject } from 'rxjs'
+import { Event } from '../common/event'
 
 export class WorkerBridge {
   private worker: Worker | null = null
@@ -11,6 +12,7 @@ export class WorkerBridge {
   donePromiser: PromiseWithResolvers<void> | null = null
   handlers: Map<string, (arg1: any, ...args: any[]) => void> = new Map()
   subject: Subject<WorkerMessage> = new Subject()
+  workerEvent: Event<WorkerEventFromWorker> = new Event()
   waitResolved: Set<WorkerCallMessage> = new Set()
 
   constructor(name: string, url: string) {
@@ -106,6 +108,10 @@ export class WorkerBridge {
     }
   }
 
+  private handleEvent(id: keyof WorkerEventFromWorker, args: any) {
+    this.workerEvent.emit(id, args)
+  }
+
   waitReady() {
     if (this.isReady) {
       return Promise.resolve()
@@ -133,6 +139,8 @@ export class WorkerBridge {
       case 'call':
         this.handleCall(message)
         break
+      case 'event':
+        this.handleEvent(message.name, message.event)
     }
   }
 
@@ -203,5 +211,9 @@ export class WorkerBridge {
         args: event,
       })
     }
+  }
+
+  onWorkerEvent<N extends keyof WorkerEventFromWorker>(name: N, callback: (event: WorkerEventFromWorker[N]) => void) {
+    this.workerEvent.on(name, callback)
   }
 }

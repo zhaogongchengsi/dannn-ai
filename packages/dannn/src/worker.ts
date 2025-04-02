@@ -114,4 +114,12 @@ export class BaseWorker<E> extends Event<WorkerFromWindowMessage & E> {
 			type: 'done',
 		})
 	}
+
+	emitEventToWindow(name: string, event: any) {
+		this.postMessage({
+			type: 'event',
+			name,
+			event,
+		})
+	}
 }
