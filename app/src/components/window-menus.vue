@@ -1,8 +1,8 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
-import SidebarTrigger from '@/components/ui/sidebar/SidebarTrigger.vue'
 import { Expand, Minimize, Minus, X } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
+import modeToggle from './mode-toggle.vue'
 
 const isMaximized = ref(false)
 const isMinimized = ref(false)
@@ -39,35 +39,24 @@ const isMac = window.dannn.is.mac
 </script>
 
 <template>
-  <div class="flex items-center justify-end space-x-1">
-    <SidebarTrigger v-if="!isMac" />
-    <Button
-      variant="ghost" size="icon"
-      class="size-7"
-      @click="onMinimize"
-    >
-      <Minus :size="24" />
-    </Button>
-    <Button
-      v-if="isMaximized" variant="ghost" size="icon"
-      class="size-7"
-      @click="onUnmaximize"
-    >
-      <Minimize :size="18" />
-    </Button>
-    <Button
-      v-if="isMinimized" variant="ghost" size="icon"
-      class="size-7"
-      @click="onMaximize"
-    >
-      <Expand :size="18" />
-    </Button>
-    <Button
-      variant="ghost"
-      size="icon"
-      class="size-7"
-    >
-      <X :size="24" />
-    </Button>
+  <div class="flex items-center h-[--app-header-height]">
+    <div v-if="isMac" class="h-full" />
+    <div class="ml-auto space-x-1">
+      <mode-toggle />
+      <template v-if="!isMac">
+        <Button variant="ghost" size="icon" class="size-7" @click="onMinimize">
+          <Minus :size="24" />
+        </Button>
+        <Button v-if="isMaximized" variant="ghost" size="icon" class="size-7" @click="onUnmaximize">
+          <Minimize :size="18" />
+        </Button>
+        <Button v-if="isMinimized" variant="ghost" size="icon" class="size-7" @click="onMaximize">
+          <Expand :size="18" />
+        </Button>
+        <Button variant="ghost" size="icon" class="size-7">
+          <X :size="24" />
+        </Button>
+      </template>
+    </div>
   </div>
 </template>
