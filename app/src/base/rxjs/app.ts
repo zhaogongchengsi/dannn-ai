@@ -14,6 +14,5 @@ export function onAppReady(func: () => void) {
 }
 
 onAppReady(() => {
-  console.log('App is ready')
   loadLocalExtensions()
 })

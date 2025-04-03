@@ -48,7 +48,7 @@ const isMac = window.dannn.is.mac
           <Minus :size="24" />
         </Button>
         <Button v-if="isMaximized" variant="ghost" size="icon" class="size-7" @click="onUnmaximize">
-          <Minimize :size="18" />
+          <Minimize :size="16" />
         </Button>
         <Button v-if="isMinimized" variant="ghost" size="icon" class="size-7" @click="onMaximize">
           <Expand :size="18" />
