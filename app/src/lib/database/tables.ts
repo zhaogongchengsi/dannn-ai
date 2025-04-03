@@ -52,6 +52,6 @@ const aiMessageKeys: AIMessageKeys[] = [
 
 export const tableSchemasV1 = {
   aiModels: aiModelKeys.join(', '),
-  aiChat: aiChatKeys.join(', '),
+  aiChats: aiChatKeys.join(', '),
   aiMessages: aiMessageKeys.join(', '),
 }
