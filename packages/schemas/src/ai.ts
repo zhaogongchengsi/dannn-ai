@@ -1,8 +1,9 @@
 import { z } from 'zod'
 
 export const aiConfig = z.object({
-  title: z.string().optional().describe('AI 标题'),
   name: z.string().describe('AI 名称'),
+  title: z.string().optional().describe('AI 标题'),
+  version: z.string().describe('AI 版本'),
   description: z.string().optional().describe('AI 介绍'),
   role: z.string().optional().describe('AI 角色'),
   prompt: z.string().optional().describe('AI 提示词'),
@@ -13,7 +14,7 @@ export const aiConfig = z.object({
   topP: z.number().min(0).max(1).optional().describe('采样概率'),
   frequencyPenalty: z.number().optional().describe('频率惩罚'),
   presencePenalty: z.number().optional().describe('话题惩罚'),
-  apiBaseurl: z.string().describe('AI API 端点'),
+  apiBaseURL: z.string().describe('AI API 端点'),
   apiKey: z.string().describe('API Key'),
   functionCalls: z
     .array(

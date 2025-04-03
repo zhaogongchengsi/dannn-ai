@@ -1,38 +1,34 @@
+import type { AIConfig } from '@dannn/schemas'
+
 /**
  * AI 信息表
  */
-export interface AIModel {
+export interface AIModel extends AIConfig {
   id: string // AI 唯一标识符
-  name: string // AI 名称
-  version: string // AI 版本
-  icon?: string // AI 图标（可选）
-  description?: string // AI 描述（可选）
+  module: string // AI 当前使用的module
   createdAt: number // 创建时间戳
-  type?: string // AI 类型
+  updateAt: number // 更新时间戳
+  isDeleted?: boolean // 是否被删除
+  isDisabled?: boolean // 是否被禁用
+  lastMessageAt?: number // 上次消息时间戳（可选）
 }
 
 /**
  * AI 会话信息表
  * 一个会话可以包含多个 AI
  */
-export interface AISession {
+export interface AIChat {
   id: string // AI 唯一标识符
-  name: string // AI 名称
-  version: string // AI 版本
+  title: string // AI 名称
   description?: string // AI 描述（可选）
-  type: 'openai' | 'custom' | 'local' | string // AI 类型（支持 OpenAI、本地、自定义等）
-  apiKey?: string // OpenAI 或其他 API 的密钥（可选）
-  baseURL?: string // 自定义 API 地址（可选）
-  models: string[] // 支持的模型列表（如 ['gpt-4', 'gpt-3.5']）
-  model?: string // 使用的模型
   temperature?: number // 生成文本时的随机性
   maxTokens?: number // 最大 token 长度
-  topP?: number // 采样参数，类似于 temperature
   presencePenalty?: number // 影响 AI 提及新主题的倾向
   frequencyPenalty?: number // 影响 AI 重复词的倾向
   systemPrompt?: string // 自定义系统提示词
   createdAt: number // 创建时间戳
   updateAt: number // 更新时间戳
+  participants: string[] // 参与者列表（AI ID）
 }
 
 /**
@@ -41,6 +37,7 @@ export interface AISession {
  */
 export interface AIMessage {
   id: string // 消息唯一标识符
+  sortId: number // 消息排序 ID
   sessionId: string // 关联的会话 ID
   senderId: string // 发送者 AI ID 或用户 ID
   content: string // 消息内容（可能是大文本）

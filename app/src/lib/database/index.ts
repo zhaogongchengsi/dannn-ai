@@ -1,5 +1,5 @@
 import type { Table } from 'dexie'
-import type { AIMessage, AIModel, AISession } from './models'
+import type { AIMessage, AIModel } from './models'
 import Dexie from 'dexie'
 import { tableSchemasV1 } from './tables'
 
@@ -8,7 +8,7 @@ import { tableSchemasV1 } from './tables'
  */
 export class Database extends Dexie {
   aiModels!: Table<AIModel, string>
-  aiSessions!: Table<AISession, string>
+  aiChats!: Table<AIModel, string>
   aiMessages!: Table<AIMessage, string>
 
   constructor() {
