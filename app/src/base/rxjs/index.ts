@@ -4,9 +4,8 @@ import { combineLatest } from 'rxjs'
 import { appMount, appMount$, appReady$, onAppReady } from './app'
 import { APP_PROVIDE_RX_KEY } from './constant'
 import { extensionDestroy, extensionWorkerSubject, getExtensionWorker, getExtensionWorkers, onExtensionLoaded } from './extensions'
-import { onToasterReady, toasterReady, toasterReady$ } from './ui/toaster'
 
-combineLatest([appMount$, toasterReady$]).subscribe(() => {
+combineLatest([appMount$]).subscribe(() => {
   appReady$.next(true)
 })
 
@@ -19,8 +18,6 @@ export function createRx(): Plugin {
     getExtensionWorkers,
     appMount,
     onAppReady,
-    onToasterReady,
-    toasterReady,
     extensionDestroy,
     onExtensionLoaded,
   }

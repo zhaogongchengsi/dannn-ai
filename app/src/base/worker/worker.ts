@@ -1,4 +1,3 @@
-import type { ExtensionNeedModule } from '@dannn/types'
 import type { Extension, ExtensionPermissions } from '../../../../packages/schemas/src/extension'
 import type { CreateExtensionOptions } from '../types/extension'
 import { compact, join } from 'lodash'
@@ -88,18 +87,6 @@ export class ExtensionWorker extends WorkerBridge {
     this.donePromiser?.resolve()
     this.donePromiser = null
     this.subject.complete()
-  }
-
-  implementation(module: ExtensionNeedModule) {
-    Object.keys(module).forEach((key) => {
-      this.expose(key, module[key as keyof ExtensionNeedModule])
-    })
-  }
-
-  sidebarReady() {
-    this.ready$.subscribe(() => {
-      this.emitToWorker('sidebar-ready')
-    })
   }
 
   emitSendMessage(id: string, message: string) {

@@ -10,8 +10,7 @@
     ],
   },
   "include": [
-    "src/**/*.ts",
-    "../../event/src/**/*.ts",
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -1,10 +1,8 @@
-import { Logger } from './logger'
 import { Window } from './window' 
 import { BaseWorker } from './worker'
 
 export interface ExtensionContext {
 	window: Window
-	logger: Logger
 }
 
 export function defineExtension(func: (ctx: ExtensionContext) => void) {
@@ -15,13 +13,11 @@ export function defineExtension(func: (ctx: ExtensionContext) => void) {
 	const baseWorker = new BaseWorker()
 
 	const window = new Window()
-	const logger = new Logger()
 	
 	function activate() {
 		try {
 			func({
-				window,
-				logger
+				window
 			})
 		} catch (e) {
 			console.error('Error while activating extension:', e)

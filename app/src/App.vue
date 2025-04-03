@@ -1,13 +1,10 @@
 <script setup lang='ts'>
 import { Toaster } from '@/components/ui/sonner'
 import WindowMenus from '@/components/window-menus.vue'
-import { computed, onMounted } from 'vue'
-import { toast } from 'vue-sonner'
-import { useAppRx } from './base/rxjs/hook'
+import { computed } from 'vue'
 import { useConfig } from './composables/config'
 
 const config = useConfig()
-const rx = useAppRx()
 
 config.init()
 
@@ -17,17 +14,6 @@ const toasterTheme = computed(() => {
     return 'system'
   }
   return mode === 'dark' ? 'dark' : 'light'
-})
-
-onMounted(() => rx.toasterReady())
-
-rx.onToasterReady((config) => {
-  if (!config.content.trim()) {
-    return
-  }
-
-  // TODO: add a type for config
-  toast(config.content)
 })
 </script>
 
