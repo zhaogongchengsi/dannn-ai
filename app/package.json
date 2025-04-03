@@ -51,7 +51,6 @@
   },
   "devDependencies": {
     "@dannn/cli": "workspace:^",
-    "@dannn/types": "workspace:^",
     "@iconify-json/radix-icons": "^1.2.2",
     "@iconify/vue": "^4.3.0",
     "@types/fs-extra": "^11.0.4",

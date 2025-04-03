@@ -1,5 +1,4 @@
-import type { WorkerCallErrorMessage, WorkerCallMessage, WorkerCallResultMessage, WorkerEventFromWorker, WorkerEventMessage, WorkerMessage, WorkerModuleMessage } from '../types/worker'
-import { filter, Subject } from 'rxjs'
+import type { WorkerCallFunctionErrorMessage, WorkerCallFunctionMessage, WorkerCallFunctionResponseMessage, WorkerEventEmitMessage, WorkerMessage } from '@dannn/schemas'
 import { Event } from '../common/event'
 
 export class WorkerBridge {
@@ -11,9 +10,8 @@ export class WorkerBridge {
   readyMethodsName: Set<string> = new Set()
   donePromiser: PromiseWithResolvers<void> | null = null
   handlers: Map<string, (arg1: any, ...args: any[]) => void> = new Map()
-  subject: Subject<WorkerMessage> = new Subject()
-  workerEvent: Event<WorkerEventFromWorker> = new Event()
-  waitResolved: Set<WorkerCallMessage> = new Set()
+  workerEvent: Event<Record<string, any>> = new Event()
+  waitResolved: Set<WorkerCallFunctionMessage> = new Set()
 
   constructor(name: string, url: string) {
     this.name = name
@@ -23,28 +21,17 @@ export class WorkerBridge {
     })
 
     this.worker.onmessage = (e) => {
-      this.subject.next(e.data)
+      const message = e.data as WorkerMessage
+      this.onMessage(message)
     }
 
     this.worker.onerror = (e) => {
-      this.subject.next({
-        type: 'error',
-        error: e.message,
-      })
+      console.error(`Worker ${this.name} error:`, e.message)
     }
 
-    this.worker.onmessageerror = (e) => {
-      this.subject.next({
-        type: 'error',
-        error: e.data,
-      })
+    this.worker.onmessageerror = (e: any) => {
+      console.error(`Worker ${this.name} message error:`, e?.message)
     }
-
-    this.subject.pipe(filter(message => 'type' in message)).subscribe(this.onMessage.bind(this))
-  }
-
-  toMessageObservable() {
-    return this.subject.pipe(filter(message => 'type' in message))
   }
 
   terminate() {
@@ -62,41 +49,42 @@ export class WorkerBridge {
     }
   }
 
-  private handleCallResult(message: WorkerCallResultMessage) {
+  private handleCallResult(message: WorkerCallFunctionResponseMessage) {
     const promiser = this.promiserMap.get(message.id)
     if (promiser) {
-      promiser.resolve(message.result)
+      promiser.resolve(message.data.result)
     }
   }
 
-  private handleError(message: WorkerCallErrorMessage) {
+  private handleError(message: WorkerCallFunctionErrorMessage) {
     const promiser = this.promiserMap.get(message.id)
     if (promiser) {
-      promiser.reject(new Error(message.error))
+      promiser.reject(new Error(message.data.error))
     }
   }
 
-  private handleModule(message: WorkerModuleMessage) {
-    this.readyMethodsName.add(message.name)
-  }
-
-  private handleCall(message: WorkerCallMessage) {
-    const { id, args, name } = message
-    const handler = this.handlers.get(name.trim())
+  private handleCall(message: WorkerCallFunctionMessage) {
+    const { id, data } = message
+    const handler = this.handlers.get(data.name.trim())
     if (handler) {
+      const args = data.args || []
       Promise.resolve(handler.apply(this, [args[0], ...args.slice(1)]))
         .then((result) => {
           this.postMessage({
-            type: 'call-result-from-window',
+            type: 'call-function-response',
             id,
-            result,
+            data: {
+              result,
+            },
           })
         })
         .catch((error) => {
           this.postMessage({
-            type: 'call-result-from-window',
+            type: 'call-function-error',
             id,
-            error: error.message,
+            data: {
+              error: error.message,
+            },
           })
         })
         .finally(() => {
@@ -106,10 +94,6 @@ export class WorkerBridge {
     else {
       this.waitResolved.add(message)
     }
-  }
-
-  private handleEvent(id: keyof WorkerEventFromWorker, args: any) {
-    this.workerEvent.emit(id, args)
   }
 
   waitReady() {
@@ -124,24 +108,23 @@ export class WorkerBridge {
 
   private onMessage(message: WorkerMessage) {
     switch (message.type) {
-      case 'done':
-        this.handleDone()
-        break
-      case 'call-result':
+      case 'call-function-response':
         this.handleCallResult(message)
         break
-      case 'call-error':
+      case 'call-function-error':
         this.handleError(message)
         break
-      case 'module':
-        this.handleModule(message)
-        break
-      case 'call':
+      case 'call-function':
         this.handleCall(message)
         break
-      case 'event':
-        this.handleEvent(message.name, message.event)
+      case 'event-emit':
+        this.handleEvent(message)
     }
+  }
+
+  private handleEvent(message: WorkerEventEmitMessage) {
+    const { name, event } = message.data
+    this.workerEvent.emit(name, event)
   }
 
   invoke<T>(name: string, ...args: any[]) {
@@ -159,9 +142,11 @@ export class WorkerBridge {
     this.promiserMap.set(id, promiser)
 
     this.postMessage({
-      type: 'call',
-      name,
-      args,
+      type: 'call-function',
+      data: {
+        name,
+        args,
+      },
       id,
     })
 
@@ -173,12 +158,6 @@ export class WorkerBridge {
   }
 
   expose(name: string, handler: (arg1: any, ...args: any[]) => void) {
-    if (this.isWorkerLoaded) {
-      this.postMessage({
-        type: 'expose',
-        name,
-      })
-    }
     this.handlers.set(name, handler)
     this.waitResolved.forEach((message) => {
       this.handleCall(message)
@@ -197,23 +176,9 @@ export class WorkerBridge {
     return this.worker !== null
   }
 
-  postMessage(message: any) {
+  postMessage(message: WorkerMessage) {
     if (this.worker) {
       this.worker.postMessage(message)
     }
-  }
-
-  emitToWorker(name: string, event?: any) {
-    if (this.worker) {
-      this.worker.postMessage({
-        type: 'event',
-        name,
-        args: event,
-      })
-    }
-  }
-
-  onWorkerEvent<N extends keyof WorkerEventFromWorker>(name: N, callback: (event: WorkerEventFromWorker[N]) => void) {
-    this.workerEvent.on(name, callback)
   }
 }

@@ -7,7 +7,7 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.7.0",
-  "devDependencies": {
-    "@dannn/types": "workspace:^"
+  "dependencies": {
+    "@dannn/schemas": "workspace:^"
   }
 }

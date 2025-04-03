@@ -138,9 +138,6 @@ importers:
       '@dannn/cli':
         specifier: workspace:^
         version: link:../packages/cli
-      '@dannn/types':
-        specifier: workspace:^
-        version: link:../packages/types
       '@iconify-json/radix-icons':
         specifier: ^1.2.2
         version: 1.2.2
@@ -192,10 +189,10 @@ importers:
         version: 0.25.1
 
   packages/dannn:
-    devDependencies:
-      '@dannn/types':
+    dependencies:
+      '@dannn/schemas':
         specifier: workspace:^
-        version: link:../types
+        version: link:../schemas
 
   packages/deepseek:
     dependencies:

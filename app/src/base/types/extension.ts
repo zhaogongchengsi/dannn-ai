@@ -1,5 +1,4 @@
-import type { Sidebar } from '@dannn/types'
-import type { Extension } from '../../../../packages/schemas/src/extension'
+import type { Extension } from '@dannn/schemas'
 
 export interface ExtensionMetadata {
   id: string

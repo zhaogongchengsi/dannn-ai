@@ -1,7 +1,7 @@
-import type { Extension, ExtensionPermissions } from '../../../../packages/schemas/src/extension'
+import type { Extension, ExtensionPermissions } from '@dannn/schemas'
 import type { CreateExtensionOptions } from '../types/extension'
 import { compact, join } from 'lodash'
-import { filter, ReplaySubject } from 'rxjs'
+import { ReplaySubject } from 'rxjs'
 import { WorkerBridge } from './bridge'
 
 export class ExtensionWorker extends WorkerBridge {
@@ -32,11 +32,7 @@ export class ExtensionWorker extends WorkerBridge {
     this.icon = config.icon
     this.description = config.description
     this.initReadme()
-    this.toMessageObservable().pipe(filter(message => message.type === 'done')).subscribe(async () => {
-      await this.initEnv(config.permissions)
-      await this.activate()
-      this.ready$.next(true)
-    })
+    this.initEnv()
   }
 
   private generateExtensionId(name: string) {
@@ -81,15 +77,8 @@ export class ExtensionWorker extends WorkerBridge {
   }
 
   destroy() {
-    this.postMessage({
-      type: 'destroy',
-    })
+    this.terminate()
     this.donePromiser?.resolve()
     this.donePromiser = null
-    this.subject.complete()
-  }
-
-  emitSendMessage(id: string, message: string) {
-    this.emitToWorker('question', { message, id })
   }
 }
