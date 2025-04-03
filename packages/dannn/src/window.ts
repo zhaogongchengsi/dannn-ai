@@ -1,9 +1,14 @@
-import { BaseWorker } from './worker'; 
+import { SelfWorker } from './worker'; 
 
-export type WindowEvent = {
-	'sidebar-ready': any[]
-	'question': { id: string, message: string }
-}
+export class Window {
+	selfWorker: SelfWorker
+	constructor(
+		selfWorker: SelfWorker
+	) {
+		this.selfWorker = selfWorker
+	}
 
-export class Window extends BaseWorker<WindowEvent> {
+	getEnv(key: string) {
+		return this.selfWorker.invoke('getEnv', key)
+	}
 }

@@ -1,5 +1,7 @@
-import type { Extension, ExtensionPermissions } from '@dannn/schemas'
+import type { AIModel } from '@/lib/database/models'
+import type { AIConfig, Extension, ExtensionPermissions } from '@dannn/schemas'
 import type { CreateExtensionOptions } from '../types/extension'
+import { registerAI } from '@/lib/database/aiService'
 import { compact, join } from 'lodash'
 import { ReplaySubject } from 'rxjs'
 import { WorkerBridge } from './bridge'
@@ -13,7 +15,8 @@ export class ExtensionWorker extends WorkerBridge {
   id: string
 
   permissions: ExtensionPermissions | undefined
-  env: Record<string, string> = {}
+  env: Record<string, string | undefined> = {}
+  evnInitialized = false
   dir: string
   dirname: string
 
@@ -33,6 +36,15 @@ export class ExtensionWorker extends WorkerBridge {
     this.description = config.description
     this.initReadme()
     this.initEnv()
+    this.expose('registerAI', async (ai: AIConfig) => {
+      return await this.registerAI(ai)
+    })
+    this.expose('getEnv', async (key: string) => {
+      if (!this.evnInitialized) {
+        await this.initEnv(this.permissions)
+      }
+      return this.env[key]
+    })
   }
 
   private generateExtensionId(name: string) {
@@ -51,8 +63,10 @@ export class ExtensionWorker extends WorkerBridge {
     if (!permissions?.env) {
       return {}
     }
-    return await window.dannn.getEnv(permissions.env)
+    const envs = await window.dannn.getEnv(permissions.env)
       .catch(() => ({} as Record<string, string>))
+    this.env = envs || {}
+    this.evnInitialized = true
   }
 
   private async initReadme() {
@@ -74,6 +88,10 @@ export class ExtensionWorker extends WorkerBridge {
     else {
       return await this.invoke<void>('activate')
     }
+  }
+
+  async registerAI(ai: AIConfig): Promise<AIModel> {
+    return await registerAI(ai)
   }
 
   destroy() {

@@ -1,7 +1,7 @@
 import Event from "./event";
 import { WorkerMessage, WorkerCallFunctionMessage, WorkerEventEmitMessage } from '@dannn/schemas'
 
-export class BaseWorker<E> extends Event<E> {
+export class SelfWorker extends Event<any> {
 	// @ts-ignore
 	private promiserMap = new Map<string, PromiseWithResolvers<any>>()
 	private handlers = new Map<string, (...args: any[]) => void>()
@@ -35,7 +35,7 @@ export class BaseWorker<E> extends Event<E> {
 
 	private handleEvent(data: WorkerEventEmitMessage) {
 		const { name, event } = data.data
-		this.emit(name as keyof E, event)
+		this.emit(name, event)
 	}
 
 	private handleCallResult(data: WorkerMessage) {
