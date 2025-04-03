@@ -1,8 +1,8 @@
 import { getExtensionsRoot } from '@/lib/api'
+import { extensionSchema } from '@dannn/schemas'
 import { join } from 'pathe'
 import { Subject } from 'rxjs'
 import { formatZodError } from '../common/zod'
-import { extensionSchema } from '../schemas/extension'
 import { ExtensionWorker } from '../worker/worker'
 import { APP_EXTENSION_CONFIG_NAME } from './constant'
 

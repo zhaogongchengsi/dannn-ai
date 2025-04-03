@@ -1,5 +1,5 @@
 import type { ExtensionNeedModule } from '@dannn/types'
-import type { Extension, ExtensionPermissions } from '../schemas/extension'
+import type { Extension, ExtensionPermissions } from '../../../../packages/schemas/src/extension'
 import type { CreateExtensionOptions } from '../types/extension'
 import { compact, join } from 'lodash'
 import { filter, ReplaySubject } from 'rxjs'
@@ -102,7 +102,7 @@ export class ExtensionWorker extends WorkerBridge {
     })
   }
 
-  emitSendMessage(id: string,message: string){
-    this.emitToWorker('question', {message, id})
+  emitSendMessage(id: string, message: string) {
+    this.emitToWorker('question', { message, id })
   }
 }
