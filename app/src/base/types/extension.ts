@@ -1,11 +1,9 @@
-import type { Extension } from '@dannn/schemas'
-
-export interface ExtensionMetadata {
-  id: string
-  manifest: Extension
-  uri: string
-  readme?: string | undefined
-}
+// export interface ExtensionMetadata {
+//   id: string
+//   manifest: Extension
+//   uri: string
+//   readme?: string | undefined
+// }
 
 export interface CreateExtensionOptions {
   /**
