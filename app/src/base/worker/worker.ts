@@ -39,12 +39,6 @@ export class ExtensionWorker extends WorkerBridge {
     this.expose('registerAI', async (ai: AIConfig) => {
       return await this.registerAI(ai)
     })
-    this.expose('getEnv', async (key: string) => {
-      if (!this.evnInitialized) {
-        await this.initEnv(this.permissions)
-      }
-      return this.env[key]
-    })
   }
 
   private generateExtensionId(name: string) {
