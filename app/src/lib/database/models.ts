@@ -22,10 +22,6 @@ export interface AIChat {
   id: ID // AI 唯一标识符
   title: string // AI 名称
   description?: string // AI 描述（可选）
-  temperature?: number // 生成文本时的随机性
-  maxTokens?: number // 最大 token 长度
-  presencePenalty?: number // 影响 AI 提及新主题的倾向
-  frequencyPenalty?: number // 影响 AI 重复词的倾向
   systemPrompt?: string // 自定义系统提示词
   createdAt: number // 创建时间戳
   updateAt: number // 更新时间戳
