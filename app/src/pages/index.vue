@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import type { CreateChatSchemas } from '@/lib/database/chatService'
 import { AutoForm } from '@/components/ui/auto-form'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,29 +16,24 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableEmpty,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { createChatSchemas } from '@/lib/database/chatService'
 import { useChatStore } from '@/stores/chat'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
-import { z } from 'zod'
 
 const chatStore = useChatStore()
 
-const chatSchemas = z.object({
-  title: z.string().min(1, '名称不能为空').describe('聊天名称'),
-  description: z.string().optional().describe('描述'),
-  systemPrompt: z.string().optional().describe('提示词'),
-})
-
 const form = useForm({
-  validationSchema: toTypedSchema(chatSchemas),
+  validationSchema: toTypedSchema(createChatSchemas),
 })
 
-function onFormSubmit(values) {
-  console.log('Form submitted:', values)
+function onFormSubmit(values: CreateChatSchemas) {
+  chatStore.addChat(values)
 }
 </script>
 
@@ -67,10 +63,9 @@ function onFormSubmit(values) {
               </DialogHeader>
               <AutoForm
                 :form="form"
-                :schema="chatSchemas" :field-config="{
+                :schema="createChatSchemas" :field-config="{
                   title: {
                     label: '聊天名称',
-                    placeholder: '请输入聊天名称',
                     description: '群聊的名称',
                   },
                   description: {
@@ -100,14 +95,16 @@ function onFormSubmit(values) {
       <Table class="w-full">
         <TableHeader>
           <TableRow>
-            <TableHead class="w-[100px]">
+            <TableHead class="w-28 text-left">
               名称
             </TableHead>
-            <TableHead>描述</TableHead>
-            <TableHead>提示词</TableHead>
-            <TableHead class="text-right">
+            <TableHead class="w-1/4 text-left">
+              描述
+            </TableHead>
+            <TableHead class="w-1/4 text-left">
               参与者
             </TableHead>
+            <TableHead>提示词</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody class="text-sm text-muted-foreground max-h-24 overflow-auto">
@@ -116,10 +113,12 @@ function onFormSubmit(values) {
               {{ chat.title }}
             </TableCell>
             <TableCell>{{ chat.description }}</TableCell>
-            <TableCell>{{ chat.systemPrompt }}</TableCell>
-            <TableCell class="text-right">
-              ${{ chat.participants }}
+            <TableCell>
+              <p>
+                {{ chat.participants.length }} 人参与
+              </p>
             </TableCell>
+            <TableCell>{{ chat.systemPrompt }}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
