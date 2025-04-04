@@ -1,7 +1,9 @@
 <script setup lang='ts'>
+import { AutoForm } from '@/components/ui/auto-form'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -18,8 +20,25 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useChatStore } from '@/stores/chat'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 
 const chatStore = useChatStore()
+
+const chatSchemas = z.object({
+  title: z.string().min(1, '名称不能为空').describe('聊天名称'),
+  description: z.string().optional().describe('描述'),
+  systemPrompt: z.string().optional().describe('提示词'),
+})
+
+const form = useForm({
+  validationSchema: toTypedSchema(chatSchemas),
+})
+
+function onFormSubmit(values) {
+  console.log('Form submitted:', values)
+}
 </script>
 
 <template>
@@ -46,15 +65,34 @@ const chatStore = useChatStore()
                   选择你需要的 AI 加入群聊
                 </DialogDescription>
               </DialogHeader>
-              hello
-              <DialogFooter>
-                <Button variant="secondary" class="mr-2" type="button">
-                  取消
-                </Button>
-                <Button type="submit">
-                  创建
-                </Button>
-              </DialogFooter>
+              <AutoForm
+                :form="form"
+                :schema="chatSchemas" :field-config="{
+                  title: {
+                    label: '聊天名称',
+                    placeholder: '请输入聊天名称',
+                    description: '群聊的名称',
+                  },
+                  description: {
+                    label: '描述',
+                  },
+                  systemPrompt: {
+                    label: '提示词',
+                  },
+                }"
+                @submit="onFormSubmit"
+              >
+                <DialogFooter class="mt-5">
+                  <DialogClose>
+                    <Button variant="secondary" class="mr-2" type="button">
+                      取消
+                    </Button>
+                  </DialogClose>
+                  <Button type="submit">
+                    创建
+                  </Button>
+                </DialogFooter>
+              </AutoForm>
             </DialogContent>
           </Dialog>
         </div>
