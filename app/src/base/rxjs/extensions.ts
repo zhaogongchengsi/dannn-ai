@@ -5,7 +5,7 @@ import { join } from 'pathe'
 import { ReplaySubject, Subject } from 'rxjs'
 import { formatZodError } from '../common/zod'
 import { ExtensionWorker } from '../worker/worker'
-import { onToWorkerChannel } from './channel'
+import { onToWorkerChannel, sendFormWorkerChannel } from './channel'
 import { APP_EXTENSION_CONFIG_NAME } from './constant'
 
 const workers: Map<string, ExtensionWorker> = new Map()
@@ -90,6 +90,9 @@ export async function loadLocalExtensions() {
       })
       extensionWorker.on('register-ai', (ai) => {
         extensionAiSubject.next(ai)
+      })
+      extensionWorker.onWorkerEvent('ai-answer', message => {
+        sendFormWorkerChannel(message)
       })
     }
     catch (error) {

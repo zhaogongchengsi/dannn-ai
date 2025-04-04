@@ -30,8 +30,9 @@ defineExtension(async ({ window, registerAI }) => {
 		models,
 	})
 
-	ai.onQuestion((message) => {
-		console.log(message)
+	ai.onQuestion((event) => {
+		console.log(event.message.content)
+		event.answer(`${event.message.content} answer !!!`)
 	})
 })
 
