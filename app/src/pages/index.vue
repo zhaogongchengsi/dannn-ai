@@ -24,6 +24,7 @@ import { createChatSchemas } from '@/lib/database/chatService'
 import { useChatStore } from '@/stores/chat'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const chatStore = useChatStore()
@@ -36,6 +37,10 @@ const form = useForm({
 function onFormSubmit(values: CreateChatSchemas) {
   chatStore.addChat(values)
 }
+
+onMounted(() => {
+  chatStore.setCurrentChatID(null)
+})
 
 function onRowClick(chatId: string) {
   router.push({

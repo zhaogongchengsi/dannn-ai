@@ -1,11 +1,13 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
+import { useChatStore } from '@/stores/chat'
 import { Expand, Home, Minimize, Minus, X } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import modeToggle from './mode-toggle.vue'
 
 const router = useRouter()
+const chatStore = useChatStore()
 
 const isMaximized = ref(false)
 const isMinimized = ref(false)
@@ -43,7 +45,11 @@ const isMac = window.dannn.is.mac
 
 <template>
   <div class="flex items-center h-[--app-header-height]">
-    <div v-if="isMac" class="h-full" />
+    <div class="h-full flex items-center px-4">
+      <h2 v-if="chatStore.currentChat" class="font-bold cursor-pointer select-none">
+        {{ chatStore.currentChat.title }}
+      </h2>
+    </div>
     <div class="ml-auto space-x-2">
       <Button variant="ghost" size="icon" class="size-7" @click="router.push('/')">
         <Home />
