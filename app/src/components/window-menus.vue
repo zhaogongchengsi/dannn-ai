@@ -1,8 +1,11 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
-import { Expand, Minimize, Minus, X } from 'lucide-vue-next'
+import { Expand, Home, Minimize, Minus, X } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import modeToggle from './mode-toggle.vue'
+
+const router = useRouter()
 
 const isMaximized = ref(false)
 const isMinimized = ref(false)
@@ -41,7 +44,10 @@ const isMac = window.dannn.is.mac
 <template>
   <div class="flex items-center h-[--app-header-height]">
     <div v-if="isMac" class="h-full" />
-    <div class="ml-auto space-x-1">
+    <div class="ml-auto space-x-2">
+      <Button variant="ghost" size="icon" class="size-7" @click="router.push('/')">
+        <Home />
+      </Button>
       <mode-toggle />
       <template v-if="!isMac">
         <Button variant="ghost" size="icon" class="size-7" @click="onMinimize">

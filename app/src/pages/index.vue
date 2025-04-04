@@ -16,7 +16,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableEmpty,
   TableHead,
   TableHeader,
   TableRow,
@@ -25,8 +24,10 @@ import { createChatSchemas } from '@/lib/database/chatService'
 import { useChatStore } from '@/stores/chat'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
+import { useRouter } from 'vue-router'
 
 const chatStore = useChatStore()
+const router = useRouter()
 
 const form = useForm({
   validationSchema: toTypedSchema(createChatSchemas),
@@ -35,11 +36,20 @@ const form = useForm({
 function onFormSubmit(values: CreateChatSchemas) {
   chatStore.addChat(values)
 }
+
+function onRowClick(chatId: string) {
+  router.push({
+    path: 'chat',
+    query: {
+      chatId,
+    },
+  })
+}
 </script>
 
 <template>
   <div class="w-full h-full flex justify-center">
-    <div class="w-full max-w-3xl p-4">
+    <div class="w-full max-w-6xl p-4">
       <div class="w-full mb-6">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold">
@@ -108,7 +118,7 @@ function onFormSubmit(values: CreateChatSchemas) {
           </TableRow>
         </TableHeader>
         <TableBody class="text-sm text-muted-foreground max-h-24 overflow-auto">
-          <TableRow v-for="chat of chatStore.chats" :key="chat.id">
+          <TableRow v-for="chat of chatStore.chats" :key="chat.id" @click="onRowClick(chat.id)">
             <TableCell class="font-medium">
               {{ chat.title }}
             </TableCell>
