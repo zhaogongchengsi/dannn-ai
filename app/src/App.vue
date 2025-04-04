@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { PATTERN_BACKGROUND_DIRECTION, PATTERN_BACKGROUND_SPEED, PATTERN_BACKGROUND_VARIANT } from '@/components/ui/pattern-background'
 import PatternBackground from '@/components/ui/pattern-background/PatternBackground.vue'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Toaster } from '@/components/ui/sonner'
 import WindowMenus from '@/components/window-menus.vue'
 import { computed } from 'vue'
@@ -28,9 +29,9 @@ const toasterTheme = computed(() => {
     <div class="w-screen h-screen">
       <section class="w-full h-screen relative">
         <WindowMenus />
-        <main class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-header-height))' }">
+        <ScrollArea class="w-screen overflow-auto" :style="{ height: 'calc(100vh - var(--app-header-height))' }">
           <router-view />
-        </main>
+        </ScrollArea>
       </section>
       <Toaster :theme="toasterTheme" />
     </div>
