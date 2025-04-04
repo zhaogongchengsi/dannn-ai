@@ -2,14 +2,14 @@ import { AIConfig, aiConfig } from '@dannn/schemas'
 import { Window } from './window'
 import { SelfWorker } from './worker'
 import { isIdValid } from './utils'
-import { AI } from './AI'
+import { AI } from './ai'
 
 export interface ExtensionContext {
 	window: Window
 	registerAI(ai: AIConfig): Promise<AI>
 }
 
-export function defineExtension(func: (ctx: ExtensionContext) => void) {
+export function defineExtension(func: (ctx: ExtensionContext) => void | Promise<void>) {
 	if (typeof func !== 'function') {
 		throw new Error('Extension must be a function')
 	}
@@ -37,9 +37,9 @@ export function defineExtension(func: (ctx: ExtensionContext) => void) {
 		}
 	}
 
-	function activate() {
+	async function activate() {
 		try {
-			func({
+			await func({
 				window,
 				registerAI
 			})

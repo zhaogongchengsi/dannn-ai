@@ -1,20 +1,19 @@
 import { defineExtension } from '@dannn/core';
 
-defineExtension(({ logger, window }) => {
-	logger.log('DeepSeek extension activated');
+defineExtension(async ({ window, registerAI }) => {
+	console.log('DeepSeek extension activated');
 
-	window.onSidebarReady(async () => {
-		const ok = await window.appendSidebar({
-			id: 'deepseek-chat',
-			title: 'DeepSeek Chat',
-			type: 'chat',
-		})
-		console.log('Append sidebar:', ok);
-	})
-
-	window.onQuestion((question) => {
-		console.log('Received question:', question);
-		window.replyQuestion(question.id, question.message + 'This is a reply to your question.');
+	registerAI({
+		name: 'DeepSeek',
+		description: 'DeepSeek is a powerful AI tool that helps you find information quickly and efficiently.',
+		icon: 'https://www.deepseek.com/favicon.ico',
+		permissions: {
+			env: ['DEEPSEEK_API_KEY'],
+		},
+	}).then((ai) => {
+		console.log('AI registered:', ai);
+	}).catch((error) => {
+		console.error('Error registering AI:', error);
 	})
 })
 
