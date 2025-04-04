@@ -127,6 +127,20 @@ export class WorkerBridge extends Event<ExtensionEvent> {
     this.workerEvent.emit(name, event)
   }
 
+  emitWorkerEvent(name: string, event: Record<string, any>) {
+    this.postMessage({
+      type: 'event-emit',
+      data: {
+        name,
+        event,
+      },
+    })
+  }
+
+  onWorkerEvent(name: string, fn: (e: any) => void) {
+    this.workerEvent.on(name, fn)
+  }
+
   invoke<T>(name: string, ...args: any[]) {
     const id = this.generateId()
     if (this.isReady) {

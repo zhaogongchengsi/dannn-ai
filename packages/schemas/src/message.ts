@@ -37,7 +37,6 @@ export const WorkerCallFunctionErrorMessage = z.object({
 })
 
 export const WorkerEventEmitMessage = z.object({
-	id: z.string(),
 	type: z.literal('event-emit'),
 	data: z.object({
 		name: z.string(),

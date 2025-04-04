@@ -1,5 +1,5 @@
 import type { AIModel } from '@/lib/database/models'
-import type { AIConfig, Extension, ExtensionPermissions } from '@dannn/schemas'
+import type { AIConfig, ChannelMessage, Extension, ExtensionPermissions } from '@dannn/schemas'
 import type { CreateExtensionOptions } from '../types/extension'
 import { registerAI } from '@/lib/database/aiService'
 import { compact, join } from 'lodash'
@@ -20,6 +20,7 @@ export class ExtensionWorker extends WorkerBridge {
   readme: string | undefined
 
   ais: AIModel[] = []
+  onlineAis: string[] = []
 
   constructor(config: Extension, options: CreateExtensionOptions) {
     super(config.name, config.main)
@@ -55,6 +56,18 @@ export class ExtensionWorker extends WorkerBridge {
       }
       throw new Error(`Permission denied to access env key: ${key}`)
     })
+
+    this.onWorkerEvent('ai-online', (id) => {
+      this.onlineAis.push(id)
+    })
+  }
+
+  includesAI(aiId: string) {
+    return this.ais.some(ai => ai.id === aiId)
+  }
+
+  sendToWorkerChannel(message: ChannelMessage) {
+    this.emitWorkerEvent('question', message)
   }
 
   private generateExtensionId(name: string) {

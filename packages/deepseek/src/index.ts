@@ -1,11 +1,7 @@
 import { defineExtension } from '@dannn/core';
 
 defineExtension(async ({ window, registerAI }) => {
-	console.log('DeepSeek extension activated');
-
 	const apiKey = await window.getEnv('DEEPSEEK_API_KEY');
-
-	console.log('api kay', apiKey)
 
 	async function getModels() {
 		const response = await fetch('https://api.deepseek.com/models', {
@@ -22,7 +18,7 @@ defineExtension(async ({ window, registerAI }) => {
 
 	const models = await getModels()
 
-	registerAI({
+	const ai = await registerAI({
 		name: 'DeepSeek',
 		description: 'DeepSeek is a powerful AI tool that helps you find information quickly and efficiently.',
 		icon: 'https://www.deepseek.com/favicon.ico',
@@ -32,10 +28,10 @@ defineExtension(async ({ window, registerAI }) => {
 		prompt: 'You are a helpful assistant.',
 		type: 'text',
 		models,
-	}).then((ai) => {
-		console.log('AI registered:', ai);
-	}).catch((error) => {
-		console.error('Error registering AI:', error);
+	})
+
+	ai.onQuestion((message) => {
+		console.log(message)
 	})
 })
 
