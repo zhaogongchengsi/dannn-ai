@@ -52,4 +52,6 @@ export function defineExtension(func: (ctx: ExtensionContext) => void | Promise<
 
 	selfWorker.expose('activate', activate)
 	selfWorker.expose('deactivate', deactivate)
+
+	selfWorker.invoke('done', {})
 }

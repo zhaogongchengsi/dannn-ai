@@ -1,11 +1,11 @@
 import type { Plugin } from 'vue'
 import type { AppRx } from './type'
 import { combineLatest } from 'rxjs'
-import { appMount, appMount$, appReady$, onAppReady } from './app'
+import { appMount, appMount$, appReady$, onAppMount, onAppReady } from './app'
 import { APP_PROVIDE_RX_KEY } from './constant'
-import { extensionDestroy, extensionWorkerSubject, getExtensionWorker, getExtensionWorkers, onExtensionLoaded } from './extensions'
+import { activeExtension$, extensionDestroy, extensionWorkerSubject, getExtensionWorker, getExtensionWorkers, loadLocalExtensions, onExtensionLoaded, setActiveExtension } from './extensions'
 
-combineLatest([appMount$]).subscribe(() => {
+combineLatest([appMount$, activeExtension$]).subscribe(() => {
   appReady$.next(true)
 })
 
@@ -21,6 +21,16 @@ export function createRx(): Plugin {
     extensionDestroy,
     onExtensionLoaded,
   }
+
+  onAppMount(async () => {
+    console.log('App mounted')
+    await loadLocalExtensions()
+  })
+
+  onAppReady(() => {
+    console.log('App ready')
+    setActiveExtension()
+  })
 
   return {
     install(app) {

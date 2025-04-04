@@ -11,20 +11,13 @@ const aiModelKeys: AIModelKeys[] = [
   'createdAt',
   'updateAt',
   'isDeleted',
-  'apiBaseURL',
   'models',
   'description',
-  'frequencyPenalty',
-  'functionCalls',
-  'presencePenalty',
   'lastMessageAt',
-  'maxTokens',
   'version',
   'module',
   'role',
   'prompt',
-  'temperature',
-  'topP',
 ]
 
 const aiChatKeys: AIChatKeys[] = [

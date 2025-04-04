@@ -1,19 +1,20 @@
 import type { WorkerCallFunctionErrorMessage, WorkerCallFunctionMessage, WorkerCallFunctionResponseMessage, WorkerEventEmitMessage, WorkerMessage } from '@dannn/schemas'
+import type { ExtensionEvent } from '../types/extension'
 import { Event } from '../common/event'
 
-export class WorkerBridge {
+export class WorkerBridge extends Event<ExtensionEvent> {
   private worker: Worker | null = null
-  isReady = false
+  isReady: PromiseWithResolvers<void> | null = Promise.withResolvers<void>()
   name: string
   url: string
   promiserMap: Map<string, PromiseWithResolvers<any>> = new Map()
   readyMethodsName: Set<string> = new Set()
-  donePromiser: PromiseWithResolvers<void> | null = null
   handlers: Map<string, (arg1: any, ...args: any[]) => void> = new Map()
   workerEvent: Event<Record<string, any>> = new Event()
   waitResolved: Set<WorkerCallFunctionMessage> = new Set()
 
   constructor(name: string, url: string) {
+    super()
     this.name = name
     this.url = url
     this.worker = new Worker(`dannn://import.extension/${url}?name=${name}`, {
@@ -32,6 +33,10 @@ export class WorkerBridge {
     this.worker.onmessageerror = (e: any) => {
       console.error(`Worker ${this.name} message error:`, e?.message)
     }
+
+    this.expose('done', () => {
+      this.handleDone()
+    })
   }
 
   terminate() {
@@ -42,11 +47,8 @@ export class WorkerBridge {
   }
 
   private handleDone() {
-    this.isReady = true
-    if (this.donePromiser) {
-      this.donePromiser.resolve()
-      this.donePromiser = null
-    }
+    this.isReady?.resolve()
+    this.isReady = null
   }
 
   private handleCallResult(message: WorkerCallFunctionResponseMessage) {
@@ -98,12 +100,9 @@ export class WorkerBridge {
 
   waitReady() {
     if (this.isReady) {
-      return Promise.resolve()
+      return this.isReady.promise
     }
-    else {
-      this.donePromiser = Promise.withResolvers<void>()
-      return this.donePromiser.promise
-    }
+    return Promise.resolve()
   }
 
   private onMessage(message: WorkerMessage) {
@@ -119,6 +118,7 @@ export class WorkerBridge {
         break
       case 'event-emit':
         this.handleEvent(message)
+        break
     }
   }
 
@@ -128,12 +128,8 @@ export class WorkerBridge {
   }
 
   invoke<T>(name: string, ...args: any[]) {
-    if (!this.readyMethodsName.has(name)) {
-      return Promise.reject(new Error(`Method ${name} not ready`))
-    }
-
     const id = this.generateId()
-    if (!this.isReady) {
+    if (this.isReady) {
       return Promise.reject(new Error('Worker not ready'))
     }
 

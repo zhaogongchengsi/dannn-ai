@@ -1,13 +1,17 @@
+import type { AIModel } from '@/lib/database/models'
 import { getExtensionsRoot } from '@/lib/api'
 import { extensionSchema } from '@dannn/schemas'
 import { join } from 'pathe'
-import { Subject } from 'rxjs'
+import { ReplaySubject, Subject } from 'rxjs'
 import { formatZodError } from '../common/zod'
 import { ExtensionWorker } from '../worker/worker'
 import { APP_EXTENSION_CONFIG_NAME } from './constant'
 
 const workers: Map<string, ExtensionWorker> = new Map()
+const activeExtensionAi = new ReplaySubject<boolean>(1)
+export const activeExtension$ = new ReplaySubject<boolean>(1)
 export const extensionWorkerSubject = new Subject<ExtensionWorker>()
+export const extensionAiSubject = new Subject<AIModel>()
 
 export function getExtensionWorker(id: string) {
   return workers.get(id)
@@ -37,17 +41,26 @@ export function extensionDestroy() {
   extensionWorkerSubject.complete()
 }
 
+export function setActiveExtension() {
+  activeExtensionAi.next(true)
+}
+
+export function onAIRegistered(callback: (ai: AIModel) => void) {
+  return extensionAiSubject.subscribe(callback)
+}
+
 export async function loadLocalExtensions() {
   const root = await getExtensionsRoot()
   const extensions = await window.dannn.readDir(root)
 
-  extensions.forEach(async (extension) => {
+  for (const extension of extensions) {
     try {
       const pluginDir = join(root, extension)
       const configPath = join(pluginDir, APP_EXTENSION_CONFIG_NAME)
 
       if (!await window.dannn.exists(configPath)) {
-        return
+        console.warn('Extension config not found:', configPath)
+        continue
       }
 
       const config = await window.dannn.readFile(configPath).catch(() => {
@@ -55,7 +68,8 @@ export async function loadLocalExtensions() {
       })
 
       if (!config) {
-        return
+        console.warn('Extension config is empty:', configPath)
+        continue
       }
 
       const { success, data, error } = extensionSchema.safeParse(JSON.parse(config))
@@ -68,9 +82,19 @@ export async function loadLocalExtensions() {
       const extensionWorker = new ExtensionWorker(data, { pluginDir, dirname: extension })
       workers.set(extensionWorker.id, extensionWorker)
       extensionWorkerSubject.next(extensionWorker)
+      activeExtensionAi.subscribe((active) => {
+        if (active) {
+          extensionWorker.activate()
+        }
+      })
+      extensionWorker.on('register-ai', (ai) => {
+        extensionAiSubject.next(ai)
+      })
     }
     catch (error) {
       console.error('Error loading extension:', error)
     }
-  })
+  }
+
+  activeExtension$.next(true)
 }

@@ -5,6 +5,7 @@ import { computed } from 'vue'
 import { useConfig } from './composables/config'
 
 const config = useConfig()
+useAIStore()
 
 config.init()
 

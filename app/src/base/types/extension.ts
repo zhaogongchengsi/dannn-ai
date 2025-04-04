@@ -1,9 +1,4 @@
-// export interface ExtensionMetadata {
-//   id: string
-//   manifest: Extension
-//   uri: string
-//   readme?: string | undefined
-// }
+import type { AIModel } from '@/lib/database/models'
 
 export interface CreateExtensionOptions {
   /**
@@ -11,4 +6,8 @@ export interface CreateExtensionOptions {
    */
   pluginDir: string
   dirname: string
+}
+
+export interface ExtensionEvent {
+  'register-ai': AIModel
 }

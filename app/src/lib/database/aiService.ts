@@ -71,15 +71,8 @@ export async function registerAI(ai: AIConfig): Promise<AIModel> {
     description: ai.description || '',
     version: ai.version,
     type: ai.type ?? 'text',
-    apiKey: ai.apiKey || '',
-    apiBaseURL: ai.apiBaseURL || '',
     models: ai.models, // 默认支持 GPT-4
     module: ai.models?.[0], // 默认选第一个模型
-    temperature: ai.temperature ?? 0.7,
-    maxTokens: ai.maxTokens ?? 4096,
-    topP: ai.topP ?? 1,
-    presencePenalty: ai.presencePenalty ?? 0,
-    frequencyPenalty: ai.frequencyPenalty ?? 0,
     prompt: ai.prompt || '',
     createdAt: Date.now(),
     updateAt: Date.now(),

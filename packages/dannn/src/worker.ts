@@ -1,5 +1,5 @@
 import Event from "./event";
-import { WorkerMessage, WorkerCallFunctionMessage, WorkerEventEmitMessage } from '@dannn/schemas'
+import { WorkerMessage, WorkerCallFunctionMessage, WorkerEventEmitMessage, WorkerCallFunctionResponseMessage, WorkerCallFunctionErrorMessage } from '@dannn/schemas'
 
 export class SelfWorker extends Event<any> {
 	// @ts-ignore
@@ -38,7 +38,7 @@ export class SelfWorker extends Event<any> {
 		this.emit(name, event)
 	}
 
-	private handleCallResult(data: WorkerMessage) {
+	private handleCallResult(data: WorkerCallFunctionResponseMessage | WorkerCallFunctionErrorMessage) {
 		const { id } = data
 		if (this.promiserMap.has(id)) {
 			const promiser = this.promiserMap.get(id)!
@@ -51,13 +51,13 @@ export class SelfWorker extends Event<any> {
 		}
 	}
 
-	private callFunctionHandle(data: WorkerCallFunctionMessage) {
+	private async callFunctionHandle(data: WorkerCallFunctionMessage) {
 		const { id } = data
 		const { name, args } = data.data
 		if (this.handlers.has(name)) {
 			const handler = this.handlers.get(name)!
 			try {
-				const result = handler(...args)
+				const result = await Promise.resolve(handler(...args))
 				this.postMessage({
 					type: 'call-function-response',
 					id,

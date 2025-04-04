@@ -8,6 +8,7 @@ export const WorkerMessageType = z.enum([
 	'call-function-response',
 	'call-function-error',
 	'event-emit',
+	'done'
 ])
 
 export const WorkerCallFunctionMessage = z.object({
@@ -44,16 +45,22 @@ export const WorkerEventEmitMessage = z.object({
 	}),
 })
 
+export const WorkerDoneMessage = z.object({
+	type: z.literal('done'),
+})
+
 export type WorkerMessageType = z.infer<typeof WorkerMessageType>
 export type WorkerCallFunctionMessage = z.infer<typeof WorkerCallFunctionMessage>
 export type WorkerCallFunctionResponseMessage = z.infer<typeof WorkerCallFunctionResponseMessage>
 export type WorkerCallFunctionErrorMessage = z.infer<typeof WorkerCallFunctionErrorMessage>
 export type WorkerEventEmitMessage = z.infer<typeof WorkerEventEmitMessage>
+export type WorkerDoneMessage = z.infer<typeof WorkerDoneMessage>
 export type WorkerMessage =
 	WorkerCallFunctionMessage |
 	WorkerCallFunctionResponseMessage |
 	WorkerCallFunctionErrorMessage |
-	WorkerEventEmitMessage
+	WorkerEventEmitMessage |
+	WorkerDoneMessage
 export type WorkerMessageData =
 	WorkerCallFunctionMessage['data'] |
 	WorkerCallFunctionResponseMessage['data'] |

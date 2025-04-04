@@ -126,6 +126,7 @@ declare global {
   const until: typeof import('@vueuse/core')['until']
   const useAI: typeof import('./src/composables/ai')['useAI']
   const useAIHub: typeof import('./src/composables/ai')['useAIHub']
+  const useAIStore: typeof import('./src/stores/ai')['useAIStore']
   const useActiveElement: typeof import('@vueuse/core')['useActiveElement']
   const useAnimate: typeof import('@vueuse/core')['useAnimate']
   const useArrayDifference: typeof import('@vueuse/core')['useArrayDifference']
