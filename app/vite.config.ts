@@ -5,6 +5,7 @@ import tailwind from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
 import VueRouter from 'unplugin-vue-router/vite'
 import { defineConfig } from 'vite'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -27,6 +28,7 @@ export default defineConfig({
         './src/stores/**.ts',
       ],
     }),
+    vueDevTools(),
   ],
   css: {
     postcss: {

@@ -3,7 +3,7 @@ import type { AppRx } from './type'
 import { combineLatest } from 'rxjs'
 import { appMount, appMount$, appReady$, onAppMount, onAppReady } from './app'
 import { APP_PROVIDE_RX_KEY } from './constant'
-import { activeExtension$, extensionDestroy, extensionWorkerSubject, getExtensionWorker, getExtensionWorkers, loadLocalExtensions, onExtensionLoaded, setActiveExtension } from './extensions'
+import { activeExtension$, extensionAiSubject, extensionDestroy, extensionWorkerSubject, getExtensionWorker, getExtensionWorkers, loadLocalExtensions, onExtensionLoaded, setActiveExtension } from './extensions'
 
 combineLatest([appMount$, activeExtension$]).subscribe(() => {
   appReady$.next(true)
@@ -14,6 +14,7 @@ export function createRx(): Plugin {
     appMount$,
     appReady$,
     extensionWorkerSubject,
+    extensionAiSubject,
     getExtensionWorker,
     getExtensionWorkers,
     appMount,
@@ -23,12 +24,10 @@ export function createRx(): Plugin {
   }
 
   onAppMount(async () => {
-    console.log('App mounted')
     await loadLocalExtensions()
   })
 
   onAppReady(() => {
-    console.log('App ready')
     setActiveExtension()
   })
 

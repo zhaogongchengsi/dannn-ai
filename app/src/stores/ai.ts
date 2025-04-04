@@ -7,15 +7,23 @@ import { reactive } from 'vue'
 export const useAIStore = defineStore('dannn-ai', () => {
   const ais = reactive<AIModel[]>([])
 
+  function addAIIfNotExists(ai: AIModel) {
+    if (!ais.some(existingAI => existingAI.id === ai.id)) {
+      ais.push(ai)
+    }
+  }
+
   async function init() {
     const ais = await findAllAIs()
     ais.forEach((ai) => {
-      ais.push(ai)
+      addAIIfNotExists(ai)
     })
   }
 
+  init()
+
   onAIRegistered((ai) => {
-    console.log('AI registered:', ai)
+    addAIIfNotExists(ai)
   })
 
   init()
