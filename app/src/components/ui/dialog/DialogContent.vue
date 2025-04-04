@@ -13,7 +13,12 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-const props = defineProps<DialogContentProps & { class?: HTMLAttributes['class'] }>()
+const props = withDefaults(
+  defineProps<DialogContentProps & { class?: HTMLAttributes['class'], overlay?: boolean }>(),
+  {
+    overlay: true,
+  },
+)
 const emits = defineEmits<DialogContentEmits>()
 
 const delegatedProps = computed(() => {
@@ -28,6 +33,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 <template>
   <DialogPortal>
     <DialogOverlay
+      v-if="overlay"
       class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
     />
     <DialogContent

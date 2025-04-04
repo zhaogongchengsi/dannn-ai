@@ -1,8 +1,9 @@
 import type { CreateChatSchemas } from '@/lib/database/chatService'
 import type { AIChat } from '@/lib/database/models'
-import { createChat, findAllChats } from '@/lib/database/chatService'
+import { addAiMemberToChat, createChat, findAllChats } from '@/lib/database/chatService'
 import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
+import { useAIStore } from './ai'
 
 export const useChatStore = defineStore('dannn-chat', () => {
   const chats = reactive<AIChat[]>([])
@@ -28,6 +29,18 @@ export const useChatStore = defineStore('dannn-chat', () => {
     currentChatID.value = id
   }
 
+  async function setAiToChat(id: string, aiId: string) {
+    const chat = chats.find(chat => chat.id === id)
+    if (chat?.participants.includes(aiId)) {
+      console.warn(`AI member ${aiId} already exists in chat ${id}`)
+      return
+    }
+    await addAiMemberToChat(id, aiId)
+    if (chat) {
+      chat.participants.push(aiId)
+    }
+  }
+
   init()
 
   return {
@@ -36,5 +49,6 @@ export const useChatStore = defineStore('dannn-chat', () => {
     currentChatID,
     addChat,
     setCurrentChatID,
+    setAiToChat,
   }
 })

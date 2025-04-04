@@ -28,3 +28,27 @@ export async function createChat(data: CreateChatSchemas) {
   await database.aiChats.add(chat)
   return chat
 }
+
+export async function updateChatParticipants(chatId: string, participants: string[]) {
+  const chat = await database.aiChats.get(chatId)
+  if (!chat) {
+    throw new Error(`Chat with id ${chatId} not found`)
+  }
+  chat.participants = participants
+  chat.updateAt = Date.now()
+  await database.aiChats.put(chat)
+  return chat
+}
+
+export async function addAiMemberToChat(chatId: string, aiMemberId: string) {
+  const chat = await database.aiChats.get(chatId)
+  if (!chat) {
+    throw new Error(`Chat with id ${chatId} not found`)
+  }
+  if (!chat.participants.includes(aiMemberId)) {
+    chat.participants.push(aiMemberId)
+    chat.updateAt = Date.now()
+    await database.aiChats.put(chat)
+  }
+  return chat
+}
