@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { database } from './database' // Adjust the import path based on your project structure
+import { database } from './database'
 
 export async function findAllChats() {
   return await database.aiChats.toArray()
@@ -51,5 +51,24 @@ export async function addAiMemberToChat(chatId: string, aiMemberId: string) {
     chat.updateAt = Date.now()
     await database.aiChats.put(chat)
   }
+  return chat
+}
+
+export async function findLastMessageSortId(chatId: string) {
+  const chat = await database.aiChats.get(chatId)
+  if (!chat) {
+    throw new Error(`Chat with id ${chatId} not found`)
+  }
+  return chat.lastMessageSortId
+}
+
+export async function updateLastMessageSortId(chatId: string, sortId: number) {
+  const chat = await database.aiChats.get(chatId)
+  if (!chat) {
+    throw new Error(`Chat with id ${chatId} not found`)
+  }
+  chat.lastMessageSortId = sortId
+  chat.updateAt = Date.now()
+  await database.aiChats.put(chat)
   return chat
 }
