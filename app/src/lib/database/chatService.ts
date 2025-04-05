@@ -95,6 +95,19 @@ export async function findAllChatsWithMessages(): Promise<Room[]> {
   return chatsWithMessages
 }
 
+export async function findMessageById(messageId: string): Promise<AIMessage | undefined> {
+  return await database.aiMessages.get(messageId)
+}
+
+export async function findChatById(chatId: string): Promise<AIChat | undefined> {
+  return await database.aiChats.get(chatId)
+}
+
+export async function addMessage(message: AIMessage) {
+  const id = await database.aiMessages.add(message)
+  return (await findMessageById(id))!
+}
+
 export async function createQuestionMessage(
   question: string,
   chatId: string,
@@ -115,9 +128,7 @@ export async function createQuestionMessage(
 
     await updateLastMessageSortId(chatId, sortId)
 
-    await database.aiMessages.add(message)
-
-    return message
+    return await addMessage(message)
   })
 }
 
@@ -144,9 +155,7 @@ export async function createAnswerMessage(
 
     await updateLastMessageSortId(chatId, sortId)
 
-    await database.aiMessages.add(message)
-
-    return message
+    return await addMessage(message)
   })
 }
 
@@ -170,6 +179,5 @@ export async function updateMessageContent(messageId: string, stream: StreamAnsw
     message.toHTML = markdownToHtml(message.content)
   }
 
-  await database.aiMessages.put(message)
-  return message
+  return await addMessage(message)
 }
