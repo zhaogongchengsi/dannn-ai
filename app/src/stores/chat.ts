@@ -1,7 +1,7 @@
 import type { CreateChatSchemas, Room } from '@/lib/database/chatService'
 import { sendToWorkerChannel } from '@/base/rxjs/channel'
 import { useAppRx } from '@/base/rxjs/hook'
-import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, updateMessageContent } from '@/lib/database/chatService'
+import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, updateStreamMessageContent } from '@/lib/database/chatService'
 import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
 import { AIMessage } from '@/lib/database/models'
@@ -58,9 +58,10 @@ export const useChatStore = defineStore('dannn-chat', () => {
     }
 
     if (message.type === 'stream') {
+      // BUG: 这里的 message 是一个流式消息，应该是一个数组 会导致重复创建消息
       const newMessage = await createAnswerMessage(message.content, message.chatId, message.aiReplier)
       chat.lastMessageSortId = newMessage.sortId
-      const updatedMessage = await updateMessageContent(newMessage.id, message)
+      const updatedMessage = await updateStreamMessageContent(newMessage.id, message)
       addMessageToChat(chat.id, updatedMessage)
     }
   })

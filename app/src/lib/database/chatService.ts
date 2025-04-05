@@ -159,7 +159,7 @@ export async function createAnswerMessage(
   })
 }
 
-export async function updateMessageContent(messageId: string, stream: StreamAnswerMessage) {
+export async function updateStreamMessageContent(messageId: string, stream: StreamAnswerMessage) {
   const message = await database.aiMessages.get(messageId)
 
   if (!message) {
@@ -171,7 +171,7 @@ export async function updateMessageContent(messageId: string, stream: StreamAnsw
   message.complete = stream.complete
   message.timestamp = Date.now()
 
-  message.stream.sort((a, b) => a.id - b.id)
+  message.stream.sort((a, b) => a.sortId - b.sortId)
 
   message.content = message.stream.map((s) => s.content).join('')
 
