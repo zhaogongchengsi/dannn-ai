@@ -3,25 +3,30 @@ import { z } from 'zod'
 
 export const questionMessage = z.object({
 	id: z.string(),
+	chatId: z.string(),
 	content: z.string(),
 	aiReplier: z.string().array(),
 })
 
 export const completeAnswerMessage = z.object({
+	chatId: z.string(),
 	type: z.literal('content'),
 	questionId: z.string(),
 	content: z.string(),
 	aiReplier: z.string(),
+	createAt: z.number(),
 })
 
 
 export const streamAnswerMessage = z.object({
-	type: z.literal('stream'),
 	id: z.number(),
+	chatId: z.string(),
+	type: z.literal('stream'),
 	questionId: z.string(),
 	content: z.string(),
 	aiReplier: z.string(),
 	complete: z.boolean(),
+	createAt: z.number(),
 })
 
 const answerMessage = z.union([completeAnswerMessage, streamAnswerMessage])
