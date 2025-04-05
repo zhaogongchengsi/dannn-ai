@@ -1,3 +1,4 @@
+import type { AIChat, AIMessage } from './models'
 import { z } from 'zod'
 import { database } from './database'
 
@@ -12,6 +13,10 @@ export const createChatSchemas = z.object({
 })
 
 export type CreateChatSchemas = z.infer<typeof createChatSchemas>
+
+export interface Room extends AIChat {
+  messages: AIMessage[]
+}
 
 export async function createChat(data: CreateChatSchemas) {
   const { title, description, systemPrompt } = createChatSchemas.parse(data)
@@ -71,4 +76,71 @@ export async function updateLastMessageSortId(chatId: string, sortId: number) {
   chat.updateAt = Date.now()
   await database.aiChats.put(chat)
   return chat
+}
+
+export async function findAllChatsWithMessages(): Promise<Room[]> {
+  const chats = await database.aiChats.toArray()
+  const chatsWithMessages = await Promise.all(
+    chats.map(async (chat) => {
+      const messages = await database.aiMessages
+        .where('chatId')
+        .equals(chat.id)
+        .toArray()
+      return { ...chat, messages: messages.sort((a, b) => a.sortId - b.sortId) }
+    }),
+  )
+  return chatsWithMessages
+}
+
+export async function createQuestionMessage(
+  question: string,
+  chatId: string,
+): Promise<AIMessage> {
+  return await database.transaction('rw', [database.aiMessages, database.aiChats], async () => {
+    const lastSortId = await findLastMessageSortId(chatId)
+    const sortId = lastSortId + 1
+
+    const message: AIMessage = {
+      id: crypto.randomUUID(),
+      chatId,
+      content: question,
+      timestamp: Date.now(),
+      senderIsUser: true,
+      sortId,
+      senderId: '',
+    }
+
+    await updateLastMessageSortId(chatId, sortId)
+
+    await database.aiMessages.add(message)
+
+    return message
+  })
+}
+
+export async function createAnswerMessage(
+  answer: string,
+  chatId: string,
+  senderId: string,
+): Promise<AIMessage> {
+  return await database.transaction('rw', [database.aiMessages, database.aiChats], async () => {
+    const lastSortId = await findLastMessageSortId(chatId)
+    const sortId = lastSortId + 1
+
+    const message: AIMessage = {
+      id: crypto.randomUUID(),
+      chatId,
+      content: answer,
+      timestamp: Date.now(),
+      senderIsAI: true,
+      sortId,
+      senderId,
+    }
+
+    await updateLastMessageSortId(chatId, sortId)
+
+    await database.aiMessages.add(message)
+
+    return message
+  })
 }

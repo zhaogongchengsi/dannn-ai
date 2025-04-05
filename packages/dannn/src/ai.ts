@@ -1,10 +1,10 @@
-import { AIConfig, ChannelMessage } from "@dannn/schemas";
+import { AIConfig, QuestionMessage, AnswerMessage } from "@dannn/schemas";
 import { SelfWorker } from "./worker";
 
 
 interface QuestionEvent {
-	message: ChannelMessage
-	answer: (message: string) => void
+	message: QuestionMessage
+	completeAnswer: (answerMessageContent: string) => void
 }
 
 export class AI {
@@ -18,17 +18,19 @@ export class AI {
 	}
 
 	onQuestion(fn: (e: QuestionEvent) => void) {
-		const handle = (message: ChannelMessage) => {
-			const answer = (message: string) => {
-				const answerMessage: ChannelMessage = {
-					content: message,
-					aiReplier: [this.id]
+		const handle = (message: QuestionMessage) => {
+			const completeAnswer = (answerMessageContent: string) => {
+				const answerMessage: AnswerMessage = {
+					content: answerMessageContent,
+					aiReplier: this.id,
+					chatId: message.chatId,
+					type: 'content',
 				}
 				this.selfWorker.emitEventToWindow('ai-answer', answerMessage)
 			}
 			fn({
 				message,
-				answer
+				completeAnswer
 			})
 		}
 		this.selfWorker.on('question', handle)

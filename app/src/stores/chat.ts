@@ -1,28 +1,47 @@
-import type { CreateChatSchemas } from '@/lib/database/chatService'
-import type { AIChat } from '@/lib/database/models'
-import { addAiMemberToChat, createChat, findAllChats } from '@/lib/database/chatService'
+import type { CreateChatSchemas, Room } from '@/lib/database/chatService'
+import { sendToWorkerChannel } from '@/base/rxjs/channel'
+import { useAppRx } from '@/base/rxjs/hook'
+import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages } from '@/lib/database/chatService'
 import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
-import { useAIStore } from './ai'
 
 export const useChatStore = defineStore('dannn-chat', () => {
-  const chats = reactive<AIChat[]>([])
+  const rx = useAppRx()
+
+  const rooms = reactive<Room[]>([])
   const currentChatID = ref<string | null>(null)
 
   const currentChat = computed(() => {
-    return chats.find(chat => chat.id === currentChatID.value) || null
+    return rooms.find(chat => chat.id === currentChatID.value) || null
   })
 
   async function init() {
-    const allChat = await findAllChats()
+    const allChat = await findAllChatsWithMessages()
     allChat.forEach((chat) => {
-      chats.push(chat)
+      rooms.push(chat)
     })
   }
 
+  init()
+
+  rx.onFormWorkerChannel(async (message) => {
+    console.log('chat ', message)
+    if (message.type === 'content') {
+      const newMessage = await createAnswerMessage(message.content, message.chatId, message.aiReplier)
+      const chat = rooms.find(chat => chat.id === message.chatId)
+      if (chat) {
+        chat.messages.push(newMessage)
+        chat.lastMessageSortId = newMessage.sortId
+      }
+    }
+  })
+
   async function addChat(chat: CreateChatSchemas) {
     const newChat = await createChat(chat)
-    chats.push(newChat)
+    rooms.push({
+      ...newChat,
+      messages: [],
+    })
   }
 
   async function setCurrentChatID(id: string | null) {
@@ -30,7 +49,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
   }
 
   async function setAiToChat(id: string, aiId: string) {
-    const chat = chats.find(chat => chat.id === id)
+    const chat = rooms.find(chat => chat.id === id)
     if (chat?.participants.includes(aiId)) {
       console.warn(`AI member ${aiId} already exists in chat ${id}`)
       return
@@ -41,14 +60,27 @@ export const useChatStore = defineStore('dannn-chat', () => {
     }
   }
 
-  init()
+  async function question(question: string, chatID?: string) {
+    const chat = chatID ? rooms.find(chat => chat.id === chatID) : currentChat.value
+    if (!chat) {
+      throw new Error(`Chat with id ${chatID} not found`)
+    }
+    const questionMessage = await createQuestionMessage(question, chat.id)
+    sendToWorkerChannel({
+      id: questionMessage.id,
+      chatId: chat.id,
+      content: questionMessage.content,
+      aiReplier: [...chat.participants],
+    })
+  }
 
   return {
-    chats,
+    rooms,
     currentChat,
     currentChatID,
     addChat,
     setCurrentChatID,
     setAiToChat,
+    question,
   }
 })

@@ -31,8 +31,8 @@ defineExtension(async ({ window, registerAI }) => {
 	})
 
 	ai.onQuestion((event) => {
-		console.log(event.message.content)
-		event.answer(`${event.message.content} answer !!!`)
+		console.log(event.message)
+		event.completeAnswer(`${event.message.content} answer !!!`)
 	})
 })
 
