@@ -1,4 +1,4 @@
-import type { AIConfig } from '@dannn/schemas'
+import type { AIConfig, StreamAnswerMessage } from '@dannn/schemas'
 
 export type ID = `${string}-${string}-${string}-${string}-${string}` // UUID 格式的 ID
 /**
@@ -42,4 +42,7 @@ export interface AIMessage {
   timestamp: number // 消息时间戳
   senderIsAI?: boolean // 发送者是否为 AI（可选）
   senderIsUser?: boolean // 发送者是否为用户（可选）
+  stream?: StreamAnswerMessage[] // 流式消息内容
+  complete?: boolean // 是否完成
+  toHTML?: string // 转化为 HTML 格式的消息内容（可选）
 }

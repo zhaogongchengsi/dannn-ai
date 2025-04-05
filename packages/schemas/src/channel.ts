@@ -31,5 +31,7 @@ export const streamAnswerMessage = z.object({
 
 const answerMessage = z.union([completeAnswerMessage, streamAnswerMessage])
 
+export type CompleteAnswerMessage = z.infer<typeof completeAnswerMessage>
+export type StreamAnswerMessage = z.infer<typeof streamAnswerMessage>
 export type QuestionMessage = z.infer<typeof questionMessage>
 export type AnswerMessage = z.infer<typeof answerMessage>

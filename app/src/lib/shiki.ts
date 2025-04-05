@@ -1,4 +1,4 @@
-import type { HighlighterGeneric } from 'shiki/core'
+import type { HighlighterCore, HighlighterGeneric } from 'shiki/core'
 import { fromHighlighter } from '@shikijs/markdown-it/core'
 import MarkdownIt from 'markdown-it'
 import { createHighlighterCore } from 'shiki/core'
@@ -31,10 +31,19 @@ export async function highlighterMarkdown(code: string, theme: 'vitesse-dark' | 
   })
 }
 
-export async function markdownToHtml(markdown: string, theme: 'vitesse-dark' | 'vitesse-light' = 'vitesse-dark') {
+let init = false
+export async function initMarkdownIt(theme: 'vitesse-dark' | 'vitesse-light' = 'vitesse-dark') {
   const highlighter = await highlighterPromise
-  md.use(fromHighlighter(highlighter as HighlighterGeneric<any, any>, {
+  const m = md.use(fromHighlighter(highlighter as HighlighterGeneric<any, any>, {
     theme,
   }))
+  init = true
+  return m
+}
+
+export function markdownToHtml(markdown: string) {
+  if (!init) {
+    throw new Error('MarkdownIt not initialized, please call initMarkdownIt first')
+  }
   return md.render(markdown)
 }

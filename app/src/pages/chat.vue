@@ -2,6 +2,7 @@
 import { useChatStore } from '@/stores/chat'
 import ChatFooterBody from '@/views/chat-footer-body.vue'
 import ChatFooterHeader from '@/views/chat-footer-header.vue'
+import ChatPageContent from '@/views/chat-page-content.vue'
 import { watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -22,7 +23,7 @@ watchEffect(() => {
       style="height: calc(100vh - var(--app-header-height) - var(--app-chat-footer-height) - 2px)"
       class="overflow-y-auto"
     >
-      聊天
+      <ChatPageContent />
     </div>
     <div class="bg-[hsl(var(--background))]" style="height: var(--app-chat-footer-height);">
       <ChatFooterHeader />

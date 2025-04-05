@@ -42,6 +42,9 @@ const aiMessageKeys: AIMessageKeys[] = [
   'timestamp',
   'senderIsUser',
   'senderIsAI',
+  'stream',
+  'complete',
+  'toHTML'
 ]
 
 export const tableSchemasV1 = {

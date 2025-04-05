@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-import { sendToWorkerChannel } from '@/base/rxjs/channel'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useChatStore } from '@/stores/chat'
@@ -21,6 +20,7 @@ function onSend() {
   }
 
   chatStore.question(message)
+  value.value = ''
 }
 </script>
 

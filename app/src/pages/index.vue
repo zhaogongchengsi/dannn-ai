@@ -123,7 +123,7 @@ function onRowClick(chatId: string) {
           </TableRow>
         </TableHeader>
         <TableBody class="text-sm text-muted-foreground max-h-24 overflow-auto">
-          <TableRow v-for="chat of chatStore.chats" :key="chat.id" @click="onRowClick(chat.id)">
+          <TableRow v-for="chat of chatStore.rooms" :key="chat.id" @click="onRowClick(chat.id)">
             <TableCell class="font-medium">
               {{ chat.title }}
             </TableCell>

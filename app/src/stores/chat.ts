@@ -1,9 +1,11 @@
 import type { CreateChatSchemas, Room } from '@/lib/database/chatService'
 import { sendToWorkerChannel } from '@/base/rxjs/channel'
 import { useAppRx } from '@/base/rxjs/hook'
-import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages } from '@/lib/database/chatService'
+import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, updateMessageContent } from '@/lib/database/chatService'
 import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
+import { AIMessage } from '@/lib/database/models'
+import { markdownToHtml } from '@/lib/shiki'
 
 export const useChatStore = defineStore('dannn-chat', () => {
   const rx = useAppRx()
@@ -24,15 +26,42 @@ export const useChatStore = defineStore('dannn-chat', () => {
 
   init()
 
+  function addMessageToChat(chat: string, message: AIMessage) {
+    const chatRoom = rooms.find((room) => room.id === chat)
+    if (chatRoom) {
+      const index = chatRoom.messages.findIndex(msg => msg.sortId > message.sortId)
+      if (index === -1) {
+        chatRoom.messages.push(message)
+      } else {
+        chatRoom.messages.splice(index, 0, message)
+      }
+    } else {
+      console.warn(`Chat with id ${chat} not found`)
+    }
+  }
+
   rx.onFormWorkerChannel(async (message) => {
     console.log('chat ', message)
+
+    const chat = rooms.find(chat => chat.id === message.chatId)
+
+    if (!chat) {
+      console.warn(`Chat with id ${message.chatId} not found`)
+      return
+    }
+
     if (message.type === 'content') {
+      const htmlMd = markdownToHtml(message.content)
+      const newMessage = await createAnswerMessage(message.content, message.chatId, message.aiReplier, htmlMd)
+      chat.lastMessageSortId = newMessage.sortId
+      addMessageToChat(chat.id, newMessage)
+    }
+
+    if (message.type === 'stream') {
       const newMessage = await createAnswerMessage(message.content, message.chatId, message.aiReplier)
-      const chat = rooms.find(chat => chat.id === message.chatId)
-      if (chat) {
-        chat.messages.push(newMessage)
-        chat.lastMessageSortId = newMessage.sortId
-      }
+      chat.lastMessageSortId = newMessage.sortId
+      const updatedMessage = await updateMessageContent(newMessage.id, message)
+      addMessageToChat(chat.id, updatedMessage)
     }
   })
 
@@ -72,6 +101,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
       content: questionMessage.content,
       aiReplier: [...chat.participants],
     })
+    addMessageToChat(chat.id, questionMessage)
   }
 
   return {

@@ -1,6 +1,8 @@
 import type { AIChat, AIMessage } from './models'
 import { z } from 'zod'
 import { database } from './database'
+import { StreamAnswerMessage } from '@dannn/schemas'
+import { markdownToHtml } from '../shiki'
 
 export async function findAllChats() {
   return await database.aiChats.toArray()
@@ -86,7 +88,8 @@ export async function findAllChatsWithMessages(): Promise<Room[]> {
         .where('chatId')
         .equals(chat.id)
         .toArray()
-      return { ...chat, messages: messages.sort((a, b) => a.sortId - b.sortId) }
+
+      return { ...chat, messages: messages.sort((a, b) => a.sortId - b.sortId) } as Room
     }),
   )
   return chatsWithMessages
@@ -122,6 +125,7 @@ export async function createAnswerMessage(
   answer: string,
   chatId: string,
   senderId: string,
+  html?: string,
 ): Promise<AIMessage> {
   return await database.transaction('rw', [database.aiMessages, database.aiChats], async () => {
     const lastSortId = await findLastMessageSortId(chatId)
@@ -135,6 +139,7 @@ export async function createAnswerMessage(
       senderIsAI: true,
       sortId,
       senderId,
+      toHTML: html,
     }
 
     await updateLastMessageSortId(chatId, sortId)
@@ -143,4 +148,28 @@ export async function createAnswerMessage(
 
     return message
   })
+}
+
+export async function updateMessageContent(messageId: string, stream: StreamAnswerMessage) {
+  const message = await database.aiMessages.get(messageId)
+
+  if (!message) {
+    throw new Error(`Message with id ${messageId} not found`)
+  }
+
+  message.stream = message.stream || []
+  message.stream.push(stream)
+  message.complete = stream.complete
+  message.timestamp = Date.now()
+
+  message.stream.sort((a, b) => a.id - b.id)
+
+  message.content = message.stream.map((s) => s.content).join('')
+
+  if (message.complete) {
+    message.toHTML = markdownToHtml(message.content)
+  }
+
+  await database.aiMessages.put(message)
+  return message
 }
