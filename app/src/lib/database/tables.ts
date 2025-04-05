@@ -12,11 +12,14 @@ const aiModelKeys: AIModelKeys[] = [
   'updateAt',
   'isDeleted',
   'models',
-  'description',
+  'icon',
+  'title',
+  'isDisabled',
   'lastMessageAt',
+  'role',
+  'description',
   'version',
   'module',
-  'role',
   'prompt',
 ]
 
@@ -37,6 +40,8 @@ const aiMessageKeys: AIMessageKeys[] = [
   'senderId',
   'content',
   'timestamp',
+  'senderIsUser',
+  'senderIsAI',
 ]
 
 export const tableSchemasV1 = {

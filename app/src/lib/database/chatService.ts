@@ -24,6 +24,7 @@ export async function createChat(data: CreateChatSchemas) {
     createdAt: Date.now(),
     updateAt: Date.now(),
     participants: [],
+    lastMessageSortId: 0,
   }
   await database.aiChats.add(chat)
   return chat

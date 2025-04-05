@@ -26,6 +26,7 @@ export interface AIChat {
   createdAt: number // 创建时间戳
   updateAt: number // 更新时间戳
   participants: string[] // 参与者列表（AI ID）
+  lastMessageSortId: number // 上次消息排序 ID
 }
 
 /**
@@ -39,4 +40,6 @@ export interface AIMessage {
   senderId: string // 发送者 AI ID 或用户 ID
   content: string // 消息内容（可能是大文本）
   timestamp: number // 消息时间戳
+  senderIsAI?: boolean // 发送者是否为 AI（可选）
+  senderIsUser?: boolean // 发送者是否为用户（可选）
 }

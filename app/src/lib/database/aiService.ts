@@ -77,6 +77,11 @@ export async function registerAI(ai: AIConfig): Promise<AIModel> {
     createdAt: Date.now(),
     updateAt: Date.now(),
     isDeleted: false,
+    isDisabled: false,
+    lastMessageAt: 0,
+    icon: ai.icon,
+    title: ai.title || '未命名 AI',
+    role: ai.role || 'assistant',
   }
 
   // 存入数据库

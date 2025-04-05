@@ -91,7 +91,7 @@ export async function loadLocalExtensions() {
       extensionWorker.on('register-ai', (ai) => {
         extensionAiSubject.next(ai)
       })
-      extensionWorker.onWorkerEvent('ai-answer', message => {
+      extensionWorker.onWorkerEvent('ai-answer', (message) => {
         sendFormWorkerChannel(message)
       })
     }
