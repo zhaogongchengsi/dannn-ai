@@ -21,6 +21,7 @@ function onSend() {
   }
 
   sendToWorkerChannel({
+    id: '1',
     content: message,
     // clone
     aiReplier: [...chatStore.currentChat.participants],

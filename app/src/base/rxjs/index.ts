@@ -2,6 +2,7 @@ import type { Plugin } from 'vue'
 import type { AppRx } from './type'
 import { combineLatest } from 'rxjs'
 import { appMount, appMount$, appReady$, onAppMount, onAppReady } from './app'
+import { onFormWorkerChannel } from './channel'
 import { APP_PROVIDE_RX_KEY } from './constant'
 import { activeExtension$, extensionAiSubject, extensionDestroy, extensionWorkerSubject, getExtensionWorker, getExtensionWorkers, loadLocalExtensions, onExtensionLoaded, setActiveExtension } from './extensions'
 
@@ -21,6 +22,7 @@ export function createRx(): Plugin {
     onAppReady,
     extensionDestroy,
     onExtensionLoaded,
+    onFormWorkerChannel,
   }
 
   onAppMount(async () => {

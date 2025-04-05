@@ -36,7 +36,7 @@ export interface AIChat {
 export interface AIMessage {
   id: ID // 消息唯一标识符
   sortId: number // 消息排序 ID
-  sessionId: string // 关联的会话 ID
+  chatId: string // 关联的会话 ID
   senderId: string // 发送者 AI ID 或用户 ID
   content: string // 消息内容（可能是大文本）
   timestamp: number // 消息时间戳

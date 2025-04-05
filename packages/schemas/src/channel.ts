@@ -1,9 +1,17 @@
 
 import { z } from 'zod'
 
-export const channelMessage = z.object({
+export const questionMessage = z.object({
+	id: z.string(),
 	content: z.string(),
 	aiReplier: z.string().array(),
 })
 
-export type ChannelMessage = z.infer<typeof channelMessage>
+export const answerMessage = z.object({
+	questionId: z.string(),
+	content: z.string(),
+	aiReplier: z.string(),
+})
+
+export type QuestionMessage = z.infer<typeof questionMessage>
+export type AnswerMessage = z.infer<typeof answerMessage>

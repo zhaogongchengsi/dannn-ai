@@ -36,7 +36,7 @@ const aiChatKeys: AIChatKeys[] = [
 const aiMessageKeys: AIMessageKeys[] = [
   'id',
   'sortId',
-  'sessionId',
+  'chatId',
   'senderId',
   'content',
   'timestamp',
