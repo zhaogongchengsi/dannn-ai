@@ -1,48 +1,60 @@
 import type { CreateChatSchemas, Room } from '@/lib/database/chatService'
 import type { AIMessage, ID } from '@/lib/database/models'
+import type { Reactive } from 'vue'
 import { sendToWorkerChannel } from '@/base/rxjs/channel'
 import { useAppRx } from '@/base/rxjs/hook'
 import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, findMessageById, updateStreamMessageContent } from '@/lib/database/chatService'
 import { markdownToHtml } from '@/lib/shiki'
 import { defineStore } from 'pinia'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, toValue } from 'vue'
 
 export const useChatStore = defineStore('dannn-chat', () => {
+  console.log('useChatStore')
+
   const rx = useAppRx()
 
-  const rooms = reactive<Room[]>([])
+  const rooms = reactive<Map<string, Reactive<Room>>>(new Map())
   const currentChatID = ref<string | null>(null)
 
   const currentChat = computed(() => {
-    return rooms.find(chat => chat.id === currentChatID.value) || null
+    if (currentChatID.value) {
+      return toValue(rooms.get(currentChatID.value)) || null
+    }
+    return null
   })
 
   async function init() {
     const allChat = await findAllChatsWithMessages()
     allChat.forEach((chat) => {
-      rooms.push(chat)
+      rooms.set(chat.id, reactive(chat))
     })
   }
 
   init()
 
+  function getChatById(id: string) {
+    return rooms.get(id)
+  }
+
   function updateMessageChat(chat: string, message: AIMessage) {
-    const chatRoom = rooms.find(room => room.id === chat)
+    const chatRoom = getChatById(chat)
     if (chatRoom) {
       const index = chatRoom.messages.findLastIndex(msg => msg.id === message.id)
       if (index === -1) {
-        const preMessage = chatRoom.messages.findLastIndex(msg => msg.sortId < message.sortId)
+        /**
+         * 查看是否有消息是否应该插入到最后一个
+         */
+        const preMessage = chatRoom.messages.findLastIndex(msg => msg.sortId === message.sortId + 1)
         if (preMessage === -1) {
           chatRoom.messages.push(message)
+          chatRoom.lastMessageSortId = message.sortId
         }
         else {
           chatRoom.messages = chatRoom.messages.toSpliced(preMessage, 1, message)
-          console.log('insert message', message)
         }
       }
       else {
         chatRoom.messages = chatRoom.messages.toSpliced(index, 1, message)
-        console.log('update message', message)
       }
     }
     else {
@@ -51,9 +63,9 @@ export const useChatStore = defineStore('dannn-chat', () => {
   }
 
   rx.onFormWorkerChannel(async (message) => {
-    console.log('chat ', message)
+    console.log('onFormWorkerChannel', message)
 
-    const chat = rooms.find(chat => chat.id === message.chatId)
+    const chat = getChatById(message.chatId)
 
     if (!chat) {
       console.warn(`Chat with id ${message.chatId} not found`)
@@ -87,10 +99,10 @@ export const useChatStore = defineStore('dannn-chat', () => {
 
   async function addChat(chat: CreateChatSchemas) {
     const newChat = await createChat(chat)
-    rooms.push({
+    rooms.set(newChat.id, reactive({
       ...newChat,
       messages: [],
-    })
+    }))
   }
 
   async function setCurrentChatID(id: string | null) {
@@ -98,7 +110,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
   }
 
   async function setAiToChat(id: string, aiId: string) {
-    const chat = rooms.find(chat => chat.id === id)
+    const chat = getChatById(id)
     if (chat?.participants.includes(aiId)) {
       console.warn(`AI member ${aiId} already exists in chat ${id}`)
       return
@@ -110,7 +122,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
   }
 
   async function question(question: string, chatID?: string) {
-    const chat = chatID ? rooms.find(chat => chat.id === chatID) : currentChat.value
+    const chat = chatID ? getChatById(chatID) : currentChat.value
     if (!chat) {
       throw new Error(`Chat with id ${chatID} not found`)
     }
