@@ -1,11 +1,11 @@
 import type { CreateChatSchemas, Room } from '@/lib/database/chatService'
+import type { AIMessage } from '@/lib/database/models'
 import { sendToWorkerChannel } from '@/base/rxjs/channel'
 import { useAppRx } from '@/base/rxjs/hook'
 import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, updateStreamMessageContent } from '@/lib/database/chatService'
+import { markdownToHtml } from '@/lib/shiki'
 import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
-import { AIMessage } from '@/lib/database/models'
-import { markdownToHtml } from '@/lib/shiki'
 
 export const useChatStore = defineStore('dannn-chat', () => {
   const rx = useAppRx()
@@ -27,15 +27,17 @@ export const useChatStore = defineStore('dannn-chat', () => {
   init()
 
   function addMessageToChat(chat: string, message: AIMessage) {
-    const chatRoom = rooms.find((room) => room.id === chat)
+    const chatRoom = rooms.find(room => room.id === chat)
     if (chatRoom) {
       const index = chatRoom.messages.findIndex(msg => msg.sortId > message.sortId)
       if (index === -1) {
         chatRoom.messages.push(message)
-      } else {
+      }
+      else {
         chatRoom.messages.splice(index, 0, message)
       }
-    } else {
+    }
+    else {
       console.warn(`Chat with id ${chat} not found`)
     }
   }
