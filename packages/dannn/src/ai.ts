@@ -25,7 +25,6 @@ export class AIStream {
 	) {
 		this.aiId = aiId
 		this.questionId = questionId
-		this.id = chId
 		this.chatId = chId
 		this.selfWorker = selfWorker
 	}
@@ -41,6 +40,7 @@ export class AIStream {
 			questionId: this.questionId,
 			createAt: Date.now(),
 			complete,
+			id: this.id,
 		}
 		this._complete = complete
 		this.selfWorker.emitEventToWindow('ai-answer', answerMessage)
@@ -56,6 +56,7 @@ export class AIStream {
 			questionId: this.questionId,
 			createAt: Date.now(),
 			complete: true,
+			id: this.id,
 		}
 		this.selfWorker.emitEventToWindow('ai-answer', answerMessage)
 	}

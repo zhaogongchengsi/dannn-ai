@@ -1,8 +1,8 @@
-import type { AIChat, AIMessage } from './models'
+import type { StreamAnswerMessage } from '@dannn/schemas'
+import type { AIChat, AIMessage, ID } from './models'
 import { z } from 'zod'
-import { database } from './database'
-import { StreamAnswerMessage } from '@dannn/schemas'
 import { markdownToHtml } from '../shiki'
+import { database } from './database'
 
 export async function findAllChats() {
   return await database.aiChats.toArray()
@@ -62,7 +62,7 @@ export async function addAiMemberToChat(chatId: string, aiMemberId: string) {
 }
 
 export async function findLastMessageSortId(chatId: string) {
-  const chat = await database.aiChats.get(chatId)
+  const chat = await database.aiChats.where('id').equals(chatId).first()
   if (!chat) {
     throw new Error(`Chat with id ${chatId} not found`)
   }
@@ -96,7 +96,7 @@ export async function findAllChatsWithMessages(): Promise<Room[]> {
 }
 
 export async function findMessageById(messageId: string): Promise<AIMessage | undefined> {
-  return await database.aiMessages.get(messageId)
+  return await database.aiMessages.where('id').equals(messageId).first()
 }
 
 export async function findChatById(chatId: string): Promise<AIChat | undefined> {
@@ -137,13 +137,14 @@ export async function createAnswerMessage(
   chatId: string,
   senderId: string,
   html?: string,
+  id: ID = crypto.randomUUID(),
 ): Promise<AIMessage> {
   return await database.transaction('rw', [database.aiMessages, database.aiChats], async () => {
     const lastSortId = await findLastMessageSortId(chatId)
     const sortId = lastSortId + 1
 
     const message: AIMessage = {
-      id: crypto.randomUUID(),
+      id,
       chatId,
       content: answer,
       timestamp: Date.now(),
@@ -159,8 +160,13 @@ export async function createAnswerMessage(
   })
 }
 
+export async function updateMessage(message: AIMessage) {
+  await database.aiMessages.update(message.id, message)
+  return (await findMessageById(message.id))!
+}
+
 export async function updateStreamMessageContent(messageId: string, stream: StreamAnswerMessage) {
-  const message = await database.aiMessages.get(messageId)
+  const message = await findMessageById(messageId)
 
   if (!message) {
     throw new Error(`Message with id ${messageId} not found`)
@@ -173,11 +179,11 @@ export async function updateStreamMessageContent(messageId: string, stream: Stre
 
   message.stream.sort((a, b) => a.sortId - b.sortId)
 
-  message.content = message.stream.map((s) => s.content).join('')
+  message.content = message.stream.map(s => s.content).join('')
 
   if (message.complete) {
     message.toHTML = markdownToHtml(message.content)
   }
 
-  return await addMessage(message)
+  return await updateMessage(message)
 }

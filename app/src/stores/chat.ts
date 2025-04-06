@@ -1,8 +1,8 @@
 import type { CreateChatSchemas, Room } from '@/lib/database/chatService'
-import type { AIMessage } from '@/lib/database/models'
+import type { AIMessage, ID } from '@/lib/database/models'
 import { sendToWorkerChannel } from '@/base/rxjs/channel'
 import { useAppRx } from '@/base/rxjs/hook'
-import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, updateStreamMessageContent } from '@/lib/database/chatService'
+import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, findMessageById, updateStreamMessageContent } from '@/lib/database/chatService'
 import { markdownToHtml } from '@/lib/shiki'
 import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
@@ -26,15 +26,23 @@ export const useChatStore = defineStore('dannn-chat', () => {
 
   init()
 
-  function addMessageToChat(chat: string, message: AIMessage) {
+  function updateMessageChat(chat: string, message: AIMessage) {
     const chatRoom = rooms.find(room => room.id === chat)
     if (chatRoom) {
-      const index = chatRoom.messages.findIndex(msg => msg.sortId > message.sortId)
+      const index = chatRoom.messages.findLastIndex(msg => msg.id === message.id)
       if (index === -1) {
-        chatRoom.messages.push(message)
+        const preMessage = chatRoom.messages.findLastIndex(msg => msg.sortId < message.sortId)
+        if (preMessage === -1) {
+          chatRoom.messages.push(message)
+        }
+        else {
+          chatRoom.messages = chatRoom.messages.toSpliced(preMessage, 1, message)
+          console.log('insert message', message)
+        }
       }
       else {
-        chatRoom.messages.splice(index, 0, message)
+        chatRoom.messages = chatRoom.messages.toSpliced(index, 1, message)
+        console.log('update message', message)
       }
     }
     else {
@@ -56,15 +64,24 @@ export const useChatStore = defineStore('dannn-chat', () => {
       const htmlMd = markdownToHtml(message.content)
       const newMessage = await createAnswerMessage(message.content, message.chatId, message.aiReplier, htmlMd)
       chat.lastMessageSortId = newMessage.sortId
-      addMessageToChat(chat.id, newMessage)
+      updateMessageChat(chat.id, newMessage)
     }
 
     if (message.type === 'stream') {
       // BUG: 这里的 message 是一个流式消息，应该是一个数组 会导致重复创建消息
-      const newMessage = await createAnswerMessage(message.content, message.chatId, message.aiReplier)
+      const existMessage = await findMessageById(message.id).catch(() => null)
+
+      if (existMessage) {
+        chat.lastMessageSortId = chat.lastMessageSortId > existMessage.sortId ? chat.lastMessageSortId : existMessage.sortId
+        const updatedMessage = await updateStreamMessageContent(existMessage.id, message)
+        updateMessageChat(chat.id, updatedMessage)
+        return
+      }
+
+      const newMessage = await createAnswerMessage(message.content, message.chatId, message.aiReplier, undefined, message.id as ID)
       chat.lastMessageSortId = newMessage.sortId
       const updatedMessage = await updateStreamMessageContent(newMessage.id, message)
-      addMessageToChat(chat.id, updatedMessage)
+      updateMessageChat(chat.id, updatedMessage)
     }
   })
 
@@ -104,7 +121,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
       content: questionMessage.content,
       aiReplier: [...chat.participants],
     })
-    addMessageToChat(chat.id, questionMessage)
+    updateMessageChat(chat.id, questionMessage)
   }
 
   return {

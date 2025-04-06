@@ -32,7 +32,15 @@ defineExtension(async ({ window, registerAI }) => {
 
 	ai.onQuestion((event) => {
 		console.log(event.message)
-		event.completeAnswer(`${event.message.content} answer !!!`)
+		// event.completeAnswer(`${event.message.content} answer !!!`)
+		let count = 0
+
+		let id = setInterval(() => {
+			event.streamAnswer(`第 **${count++}** 段回复 ` + '```js\n console.log(1)```', count > 5)
+			if (count > 5) {
+				clearInterval(id)
+			}
+		}, 1000)
 	})
 })
 

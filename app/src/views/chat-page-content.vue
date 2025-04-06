@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { useChatStore } from '@/stores/chat'
 import { useElementSize } from '@vueuse/core'
-import { useTemplateRef } from 'vue'
+import { useTemplateRef, watch, watchEffect } from 'vue'
 import { VirtList } from 'vue-virt-list'
 import ChatMessageRow from './chat-message-row.vue'
 
@@ -9,6 +9,14 @@ const el = useTemplateRef('el')
 const virtListRef = useTemplateRef('virtListRef')
 const chatStore = useChatStore()
 const { height } = useElementSize(el)
+
+watchEffect(() => {
+  if (!chatStore.currentChat) {
+    return
+  }
+
+  console.log(chatStore.currentChat.messages, chatStore.currentChat.messages.length)
+})
 </script>
 
 <template>

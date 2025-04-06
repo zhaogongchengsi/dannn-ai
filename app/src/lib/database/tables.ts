@@ -44,11 +44,16 @@ const aiMessageKeys: AIMessageKeys[] = [
   'senderIsAI',
   'stream',
   'complete',
-  'toHTML'
+  'toHTML',
 ]
 
+// helper: 将 id 转为主键形式
+function withPrimaryKey(keys: string[]): string {
+  return keys.join(', ')
+}
+
 export const tableSchemasV1 = {
-  aiModels: aiModelKeys.join(', '),
-  aiChats: aiChatKeys.join(', '),
-  aiMessages: aiMessageKeys.join(', '),
+  aiModels: withPrimaryKey(aiModelKeys),
+  aiChats: withPrimaryKey(aiChatKeys),
+  aiMessages: withPrimaryKey(aiMessageKeys),
 }

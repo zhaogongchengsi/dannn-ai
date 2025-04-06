@@ -19,7 +19,7 @@ export const completeAnswerMessage = z.object({
 
 
 export const streamAnswerMessage = z.object({
-	id: z.number(),
+	id: z.string(),
 	sortId: z.number(),
 	chatId: z.string(),
 	type: z.literal('stream'),
