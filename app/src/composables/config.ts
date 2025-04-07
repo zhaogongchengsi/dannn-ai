@@ -25,6 +25,8 @@ export const useConfig = createGlobalState(
       mode.value = data.theme
     }
 
+    init()
+
     function set<K extends keyof ConfigData>(key: K, value: ConfigData[K]) {
       if (!config.value) {
         return

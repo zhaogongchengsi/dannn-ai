@@ -24,8 +24,6 @@ import ChatAdd from './views/chat-add.vue'
 const config = useConfig()
 const chatStore = useChatStore()
 
-config.init()
-
 const toasterTheme = computed(() => {
   const mode = config.mode.value
   if (mode === 'auto') {
