@@ -18,6 +18,9 @@ export type CreateChatSchemas = z.infer<typeof createChatSchemas>
 
 export interface Room extends AIChat {
   messages: AIMessage[]
+  page: number 
+  pageSize: number
+  total: number
 }
 
 export async function createChat(data: CreateChatSchemas) {
@@ -84,12 +87,20 @@ export async function findAllChatsWithMessages(): Promise<Room[]> {
   const chats = await database.aiChats.toArray()
   const chatsWithMessages = await Promise.all(
     chats.map(async (chat) => {
-      const messages = await database.aiMessages
-        .where('chatId')
-        .equals(chat.id)
-        .toArray()
+      const page = 0
+      const pageSize = 20
+      const messages = await findMessagesBySortIdDesc(chat.id, page, pageSize)
+      const total = await database.aiMessages.where('chatId').equals(chat.id).count()
 
-      return { ...chat, messages: messages.sort((a, b) => a.sortId - b.sortId) } as Room
+      const room: Room = {
+        ...chat,
+        messages,
+        page,
+        pageSize,
+        total,
+      }
+
+      return room
     }),
   )
   return chatsWithMessages
@@ -105,8 +116,8 @@ export async function findChatById(chatId: string): Promise<AIChat | undefined> 
 
 export async function findMessagesBySortIdDesc(
   chatId: string,
-  pageSize: number,
-  pageIndex: number,
+  pageIndex: number = 0,
+  pageSize: number = 20,
 ): Promise<AIMessage[]> {
   return await database.aiMessages
     .where('chatId') // 过滤条件

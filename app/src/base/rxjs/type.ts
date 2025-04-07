@@ -1,4 +1,4 @@
-import type { AnswerMessage } from '@dannn/schemas'
+import type { AnswerMessage, QuestionMessage } from '@dannn/schemas'
 import type { Subject, Subscription } from 'rxjs'
 import type { ReplaySubject } from 'rxjs/internal/ReplaySubject'
 import type { ExtensionWorker } from '../worker/worker'
@@ -14,4 +14,5 @@ export interface AppRx {
   extensionDestroy: () => void
   onExtensionLoaded: (callback: (worker: ExtensionWorker) => void) => Subscription
   subscribeToWorkerAnswers: (callback: (message: AnswerMessage) => void) => () => void
+  sendQuestionToWorker: (message: QuestionMessage) => void
 }

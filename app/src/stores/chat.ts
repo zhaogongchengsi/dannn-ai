@@ -100,6 +100,9 @@ export const useChatStore = defineStore('dannn-chat', () => {
     rooms.set(newChat.id, reactive({
       ...newChat,
       messages: [],
+      page: 0,
+      pageSize: 20,
+      total: 0,
     }))
   }
 
@@ -125,7 +128,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
       throw new Error(`Chat with id ${chatID} not found`)
     }
     const questionMessage = await createQuestionMessage(question, chat.id)
-    sendQuestionToWorker({
+    rx.sendQuestionToWorker({
       id: questionMessage.id,
       chatId: chat.id,
       content: questionMessage.content,
