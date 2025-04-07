@@ -9,8 +9,6 @@ import { defineStore } from 'pinia'
 import { computed, reactive, ref, toValue } from 'vue'
 
 export const useChatStore = defineStore('dannn-chat', () => {
-  console.log('useChatStore')
-
   const rx = useAppRx()
 
   const rooms = reactive<Map<string, Reactive<Room>>>(new Map())

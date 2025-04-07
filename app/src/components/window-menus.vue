@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useChatStore } from '@/stores/chat'
 import chatPageTitle from '@/views/chat-page-title.vue'
 import { Expand, Home, Minimize, Minus, X } from 'lucide-vue-next'
@@ -47,6 +48,7 @@ const isMac = window.dannn.is.mac
 <template>
   <div class="flex items-center h-[--app-header-height]">
     <div class="h-full flex items-center px-4">
+      <SidebarTrigger />
       <chat-page-title v-if="chatStore.currentChat" />
     </div>
     <div class="ml-auto space-x-2">
