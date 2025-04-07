@@ -66,7 +66,7 @@ const toasterTheme = computed(() => {
         </Sidebar>
         <section class="w-full h-screen relative">
           <WindowMenus />
-          <ScrollArea class="w-full overflow-auto border-t" :style="{ height: 'calc(100vh - var(--app-header-height))' }">
+          <ScrollArea class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-header-height))' }">
             <router-view />
           </ScrollArea>
         </section>
