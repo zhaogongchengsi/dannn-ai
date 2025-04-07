@@ -1,27 +1,26 @@
 import type { AnswerMessage, QuestionMessage } from '@dannn/schemas'
 import { Subject } from 'rxjs'
 
-export const toWorkerChannel = new Subject<QuestionMessage>()
-export const formWorkerChannel = new Subject<AnswerMessage>()
+// 定义流
+export const questionToWorker$ = new Subject<QuestionMessage>() // 发送到 Worker 的问题流
+export const answerFromWorker$ = new Subject<AnswerMessage>() // 从 Worker 接收的回答流
 
-export function onToWorkerChannel(
-  callback: (message: QuestionMessage) => void,
-): () => void {
-  const subscription = toWorkerChannel.subscribe(callback)
+// 订阅函数
+export function subscribeToWorkerQuestions(callback: (message: QuestionMessage) => void): () => void {
+  const subscription = questionToWorker$.subscribe(callback)
   return () => subscription.unsubscribe()
 }
 
-export function onFormWorkerChannel(
-  callback: (message: AnswerMessage) => void,
-): () => void {
-  const subscription = formWorkerChannel.subscribe(callback)
+export function subscribeToWorkerAnswers(callback: (message: AnswerMessage) => void): () => void {
+  const subscription = answerFromWorker$.subscribe(callback)
   return () => subscription.unsubscribe()
 }
 
-export function sendToWorkerChannel(message: QuestionMessage): void {
-  toWorkerChannel.next(message)
+// 发送函数
+export function sendQuestionToWorker(message: QuestionMessage): void {
+  questionToWorker$.next(message)
 }
 
-export function sendFormWorkerChannel(message: AnswerMessage): void {
-  formWorkerChannel.next(message)
+export function sendAnswerFromWorker(message: AnswerMessage): void {
+  answerFromWorker$.next(message)
 }

@@ -13,5 +13,5 @@ export interface AppRx {
   onAppReady: (func: () => void) => Subscription
   extensionDestroy: () => void
   onExtensionLoaded: (callback: (worker: ExtensionWorker) => void) => Subscription
-  onFormWorkerChannel: (callback: (message: AnswerMessage) => void) => () => void
+  subscribeToWorkerAnswers: (callback: (message: AnswerMessage) => void) => () => void
 }

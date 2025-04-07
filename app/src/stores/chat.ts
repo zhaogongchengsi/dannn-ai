@@ -1,7 +1,7 @@
 import type { CreateChatSchemas, Room } from '@/lib/database/chatService'
 import type { AIMessage, ID } from '@/lib/database/models'
 import type { Reactive } from 'vue'
-import { sendToWorkerChannel } from '@/base/rxjs/channel'
+import { sendQuestionToWorker } from '@/base/rxjs/channel'
 import { useAppRx } from '@/base/rxjs/hook'
 import { addAiMemberToChat, createAnswerMessage, createChat, createQuestionMessage, findAllChatsWithMessages, findMessageById, updateStreamMessageContent } from '@/lib/database/chatService'
 import { markdownToHtml } from '@/lib/shiki'
@@ -62,7 +62,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
     }
   }
 
-  rx.onFormWorkerChannel(async (message) => {
+  rx.subscribeToWorkerAnswers(async (message) => {
     console.log('onFormWorkerChannel', message)
 
     const chat = getChatById(message.chatId)
@@ -127,7 +127,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
       throw new Error(`Chat with id ${chatID} not found`)
     }
     const questionMessage = await createQuestionMessage(question, chat.id)
-    sendToWorkerChannel({
+    sendQuestionToWorker({
       id: questionMessage.id,
       chatId: chat.id,
       content: questionMessage.content,

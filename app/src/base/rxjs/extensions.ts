@@ -5,7 +5,7 @@ import { join } from 'pathe'
 import { ReplaySubject, Subject } from 'rxjs'
 import { formatZodError } from '../common/zod'
 import { ExtensionWorker } from '../worker/worker'
-import { onToWorkerChannel, sendFormWorkerChannel } from './channel'
+import { sendQuestionToWorker, subscribeToWorkerQuestions } from './channel'
 import { APP_EXTENSION_CONFIG_NAME } from './constant'
 
 const workers: Map<string, ExtensionWorker> = new Map()
@@ -92,7 +92,7 @@ export async function loadLocalExtensions() {
         extensionAiSubject.next(ai)
       })
       extensionWorker.onWorkerEvent('ai-answer', (message) => {
-        sendFormWorkerChannel(message)
+        sendQuestionToWorker(message)
       })
     }
     catch (error) {
@@ -103,7 +103,7 @@ export async function loadLocalExtensions() {
   activeExtension$.next(true)
 }
 
-onToWorkerChannel((message) => {
+subscribeToWorkerQuestions((message) => {
   message.aiReplier.forEach((id) => {
     workers.forEach((worker) => {
       worker.includesAI(id) && worker.sendToWorkerChannel(message)
