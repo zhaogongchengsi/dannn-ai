@@ -103,6 +103,20 @@ export async function findChatById(chatId: string): Promise<AIChat | undefined> 
   return await database.aiChats.get(chatId)
 }
 
+export async function findMessagesBySortIdDesc(
+  chatId: string,
+  pageSize: number,
+  pageIndex: number,
+): Promise<AIMessage[]> {
+  return await database.aiMessages
+    .where('chatId') // 过滤条件
+    .equals(chatId)
+    .reverse() // 倒序排列
+    .offset(pageIndex * pageSize) // 跳过前面的数据
+    .limit(pageSize) // 限制返回的数据量
+    .toArray()
+}
+
 export async function addMessage(message: AIMessage) {
   const id = await database.aiMessages.add(message)
   return (await findMessageById(id))!

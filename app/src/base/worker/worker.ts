@@ -1,5 +1,5 @@
 import type { AIModel } from '@/lib/database/models'
-import type { AIConfig, ChannelMessage, Extension, ExtensionPermissions } from '@dannn/schemas'
+import type { AIConfig, Extension, ExtensionPermissions, QuestionMessage } from '@dannn/schemas'
 import type { CreateExtensionOptions } from '../types/extension'
 import { registerAI } from '@/lib/database/aiService'
 import { compact, join } from 'lodash'
@@ -66,7 +66,7 @@ export class ExtensionWorker extends WorkerBridge {
     return this.ais.some(ai => ai.id === aiId)
   }
 
-  sendToWorkerChannel(message: ChannelMessage) {
+  sendToWorkerChannel(message: QuestionMessage) {
     this.emitWorkerEvent('question', message)
   }
 
