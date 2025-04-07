@@ -32,9 +32,7 @@ function onFormSubmit(values: CreateChatSchemas) {
 <template>
   <Dialog>
     <DialogTrigger>
-      <Button size="icon" variant="ghost" class="size-7" type="button">
-        <Plus class="size-5" />
-      </Button>
+      <Plus class="size-5" />
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>

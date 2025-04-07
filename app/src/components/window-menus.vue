@@ -48,10 +48,10 @@ const isMac = window.dannn.is.mac
 <template>
   <div class="flex items-center h-[--app-header-height]">
     <div class="h-full flex items-center px-4">
-      <SidebarTrigger />
       <chat-page-title v-if="chatStore.currentChat" />
     </div>
     <div class="ml-auto space-x-2">
+      <SidebarTrigger />
       <Button variant="ghost" size="icon" class="size-7" @click="router.push('/')">
         <Home />
       </Button>

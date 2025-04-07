@@ -54,7 +54,7 @@ const toasterTheme = computed(() => {
                 <SidebarMenu>
                   <SidebarMenuItem v-for="chat of chatStore.rooms.values()" :key="chat.id">
                     <SidebarMenuButton as-child>
-                      <RouterLink :to="{ path: '/chat', query: { chatId: chat.id } }">
+                      <RouterLink :to="`/chat?chatId=${chat.id}`">
                         {{ chat.title }}
                       </RouterLink>
                     </SidebarMenuButton>
