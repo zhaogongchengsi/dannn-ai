@@ -2,9 +2,9 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
 import { createRx } from './base/rxjs'
+import { initMarkdownIt } from './lib/shiki'
 import { router } from './router'
 import './assets/index.css'
-import { initMarkdownIt } from './lib/shiki'
 
 const pinia = createPinia()
 const app = createApp(App)
@@ -25,8 +25,8 @@ window.dannn.ipc.on('window.show', async () => {
 })
 
 async function bootstrap() {
-  window.dannn.ipc.send('window.ready')
   await initMarkdownIt()
+  window.dannn.ipc.send('window.ready')
   await new Promise(resolve => setTimeout(resolve, 100))
   if (!ok) {
     requestAnimationFrame(bootstrap)
