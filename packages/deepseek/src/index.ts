@@ -1,17 +1,12 @@
 import { defineExtension } from '@dannn/core';
-import OpenAI from 'openai/index';
 
 defineExtension(async ({ window, registerAI }) => {
-
-	console.log('OpenAI', OpenAI)
-
 	const apiKey = await window.getEnv('DEEPSEEK_API_KEY');
 
 	console.log(`apiKey: ${apiKey}`)
 
 	if (!apiKey) {
-		console.error('DEEPSEEK_API_KEY is not set.')
-		return;
+		throw new Error('DEEPSEEK_API_KEY is not set. Please set it in the environment variables.');
 	}
 
 	async function getModels() {
@@ -41,26 +36,54 @@ defineExtension(async ({ window, registerAI }) => {
 		models,
 	})
 
-	// const client = new OpenAI({
-	// 	apiKey: apiKey,
-	// 	baseURL: 'https://api.deepseek.com'
-	// });
+
 
 	ai.onQuestion(async (event) => {
-		// const completion = await client.chat.completions.create({
-		// 	messages: [{ role: 'user', content: event.message.content }],
-		// 	model: "deepseek-chat",
-		// 	stream: true,
-		// });
-	
-		// for await (const chuck of completion) {
-		// 	console.log(chuck);
-		// 	chuck.choices.forEach((choice) => {
-		// 		if (choice.delta.content) {
-		// 			event.streamAnswer(choice.delta.content, false);
-		// 		}
-		// 	})
-		// }
+		let data = JSON.stringify({
+			"messages": [
+				{
+					"content": event.message.content,
+					"role": "user"
+				}
+			],
+			"model": "deepseek-chat",
+			"frequency_penalty": 0,
+			"max_tokens": 2048,
+			"presence_penalty": 0,
+			"response_format": {
+				"type": "text"
+			},
+			"stop": null,
+			"stream": true,
+			"stream_options": null,
+			"temperature": 1,
+			"top_p": 1,
+			"tools": null,
+			"tool_choice": "none",
+			"logprobs": false,
+			"top_logprobs": null
+		});
+		const response = await fetch('https://api.deepseek.com/chat/completions', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'Authorization': 'Bearer ' + apiKey,
+			},
+			body: data,
+		})
+
+		const reader = response.body?.getReader();
+		const decoder = new TextDecoder('utf-8');
+
+		while (true) {
+			const { value, done } = await reader.read();
+			if (done) break;
+
+			const chunk = decoder.decode(value, { stream: true });
+			console.log('流式输出:', chunk);
+			event.completeAnswer(chunk);
+		}
 
 		event.complete();
 	})
