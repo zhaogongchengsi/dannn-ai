@@ -5,8 +5,8 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "build:app": "dannn build -i ./main/index.ts,./main/preload.ts -d ./dist -m prod",
-    "dev:app": "dannn build -i ./main/index.ts,./main/preload.ts -d ./dist -m dev",
+    "build:app": "dannn build -i ./main/index.ts,./main/preload.ts,./main/server.ts -d ./dist -m prod",
+    "dev:app": "dannn build -i ./main/index.ts,./main/preload.ts,./main/server.ts -d ./dist -m dev",
     "build": "vite build && pnpm run build:app",
     "dev": "vite",
     "run": "electron .",

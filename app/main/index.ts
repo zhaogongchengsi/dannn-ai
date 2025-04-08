@@ -2,15 +2,33 @@ import { existsSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import process from 'node:process'
 import { ipcMain } from 'electron'
+import { fork } from 'child_process';
 import { EXTENSIONS_ROOT } from './constant'
 import { Config } from './lib/config'
 import { Window } from './lib/window'
 import { createDannnProtocol } from './protocol'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
 const config = new Config()
 const window = new Window()
+
+const _dirname = dirname(fileURLToPath(import.meta.url))
+
+const serverPath = resolve(_dirname, 'server.js')
+
+console.log(`serverPath`, serverPath)
+
+const server = fork(serverPath, [], {
+  cwd: process.cwd(),
+  stdio: 'inherit',
+})
+
+server.on('message', (message) => {
+  console.log('server message', message)
+})
 
 async function bootstrap() {
   createDannnProtocol()
