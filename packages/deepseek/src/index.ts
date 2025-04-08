@@ -1,7 +1,18 @@
 import { defineExtension } from '@dannn/core';
+import OpenAI from 'openai/index';
 
 defineExtension(async ({ window, registerAI }) => {
+
+	console.log('OpenAI', OpenAI)
+
 	const apiKey = await window.getEnv('DEEPSEEK_API_KEY');
+
+	console.log(`apiKey: ${apiKey}`)
+
+	if (!apiKey) {
+		console.error('DEEPSEEK_API_KEY is not set.')
+		return;
+	}
 
 	async function getModels() {
 		const response = await fetch('https://api.deepseek.com/models', {
@@ -30,17 +41,28 @@ defineExtension(async ({ window, registerAI }) => {
 		models,
 	})
 
-	ai.onQuestion((event) => {
-		console.log(event.message)
-		// event.completeAnswer(`${event.message.content} answer !!!`)
-		let count = 0
+	// const client = new OpenAI({
+	// 	apiKey: apiKey,
+	// 	baseURL: 'https://api.deepseek.com'
+	// });
 
-		let id = setInterval(() => {
-			event.streamAnswer(`第 **${count++}** 段回复 ` + '```js\n console.log(1)```', count > 5)
-			if (count > 5) {
-				clearInterval(id)
-			}
-		}, 1000)
+	ai.onQuestion(async (event) => {
+		// const completion = await client.chat.completions.create({
+		// 	messages: [{ role: 'user', content: event.message.content }],
+		// 	model: "deepseek-chat",
+		// 	stream: true,
+		// });
+	
+		// for await (const chuck of completion) {
+		// 	console.log(chuck);
+		// 	chuck.choices.forEach((choice) => {
+		// 		if (choice.delta.content) {
+		// 			event.streamAnswer(choice.delta.content, false);
+		// 		}
+		// 	})
+		// }
+
+		event.complete();
 	})
 })
 

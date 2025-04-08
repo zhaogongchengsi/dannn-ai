@@ -27,7 +27,7 @@ export class WorkerBridge extends Event<ExtensionEvent> {
     }
 
     this.worker.onerror = (e) => {
-      console.error(`Worker ${this.name} error:`, e.message)
+      console.error(`Worker ${this.name} error:`, e)
     }
 
     this.worker.onmessageerror = (e: any) => {

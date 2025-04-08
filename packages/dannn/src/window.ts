@@ -9,6 +9,6 @@ export class Window {
 	}
 
 	getEnv(key: string) {
-		return this.selfWorker.invoke('getEnv', key)
+		return this.selfWorker.invoke<string | undefined>('getEnv', key)
 	}
 }

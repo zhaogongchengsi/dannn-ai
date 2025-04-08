@@ -20,5 +20,8 @@
     "eslint-plugin-format": "^1.0.1",
     "esno": "^4.8.0",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "openai": "^4.90.0"
   }
 }

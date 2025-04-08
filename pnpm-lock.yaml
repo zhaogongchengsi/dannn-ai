@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      openai:
+        specifier: ^4.90.0
+        version: 4.90.0(zod@3.24.2)
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^4.10.2
