@@ -10,6 +10,7 @@
   "include": [
     "main/**/*.ts",
     "main/**/*.d.ts",
+    "./drizzle.config.ts",
     "env.d.ts"
   ],
   "exclude": [

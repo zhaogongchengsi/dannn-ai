@@ -14,10 +14,11 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.vue",
+    "./auto-imports.d.ts",
     "vite.config.ts",
     "env.d.ts",
     "./typed-router.d.ts"
-, "../packages/schemas/src/ai.ts", "../packages/schemas/src/extension.ts", "../packages/schemas/src/schema.ts"  ],
+  ],
   "exclude": [
     "node_modules"
   ]
