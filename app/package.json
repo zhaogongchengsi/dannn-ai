@@ -12,7 +12,24 @@
     "run": "electron .",
     "start": "pnpm run dev:app && pnpm run run",
     "lint": "eslint . --fix",
-    "test": "vitest"
+    "test": "vitest",
+    "gen": "drizzle-kit generate"
+  },
+  "build": {
+    "files": [
+      "dist/**/*",
+      "./index.html",
+      "drizzle/**/*"
+    ],
+    "asar": true,
+    "appId": "com.zhaozunhong.app",
+    "productName": "dannn ai",
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    }
   },
   "dependencies": {
     "@dannn/schemas": "workspace:^",
