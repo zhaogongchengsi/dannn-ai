@@ -23,16 +23,23 @@ export async function build({ entry, dir, mode }: BuildOptions) {
     ...mode ? { 'process.env.MODE': JSON.stringify(mode), MODE: JSON.stringify(mode) } : {},
   }
 
-  const res = await esbuild({
+  const dependencies = Object.keys(packageJson?.dependencies || {})
+
+  const external = Array.from(
+    new Set([
+      ...builtinModules,
+      ...builtinModules.map(module => `node:${module}`),
+      'electron',
+      ...dependencies,
+    ])
+  )
+
+  await esbuild({
     entryPoints: Array.isArray(entry) ? entry : [entry],
     outdir: dir || 'dist',
     bundle: true,
     platform: 'node',
-    external: [
-      ...builtinModules,
-      ...builtinModules.map(module => `node:${module}`),
-      'electron',
-    ],
+    external,
     loader: {
       ".png": 'file',
       '.tmpl': 'text',
@@ -45,6 +52,4 @@ export async function build({ entry, dir, mode }: BuildOptions) {
     format: packageJson?.type === 'module' ? 'esm' : 'cjs',
     define,
   })
-
-  consola.log('Output files:', res.outputFiles?.map(file => file.path).join(', '))
 }

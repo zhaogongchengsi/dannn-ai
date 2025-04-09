@@ -21,6 +21,7 @@ export interface PackageJson {
   main: string
   module: string
   types: string
+  dependencies: Record<string, string>
 }
 
 export function readPackageJson(directory: string) {
