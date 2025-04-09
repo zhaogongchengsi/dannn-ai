@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@dannn/schemas": "workspace:^",
+    "@libsql/client": "^0.15.2",
     "@shikijs/markdown-it": "^3.2.1",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/vue-table": "^8.21.2",
@@ -25,6 +26,7 @@
     "clsx": "^2.1.1",
     "crc": "^4.3.2",
     "dexie": "^4.0.11",
+    "drizzle-orm": "^0.41.0",
     "electron": "^35.0.3",
     "electron-log": "^5.3.2",
     "fs-extra": "^11.3.0",
@@ -61,6 +63,7 @@
     "@types/lodash": "^4.17.16",
     "@types/markdown-it": "^14.1.2",
     "@vitejs/plugin-vue": "^5.2.3",
+    "drizzle-kit": "^0.30.6",
     "tailwindcss": "3",
     "tailwindcss-animate": "^1.0.7",
     "unplugin-auto-import": "^19.1.2",
