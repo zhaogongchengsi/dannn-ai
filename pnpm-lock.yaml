@@ -60,6 +60,9 @@ importers:
       '@tanstack/vue-table':
         specifier: ^8.21.2
         version: 8.21.2(vue@3.5.13(typescript@5.8.2))
+      '@trpc/client':
+        specifier: ^11.0.4
+        version: 11.0.4(@trpc/server@11.0.4(typescript@5.8.2))(typescript@5.8.2)
       '@trpc/server':
         specifier: ^11.0.4
         version: 11.0.4(typescript@5.8.2)
@@ -205,6 +208,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      unbuild:
+        specifier: ^3.5.0
+        version: 3.5.0(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2))
       unplugin-auto-import:
         specifier: ^19.1.2
         version: 19.1.2(@vueuse/core@13.0.0(vue@3.5.13(typescript@5.8.2)))

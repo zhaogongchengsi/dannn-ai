@@ -1,14 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@dannn/schemas/*": [
-        "../packages/schemas/src/*"
-      ]
-    }
+    "baseUrl": "."
   },
   "references": [
     {

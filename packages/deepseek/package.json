@@ -12,8 +12,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.7.0",
-  "dependencies": {
-    "@dannn/core": "workspace:^"
-  }
+  "packageManager": "pnpm@10.7.0"
 }

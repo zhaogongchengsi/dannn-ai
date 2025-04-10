@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.base.json", // 继承 tsconfig.base.json
   "compilerOptions": {
+    "composite": true,
     "baseUrl": "./",
     "module": "Preserve",
     "moduleResolution": "bundler",
@@ -10,9 +11,11 @@
       ]
     }
   },
+  "composite": true,
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
+    "client/**/*.ts",
     "src/**/*.vue",
     "./auto-imports.d.ts",
     "vite.config.ts",

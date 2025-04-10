@@ -1,4 +1,3 @@
-import type { LibSQLDatabase } from 'drizzle-orm/libsql/driver-core'
 import { migrate } from 'drizzle-orm/libsql/migrator'
 import { drizzle } from 'drizzle-orm/libsql/sqlite3'
 import { app } from 'electron'

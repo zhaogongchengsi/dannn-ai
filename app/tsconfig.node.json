@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.base.json", // 继承 tsconfig.base.json
   "compilerOptions": {
+    "composite": true,
     "baseUrl": "./",
     "module": "Preserve",
     "moduleResolution": "bundler",
@@ -9,8 +10,10 @@
   },
   "include": [
     "main/**/*.ts",
+    "client/**/*.ts",
     "main/**/*.d.ts",
     "./drizzle.config.ts",
+    "./build.config.ts",
     "env.d.ts"
   ],
   "exclude": [
