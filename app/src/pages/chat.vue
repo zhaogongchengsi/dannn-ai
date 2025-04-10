@@ -1,20 +1,7 @@
 <script setup lang='ts'>
-import { useChatStore } from '@/stores/chat'
 import ChatFooterBody from '@/views/chat-footer-body.vue'
 import ChatFooterHeader from '@/views/chat-footer-header.vue'
 import ChatPageContent from '@/views/chat-page-content.vue'
-import { watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
-const chatStore = useChatStore()
-
-watchEffect(() => {
-  const chatId = route.query.chatId as string
-  if (chatId) {
-    chatStore.setCurrentChatID(chatId)
-  }
-})
 </script>
 
 <template>

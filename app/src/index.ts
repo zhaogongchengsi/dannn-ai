@@ -1,7 +1,6 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
-import { createRx } from './base/rxjs'
 import { initMarkdownIt } from './lib/shiki'
 import { router } from './router'
 import './assets/index.css'
@@ -9,7 +8,6 @@ import './assets/index.css'
 const pinia = createPinia()
 const app = createApp(App)
 
-app.use(createRx())
 app.use(pinia)
 app.use(router)
 
@@ -18,7 +16,6 @@ window.dannn.ipc.on('window.show', async () => {
   document.startViewTransition(() => {
     if (!ok) {
       app.mount('#app')
-      app.config.globalProperties.$rx.appMount()
       ok = true
     }
   })

@@ -15,8 +15,3 @@ export function onAppReady(func: () => void) {
 export function onAppMount(func: () => void) {
   return appMount$.subscribe(func)
 }
-
-// onAppReady(async () => {
-//   await loadLocalExtensions()
-//   setActiveExtension()
-// })

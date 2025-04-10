@@ -2,7 +2,7 @@ import type { Plugin } from 'vue'
 import type { AppRx } from './type'
 import { combineLatest } from 'rxjs'
 import { appMount, appMount$, appReady$, onAppMount, onAppReady } from './app'
-import { subscribeToWorkerAnswers, sendQuestionToWorker } from './channel'
+import { subscribeToWorkerAnswers } from './channel'
 import { APP_PROVIDE_RX_KEY } from './constant'
 import { activeExtension$, extensionAiSubject, extensionDestroy, extensionWorkerSubject, getExtensionWorker, getExtensionWorkers, loadLocalExtensions, onExtensionLoaded, setActiveExtension } from './extensions'
 
@@ -23,20 +23,10 @@ export function createRx(): Plugin {
     extensionDestroy,
     onExtensionLoaded,
     subscribeToWorkerAnswers,
-    sendQuestionToWorker,
   }
-
-  onAppMount(async () => {
-    await loadLocalExtensions()
-  })
-
-  onAppReady(() => {
-    setActiveExtension()
-  })
 
   return {
     install(app) {
-      app.config.globalProperties.$rx = $rx
       app.provide(APP_PROVIDE_RX_KEY, $rx)
     },
   }

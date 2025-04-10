@@ -18,11 +18,11 @@ import { Toaster } from '@/components/ui/sonner'
 import WindowMenus from '@/components/window-menus.vue'
 import { computed } from 'vue'
 import { useConfig } from './composables/config'
-import { useChatStore } from './stores/chat'
 import ChatAdd from './views/chat-add.vue'
 
 const config = useConfig()
-const chatStore = useChatStore()
+
+const rooms = ref<any[]>([])
 
 const toasterTheme = computed(() => {
   const mode = config.mode.value
@@ -50,7 +50,7 @@ const toasterTheme = computed(() => {
               </SidebarGroupAction>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem v-for="chat of chatStore.rooms.values()" :key="chat.id">
+                  <SidebarMenuItem v-for="chat of rooms" :key="chat.id">
                     <SidebarMenuButton as-child>
                       <RouterLink :to="`/chat?chatId=${chat.id}`">
                         {{ chat.title }}

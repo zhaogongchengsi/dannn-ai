@@ -8,7 +8,14 @@
   "license": "ISC",
   "packageManager": "pnpm@10.7.0",
   "types": "./src/index.d.ts",
+  "scripts": {
+    "build": "unbuild"
+  },
+  "devDependencies": {
+    "unbuild": "^3.5.0"
+  },
   "dependencies": {
-    "@dannn/schemas": "workspace:^"
+    "@trpc/client": "^11.0.4",
+    "socket.io-client": "^4.8.1"
   }
 }

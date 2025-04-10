@@ -87,4 +87,5 @@
   }
 
   contextBridge.exposeInMainWorld('dannn', dannn)
+  contextBridge.exposeInMainWorld('process', { env: JSON.parse(JSON.stringify(process.env)) })
 })()

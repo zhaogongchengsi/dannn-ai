@@ -1,12 +1,5 @@
 <script setup lang='ts'>
-import { useChatStore } from '@/stores/chat'
-import { onMounted } from 'vue'
 
-const chatStore = useChatStore()
-
-onMounted(() => {
-  chatStore.setCurrentChatID(null)
-})
 </script>
 
 <template>
