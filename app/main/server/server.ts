@@ -18,14 +18,6 @@ export function createServer(port: number) {
         methods: ['GET', 'POST'],
       },
     })
-
-    io.on('connection', (socket) => {
-      console.log('a user connected')
-
-      socket.on('join', (room) => {
-        console.log('join: ', room)
-      })
-    })
   }
 
   function start() {

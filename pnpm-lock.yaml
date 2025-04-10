@@ -42,6 +42,9 @@ importers:
 
   app:
     dependencies:
+      '@dannn/core':
+        specifier: workspace:^
+        version: link:../packages/dannn
       '@dannn/schemas':
         specifier: workspace:^
         version: link:../packages/schemas

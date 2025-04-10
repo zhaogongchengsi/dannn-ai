@@ -4,6 +4,7 @@ import process from 'node:process'
 import { app, ipcMain } from 'electron'
 import { getPort } from 'get-port-please'
 import { EXTENSIONS_ROOT } from './constant'
+import { migrateDb } from './database/db'
 import { Config } from './lib/config'
 import { Window } from './lib/window'
 import { createServer } from './server/server'
@@ -14,6 +15,8 @@ const config = new Config()
 const window = new Window()
 
 async function bootstrap() {
+  await migrateDb()
+
   await config.init()
 
   const port = await getPort({
@@ -31,8 +34,6 @@ async function bootstrap() {
   app.on('before-quit', () => {
     server.stop()
   })
-
-  console.log(`http server port: ${port}`)
 
   const windowConfig = config.get('window')
 
