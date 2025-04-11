@@ -17,9 +17,6 @@ class Room {
     this.client.socket.on(RoomEvent.create, (rooms: RoomData[]) => {
       this.roomCreated$.next(rooms)
     })
-    this.client.socket.on('ping', () => {
-      console.log('ping')
-    })
   }
 
   async createRoom(opt: CreateRoomOptions): Promise<RoomData[]> {
