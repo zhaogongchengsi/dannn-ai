@@ -1,3 +1,5 @@
-import { createClient } from '../../../app/base/index'
+import { room } from '../../../app/base/index'
 
-createClient()
+room.onRoomCreated((rooms) => {
+	console.log('Room created:', rooms)
+})

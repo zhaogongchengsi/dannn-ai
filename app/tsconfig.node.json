@@ -11,9 +11,11 @@
   "include": [
     "main/**/*.ts",
     "base/**/*.ts",
+    "common/**/*.ts",
     "main/**/*.d.ts",
     "./drizzle.config.ts",
     "./build.config.ts",
+    "common/types.ts",
     "env.d.ts"
   ],
   "exclude": [

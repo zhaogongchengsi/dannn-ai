@@ -19,7 +19,7 @@ export const ais = table('ais', {
   createdBy: text('created_by'),
 })
 
-export const chats = table('chats', {
+export const rooms = table('rooms', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   title: text('title').notNull(),
   avatar: text('avatar'),
@@ -39,10 +39,10 @@ export const chatParticipants = table(
   'chat_participants',
   {
     aiName: text('ai_name'),
-    chatId: integer('chat_id'),
+    roomId: integer('room_id'),
   },
   table => [
-    primaryKey({ columns: [table.aiName, table.chatId] }),
+    primaryKey({ columns: [table.aiName, table.roomId] }),
   ],
 )
 
@@ -55,7 +55,7 @@ export const messages = table('messages', {
   }).notNull().default('text'),
 
   sortBy: int('sort_by').notNull(),
-  chatId: integer('chat_id').notNull().references(() => chats.id),
+  roomId: integer('chat_id').notNull().references(() => rooms.id),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
   deletedAt: text('deleted_at'),

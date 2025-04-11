@@ -8,11 +8,14 @@ import { migrateDb } from './database/db'
 import { Config } from './lib/config'
 import { Window } from './lib/window'
 import { createServer } from './server/server'
+import { extensionLoadAll } from './extension-loader'
+import { ExtensionProcess } from './lib/extension'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
 const config = new Config()
 const window = new Window()
+let extensionProcessList: ExtensionProcess[] | null = null
 
 async function bootstrap() {
   await migrateDb()
@@ -31,8 +34,13 @@ async function bootstrap() {
 
   await server.start()
 
+  extensionProcessList = await extensionLoadAll()
+
   app.on('before-quit', () => {
     server.stop()
+    extensionProcessList?.forEach((extension) => {
+      extension.close()
+    })
   })
 
   const windowConfig = config.get('window')

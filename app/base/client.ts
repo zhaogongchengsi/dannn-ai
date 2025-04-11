@@ -1,7 +1,7 @@
+/* eslint-disable node/prefer-global/process */
 import type { TRPCClient } from '@trpc/client'
 import type { Socket } from 'socket.io-client'
 import type { AppRouter } from '../main/server/router'
-import process from 'node:process'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { io } from 'socket.io-client'
 

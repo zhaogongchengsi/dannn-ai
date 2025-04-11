@@ -12,3 +12,5 @@ app/dist-ssr
 app/extensions
 app/.dannn
 app/drizzle
+app/dist_client
+app/client_dist

@@ -2,7 +2,7 @@ import { defineBuildConfig } from 'unbuild'
 
 export default defineBuildConfig({
   entries: [
-    './client/index'
+    './base/index',
   ],
   rollup: {
     emitCJS: true,
@@ -11,5 +11,5 @@ export default defineBuildConfig({
   declaration: true,
   clean: true,
   failOnWarn: false,
-  outDir: 'client_dist'
+  outDir: 'client_dist',
 })

@@ -46,6 +46,9 @@ export async function build({ entry, dir, mode }: BuildOptions) {
       ".svg": 'file',
       ".json": 'json',
     },
+    outExtension: {
+      '.js': packageJson?.type === 'module' ? '.mjs' : '.cjs', // 将输出的 `.js` 文件改为 `.mjs`
+    },
     // minify: true,
     tsconfig: 'tsconfig.json',
     treeShaking: true,

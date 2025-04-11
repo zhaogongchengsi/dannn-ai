@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "./src/index.ts",
-  "type": "module",
   "scripts": {
     "build:code": "dannn build -i ./src/index.ts -d ../../app/extensions/deepseek -m prod",
     "copy": "node ../../scripts/copy.mjs dannn.json ../../app/extensions/deepseek/dannn.json && node ../../scripts/copy.mjs README.md ../../app/extensions/deepseek/README.md",

@@ -16,9 +16,11 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "base/**/*.ts",
+    "common/**/*.ts",
     "src/**/*.vue",
     "./auto-imports.d.ts",
     "vite.config.ts",
+    "./types.ts",
     "env.d.ts",
     "./typed-router.d.ts"
   ],
