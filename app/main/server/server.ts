@@ -18,6 +18,10 @@ export function createServer(port: number) {
         methods: ['GET', 'POST'],
       },
     })
+
+    io.on('connection', (socket) => {
+      console.log('a user connected', socket.id)
+    })
   }
 
   function start() {

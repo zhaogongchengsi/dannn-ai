@@ -64,6 +64,7 @@ function createClient(): {
 
   const socket: Socket = io(ws, {
     reconnectionDelayMax: 10000,
+    autoConnect: true,
   })
 
   return {

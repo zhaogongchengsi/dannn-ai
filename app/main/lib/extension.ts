@@ -1,10 +1,9 @@
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { parse, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import process from 'node:process'
+import { Worker } from 'node:worker_threads'
 import { z } from 'zod'
-import { utilityProcess } from 'electron'
-import { Worker } from 'worker_threads'
 
 export const PluginManifestSchema = z.object({
   name: z.string().regex(/^[^\s!@#$%^&*()+=[\]{};':"\\|,.<>/?]*$/, { message: 'Name cannot contain illegal characters or spaces' }),
@@ -40,7 +39,7 @@ export class ExtensionProcess {
   private readonly id = String(++ExtensionProcess.ID_COUNTER)
   private readonly pid = process.pid
   private static readonly all = new Map<number, IExtensionProcessInfo>()
-  process: Electron.UtilityProcess | null = null
+  process: Worker | null = null
   manifest: PluginManifest | null = null
   static getAll(): IExtensionProcessInfo[] {
     return Array.from(ExtensionProcess.all.values())
@@ -90,41 +89,42 @@ export class ExtensionProcess {
         throw new Error(`Main file ${mainFile} does not exist`)
       }
 
-      const extensionNeedEnv = manifest?.permissions?.env ? Object.fromEntries(manifest.permissions.env.map((key) => [key, process.env[key]])) : {}
+      const extensionNeedEnv = manifest?.permissions?.env ? Object.fromEntries(manifest.permissions.env.map(key => [key, process.env[key]])) : {}
       const env = { ...extensionNeedEnv, ...this._config.env }
 
-      console.log('env:',{ env })
-
-      const iProcess = utilityProcess.fork(mainFile, [], {
+      const iProcess = new Worker(mainFile, {
         env,
-        execArgv: ['--input-type=commonjs'],
-        stdio: 'inherit',
+        stdout: true,
+        stderr: true,
       })
 
       iProcess.on('exit', (code) => {
-        console.log(`Extension process exited with code ${code}`);
-        ExtensionProcess.all.delete(this.pid);
-      });
+        // eslint-disable-next-line no-console
+        console.log(`Extension process exited with code ${code}`)
+        ExtensionProcess.all.delete(this.pid)
+      })
 
       iProcess.on('error', (error: any) => {
-        console.error(`Extension process encountered an error: ${error?.message}`);
-      });
+        console.error(`Extension process encountered an error: ${error?.message}`)
+      })
 
       iProcess.on('message', (message) => {
-        console.log(`Message from extension process: ${message}`);
-      });
+        // eslint-disable-next-line no-console
+        console.log(`Message from extension process: ${message}`)
+      })
 
-      ExtensionProcess.all.set(this.pid, { pid: this.pid, id: this.id, manifest });
+      ExtensionProcess.all.set(this.pid, { pid: this.pid, id: this.id, manifest })
 
       this.process = iProcess
-    } catch (e) {
+    }
+    catch (e) {
       throw new Error(`Failed to start extension: ${e}`)
     }
   }
 
-  close (): void {
+  close(): void {
     if (this.process) {
-      this.process.kill()
+      this.process.terminate()
       this.process = null
     }
     ExtensionProcess.all.delete(this.pid)

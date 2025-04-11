@@ -29,7 +29,7 @@ export class Window extends EventEmitter<WindowEvents> {
   constructor(name?: string) {
     super()
     this.name = name || this.name
-    this.preload = resolve(_dirname, './preload.js')
+    this.preload = resolve(_dirname, './preload.mjs')
     this.icon = nativeImage.createFromPath(resolve(_dirname, logo))
   }
 

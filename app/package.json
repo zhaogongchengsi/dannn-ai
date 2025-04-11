@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "description": "",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "scripts": {
     "build:rpc": "unbuild",
     "build:app": "dannn build -i ./main/index.ts,./main/preload.ts -d ./dist -m prod",

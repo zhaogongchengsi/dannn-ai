@@ -1,3 +1,4 @@
+import type { ExtensionProcess } from './lib/extension'
 import { existsSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import process from 'node:process'
@@ -5,11 +6,10 @@ import { app, ipcMain } from 'electron'
 import { getPort } from 'get-port-please'
 import { EXTENSIONS_ROOT } from './constant'
 import { migrateDb } from './database/db'
+import { extensionLoadAll } from './extension-loader'
 import { Config } from './lib/config'
 import { Window } from './lib/window'
 import { createServer } from './server/server'
-import { extensionLoadAll } from './extension-loader'
-import { ExtensionProcess } from './lib/extension'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -34,7 +34,7 @@ async function bootstrap() {
 
   await server.start()
 
-  extensionProcessList = await extensionLoadAll()
+  extensionProcessList = await extensionLoadAll(port)
 
   app.on('before-quit', () => {
     server.stop()
@@ -77,3 +77,20 @@ ipcMain.handle('env.get', async (_, keys: string[]) => {
 })
 
 bootstrap()
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Cleaning up...')
+
+  // 执行清理操作，例如关闭所有窗口
+  app.quit()
+})
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Cleaning up...')
+  app.quit()
+})
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err)
+  // app.quit()
+})
