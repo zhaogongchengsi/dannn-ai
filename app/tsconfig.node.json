@@ -10,7 +10,7 @@
   },
   "include": [
     "main/**/*.ts",
-    "client/**/*.ts",
+    "base/**/*.ts",
     "main/**/*.d.ts",
     "./drizzle.config.ts",
     "./build.config.ts",

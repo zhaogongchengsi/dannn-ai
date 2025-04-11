@@ -1,3 +1,3 @@
-import { createClient } from '../client/index'
+import { createClient } from '../base/index'
 
 createClient()
