@@ -32,4 +32,9 @@ async function bootstrap() {
 }
 requestAnimationFrame(bootstrap)
 
+setInterval(() => {
+  room.ping()
+  console.log('ping')
+}, 3000)
+
 console.log(room)

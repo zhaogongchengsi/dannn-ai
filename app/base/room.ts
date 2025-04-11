@@ -17,12 +17,19 @@ class Room {
     this.client.socket.on(RoomEvent.create, (rooms: RoomData[]) => {
       this.roomCreated$.next(rooms)
     })
+    this.client.socket.on('ping', () => {
+      console.log('ping')
+    })
   }
 
   async createRoom(opt: CreateRoomOptions): Promise<RoomData[]> {
     const newRooms = await this.client.trpc.room.createRoom.mutate(opt)
     this.client.socket.emit(RoomEvent.create, newRooms)
     return newRooms
+  }
+
+  ping() {
+    this.client.socket.emit('ping')
   }
 
   onRoomCreated(callback: (rooms: RoomData[]) => void) {
