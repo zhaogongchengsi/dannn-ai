@@ -55,3 +55,7 @@ export async function updateAi(name: string, updates: Partial<AiConfig>): Promis
     .returning()
     .get()
 }
+
+export function getAllAis(): Promise<AIData[]> {
+  return db.select().from(ais).all()
+}

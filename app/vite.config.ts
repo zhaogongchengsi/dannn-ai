@@ -49,7 +49,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@dannn/schemas': resolve(__dirname, '../packages/schemas/src/index'),
+      "base": resolve(__dirname, './base'),
+      "common": resolve(__dirname, './common'),
     },
   },
 })

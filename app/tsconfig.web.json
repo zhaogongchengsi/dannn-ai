@@ -8,7 +8,13 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "@base/*": [
+        "./base/*"
+      ],
+      "@common/*": [
+        "./common/*"
+      ],
     }
   },
   "composite": true,

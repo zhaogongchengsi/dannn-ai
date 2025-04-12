@@ -7,18 +7,23 @@ import { io } from 'socket.io-client'
 
 const host = '127.0.0.1'
 
+let instantiated = false
 /**
  * 基础客户端单例类，负责管理trpc和socket连接
  */
 export class BaseClient {
   private static instance: BaseClient | null = null
-  private _trpc: TRPCClient<AppRouter>
-  private _socket: Socket
+  private _trpc!: TRPCClient<AppRouter>
+  private _socket!: Socket
 
   private constructor() {
+    if (instantiated) {
+      return
+    }
     const { trpc, socket } = createClient()
     this._trpc = trpc
     this._socket = socket
+    instantiated = true
   }
 
   public static getInstance(): BaseClient {
