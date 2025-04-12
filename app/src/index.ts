@@ -1,6 +1,5 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import { room } from '../base/index'
 import App from './App.vue'
 import { initMarkdownIt } from './lib/shiki'
 import { router } from './router'
@@ -30,11 +29,5 @@ async function bootstrap() {
     requestAnimationFrame(bootstrap)
   }
 }
+
 requestAnimationFrame(bootstrap)
-
-setInterval(() => {
-  room.ping()
-  console.log('ping')
-}, 3000)
-
-console.log(room)

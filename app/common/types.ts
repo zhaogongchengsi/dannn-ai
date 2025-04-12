@@ -19,3 +19,38 @@ export interface RoomData {
   isPinned: number
   isArchived: number
 }
+
+export interface AIData {
+  name: string
+  title: string
+  version: string
+  avatar: string | null
+  description: string | null
+  role: string | null
+  prompt: string | null
+  type: string
+  models: string
+  createdAt: string
+  updatedAt: string
+  isActive: number
+  lastUsedAt: string | null
+  versionHistory: string | null
+  tags: string | null
+  configuration: string | null
+  createdBy: string | null
+}
+
+export interface AiConfig {
+  name: string
+  title: string
+  avatar?: string
+  version: string
+  description?: string
+  role?: string
+  prompt?: string
+  type?: string
+  models?: string
+  tags?: string[]
+  configuration?: Record<string, any>
+  createdBy?: string
+}

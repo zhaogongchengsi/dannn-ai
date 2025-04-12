@@ -83,6 +83,7 @@ export class ExtensionProcess {
 
   async start(): Promise<void> {
     try {
+      performance.mark('start-extension')
       const manifest = await this.readManifest()
       const mainFile = resolve(this._path, manifest.main)
       if (!existsSync(mainFile)) {
@@ -98,20 +99,8 @@ export class ExtensionProcess {
         stderr: true,
       })
 
-      iProcess.on('exit', (code) => {
-        // eslint-disable-next-line no-console
-        console.log(`Extension process exited with code ${code}`)
-        ExtensionProcess.all.delete(this.pid)
-      })
-
-      iProcess.on('error', (error: any) => {
-        console.error(`Extension process encountered an error: ${error?.message}`)
-      })
-
-      iProcess.on('message', (message) => {
-        // eslint-disable-next-line no-console
-        console.log(`Message from extension process: ${message}`)
-      })
+      // 绑定事件处理
+      this.bindWorkerEvents(iProcess)
 
       ExtensionProcess.all.set(this.pid, { pid: this.pid, id: this.id, manifest })
 
@@ -120,6 +109,69 @@ export class ExtensionProcess {
     catch (e) {
       throw new Error(`Failed to start extension: ${e}`)
     }
+    finally {
+      performance.mark('end-extension')
+      performance.measure('extension', 'start-extension', 'end-extension')
+    }
+  }
+
+  /**
+   * 绑定 Worker 的事件处理
+   * @param worker 子线程 Worker 实例
+   */
+  private bindWorkerEvents(worker: Worker): void {
+    worker.on('exit', this.handleExit.bind(this))
+    worker.on('error', this.handleError.bind(this))
+    worker.on('message', this.handleMessage.bind(this))
+    worker.on('online', this.handleOnline.bind(this))
+
+    this.pipeOutput(worker)
+  }
+
+  /**
+   * 处理 Worker 的退出事件
+   * @param code 退出代码
+   */
+  private handleExit(code: number): void {
+    console.log(`Extension process exited with code ${code}`)
+    ExtensionProcess.all.delete(this.pid)
+  }
+
+  /**
+   * 处理 Worker 的错误事件
+   * @param error 错误对象
+   */
+  private handleError(error: any): void {
+    console.error(`Extension process encountered an error: ${error?.message}`)
+  }
+
+  /**
+   * 处理 Worker 的消息事件
+   * @param message 消息内容
+   */
+  private handleMessage(message: any): void {
+    console.log(`Message from extension process: ${message}`)
+  }
+
+  /**
+   * 处理 Worker 的上线事件
+   */
+  private handleOnline(): void {
+    console.log('Extension process is online')
+  }
+
+  /**
+   * 将子线程的 stdout 和 stderr 集成到父进程的输出流中
+   * @param worker 子线程 Worker 实例
+   */
+  private pipeOutput(worker: Worker): void {
+    worker.stdout?.on('data', (data) => {
+      process.stdout.write(`[Worker stdout]: ${data}`)
+    })
+
+    worker.stderr?.on('data', (data) => {
+      process.stderr.write(`[Worker stderr]: ${data}`)
+    })
   }
 
   close(): void {

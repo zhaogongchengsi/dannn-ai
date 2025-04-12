@@ -11,25 +11,21 @@ export interface CreateRoomOptions {
 
 class Room {
   private client = BaseClient.getInstance()
-  private roomCreated$ = new Subject<RoomData[]>()
+  private roomCreated$ = new Subject<RoomData>()
 
   constructor() {
-    this.client.socket.on(RoomEvent.create, (rooms: RoomData[]) => {
+    this.client.socket.on(RoomEvent.create, (rooms: RoomData) => {
       this.roomCreated$.next(rooms)
     })
   }
 
-  async createRoom(opt: CreateRoomOptions): Promise<RoomData[]> {
+  async createRoom(opt: CreateRoomOptions): Promise<RoomData> {
     const newRooms = await this.client.trpc.room.createRoom.mutate(opt)
     this.client.socket.emit(RoomEvent.create, newRooms)
     return newRooms
   }
 
-  ping() {
-    this.client.socket.emit('ping')
-  }
-
-  onRoomCreated(callback: (rooms: RoomData[]) => void) {
+  onRoomCreated(callback: (rooms: RoomData) => void) {
     return this.roomCreated$.subscribe(callback)
   }
 }

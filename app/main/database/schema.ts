@@ -4,6 +4,7 @@ export const ais = table('ais', {
   name: text('id').primaryKey().unique(),
   title: text('username').notNull(),
   version: text('email').notNull(),
+  avatar: text('avatar'),
   description: text('description'),
   role: text('role'),
   prompt: text('prompt'),

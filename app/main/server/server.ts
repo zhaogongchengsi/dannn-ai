@@ -20,7 +20,9 @@ export function createServer(port: number) {
     })
 
     io.on('connection', (socket) => {
-      console.log('a user connected', socket.id)
+      socket.onAny((event, ...args) => {
+        socket.broadcast.emit(event, ...args)
+      })
     })
   }
 

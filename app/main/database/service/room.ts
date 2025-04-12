@@ -1,4 +1,5 @@
-import type { MakeFieldsOptional } from '../../../common/types'
+import type { MakeFieldsOptional, RoomData } from '../../../common/types'
+import { eq } from 'drizzle-orm'
 import { db } from '../db'
 import { rooms } from '../schema'
 
@@ -16,5 +17,30 @@ export async function insertRoom(chat: MakeFieldsOptional<InsertChat, 'descripti
     isLocked: 0,
     isPinned: 0,
     isArchived: 0,
-  }).returning()
+  }).returning().get()
+}
+
+export async function getAllRooms(): Promise<RoomData[]> {
+  return await db.select().from(rooms).all()
+}
+
+export async function getRoomById(id: number): Promise<RoomData | undefined> {
+  return await db.select().from(rooms).where(eq(rooms.id, id)).get()
+}
+
+export async function updateRoomById(
+  id: number,
+  updates: Partial<InsertChat>,
+) {
+  return await db
+    .update(rooms)
+    .set({
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(rooms.id, id))
+}
+
+export async function deleteRoomById(id: number) {
+  await db.delete(rooms).where(eq(rooms.id, id))
 }

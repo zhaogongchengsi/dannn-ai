@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { insertRoom } from '../../database/service/room'
+import { getAllRooms, insertRoom } from '../../database/service/room'
 import { publicProcedure, router } from '../trpc'
 
 export const roomRouter = router({
@@ -15,5 +15,8 @@ export const roomRouter = router({
       description: input.description,
       avatar: input.avatar,
     })
+  }),
+  getAllRooms: publicProcedure.query(async () => {
+    return await getAllRooms()
   }),
 })
