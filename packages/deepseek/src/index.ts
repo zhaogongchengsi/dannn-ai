@@ -1,4 +1,4 @@
-import { defineExtension } from '../../../app/base/index'
+import { defineExtension } from 'base/index'
 import icon from './icon.svg'
 
 defineExtension(async (ctx) => {
@@ -16,5 +16,7 @@ defineExtension(async (ctx) => {
 		createdBy: 'local',
 	})
 
-	console.log('DeepSeek extension activated AI: ' + ai?.name)
+	console.log(ai)
+
+	console.log('DeepSeek extension activated AI: ' + ai)
 })

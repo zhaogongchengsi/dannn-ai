@@ -3,6 +3,7 @@ import { AiEvent } from '../common/event'
 import type { CreateAIInput } from '../common/schema'
 import { createAIInput } from '../common/schema'
 import { BaseClient } from './client'
+import { formatZodError } from './utils'
 
 const client = BaseClient.getInstance()
 
@@ -16,7 +17,7 @@ export async function registerAI(config: CreateAIInput) {
 	const { success, data, error } = createAIInput.safeParse(config)
 
 	if (!success) {
-		throw new Error(`Invalid AI config: ${error}`)
+		throw new Error(`Invalid AI config: ${formatZodError(error)}`)
 	}
 
 	const newAI = await client.trpc.ai.createAi.mutate(data)

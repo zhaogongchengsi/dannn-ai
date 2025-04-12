@@ -8,6 +8,14 @@
       "es2020",
       "webworker"
     ],
+    "paths": {
+      "base/*": [
+        "../../app/base/*"
+      ],
+      "common/*": [
+        "./../app/common/*"
+      ],
+    }
   },
   "include": [
     "src/**/*.ts",

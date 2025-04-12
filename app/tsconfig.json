@@ -1,6 +1,14 @@
 {
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "base/*": [
+        "./base/*"
+      ],
+      "common/*": [
+        "./common/*"
+      ],
+    }
   },
   "references": [
     {

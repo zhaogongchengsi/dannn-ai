@@ -16,6 +16,10 @@ export function readJsonFile<T>(directory: string, fileName: string): T | null {
 export interface DannnConfig {
   build?: {
     external?: string[]
+    alias?: Record<string, string>
+    entries?: string[] | string
+    outdir?: string
+    minify?: boolean
   }
 }
 

@@ -13,7 +13,6 @@ export default defineCommand({
     input: {
       type: 'string',
       description: 'The entry file or files',
-      required: true,
       alias: 'i',
     },
     dir: {
@@ -29,7 +28,7 @@ export default defineCommand({
     },
   },
   async run({ args }) {
-    const input = args.input
+    const input = args.input || ''
     const dir = args.dir || 'dist'
     const mode = args.mode
     const entry = input.split(',').map(i => i.trim()).filter(Boolean)
@@ -43,12 +42,12 @@ export default defineCommand({
 
     try {
       consola.info(`Building ${packageJson.name} mode ${mode} v${packageJson.version}`)
+
       await build({
         entry,
         dir,
         mode,
       })
-      consola.success(`Built successfully to ${dir}`)
     }
     catch (error) {
       consola.error(error)

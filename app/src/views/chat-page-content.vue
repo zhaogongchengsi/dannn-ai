@@ -10,24 +10,17 @@ const el = useTemplateRef('el')
 const virtEl = useTemplateRef('virtEl')
 const chatStore = useChatStore()
 const { height } = useElementSize(el)
-const rx = useAppRx()
 
-const unsubscribe = rx.subscribeToWorkerAnswers(() => {
-  virtEl.value?.forceUpdate()
-})
 
 watchOnce(() => virtEl.value, () => {
   virtEl.value?.scrollToBottom()
 })
 
-onUnmounted(() => {
-  unsubscribe()
-})
 </script>
 
 <template>
 <div ref="el" class="h-full w-full">
-  <div v-if="!chatStore.currentChat">
+  <!-- <div v-if="!chatStore.currentChat">
     <div class="flex items-center justify-center h-full text-zinc-500 dark:text-zinc-400">
       <span>请选择一个聊天</span>
     </div>
@@ -35,8 +28,8 @@ onUnmounted(() => {
   <div v-if="!chatStore.currentChat || !chatStore.currentChat.messages || chatStore.currentChat.messages.length === 0"
     class="flex items-center justify-center h-full text-zinc-500 dark:text-zinc-400">
     <span>暂无消息</span>
-  </div>
-  <VirtList ref="virtEl" v-else itemKey="id" :list="chatStore.currentChat.messages" :style="{ height: `${height}px` }" :minSize="20">
+  </div> -->
+  <VirtList ref="virtEl" itemKey="id" :list="[]" :style="{ height: `${height}px` }" :minSize="20">
     <template #default="{ itemData, index }">
       <ChatMessageRow :message="itemData" :index="index" />
     </template>
