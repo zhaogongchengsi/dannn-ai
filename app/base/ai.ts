@@ -24,6 +24,11 @@ export async function registerAI(config: CreateAIInput) {
 	client.socket.emit(AiEvent.create, newAI)
 }
 
+export async function getAllAIs() {
+	const ais = await client.trpc.ai.getAllAis.query()
+	return ais
+}
+
 export function onAIRegistered(callback: (ai: CreateAIInput) => void) {
 	const subscription = aiCreated$.subscribe(callback)
 	return () => subscription.unsubscribe()

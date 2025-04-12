@@ -22,6 +22,11 @@ export async function createRoom(opt: CreateRoomOptions): Promise<RoomData> {
   return newRooms
 }
 
+export async function getAllRooms(): Promise<RoomData[]> {
+  const rooms = await client.trpc.room.getAllRooms.query()
+  return rooms
+}
+
 export function onRoomCreated(callback: (room: CreateRoomOptions) => void) {
   const subscription = roomCreated$.subscribe(callback)
   return () => subscription.unsubscribe()
