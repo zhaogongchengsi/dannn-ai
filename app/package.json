@@ -14,7 +14,8 @@
     "start": "pnpm run dev:app && pnpm run run",
     "lint": "eslint . --fix",
     "test": "vitest",
-    "gen": "drizzle-kit generate"
+    "gen": "drizzle-kit generate",
+    "studio": "drizzle-kit studio"
   },
   "build": {
     "files": [
