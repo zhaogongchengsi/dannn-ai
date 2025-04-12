@@ -25,12 +25,18 @@ export async function build({ entry, dir, mode }: BuildOptions) {
 
   const dependencies = Object.keys(packageJson?.dependencies || {})
 
+  const dannnExternal = packageJson?.dannn?.build?.external || dependencies
+
+  const nativeDep = [
+    ...builtinModules,
+    ...builtinModules.map(module => `node:${module}`),
+    'electron',
+  ]
+
   const external = Array.from(
     new Set([
-      ...builtinModules,
-      ...builtinModules.map(module => `node:${module}`),
-      'electron',
-      ...dependencies,
+      ...nativeDep,
+      ...dannnExternal,
     ])
   )
 
@@ -43,7 +49,7 @@ export async function build({ entry, dir, mode }: BuildOptions) {
     loader: {
       ".png": 'file',
       '.tmpl': 'text',
-      ".svg": 'file',
+      ".svg": 'text',
       ".json": 'json',
     },
     outExtension: {

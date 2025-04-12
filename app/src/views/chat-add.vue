@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-import type { CreateChatSchemas } from '@/lib/database/chatService'
 import { AutoForm } from '@/components/ui/auto-form'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,21 +11,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { createChatSchemas } from '@/lib/database/chatService'
 import { useChatStore } from '@/stores/chat'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Plus } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 
-const chatStore = useChatStore()
-
-const form = useForm({
-  validationSchema: toTypedSchema(createChatSchemas),
-})
-
-function onFormSubmit(values: CreateChatSchemas) {
-  chatStore.addChat(values)
-}
 </script>
 
 <template>
@@ -41,7 +30,7 @@ function onFormSubmit(values: CreateChatSchemas) {
           选择你需要的 AI 加入群聊
         </DialogDescription>
       </DialogHeader>
-      <AutoForm
+      <!-- <AutoForm
         :form="form" :schema="createChatSchemas" :field-config="{
           title: {
             label: '聊天名称',
@@ -65,7 +54,7 @@ function onFormSubmit(values: CreateChatSchemas) {
             创建
           </Button>
         </DialogFooter>
-      </AutoForm>
+      </AutoForm> -->
     </DialogContent>
   </Dialog>
 </template>

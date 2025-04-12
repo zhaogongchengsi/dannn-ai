@@ -10,9 +10,9 @@ export interface CreateRoomOptions {
 }
 
 const client = BaseClient.getInstance()
-const roomCreated$ = new Subject<CreateRoomOptions>()
+const roomCreated$ = new Subject<RoomData>()
 
-client.socket.on(RoomEvent.create, (room: CreateRoomOptions) => {
+client.socket.on(RoomEvent.create, (room: RoomData) => {
   roomCreated$.next(room)
 })
 
@@ -27,7 +27,7 @@ export async function getAllRooms(): Promise<RoomData[]> {
   return rooms
 }
 
-export function onRoomCreated(callback: (room: CreateRoomOptions) => void) {
+export function onRoomCreated(callback: (room: RoomData) => void) {
   const subscription = roomCreated$.subscribe(callback)
   return () => subscription.unsubscribe()
 }

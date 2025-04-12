@@ -13,6 +13,12 @@ export function readJsonFile<T>(directory: string, fileName: string): T | null {
   }
 }
 
+export interface DannnConfig {
+  build?: {
+    external?: string[]
+  }
+}
+
 export interface PackageJson {
   name: string
   version: string
@@ -22,6 +28,7 @@ export interface PackageJson {
   module: string
   types: string
   dependencies: Record<string, string>
+  dannn?: DannnConfig
 }
 
 export function readPackageJson(directory: string) {

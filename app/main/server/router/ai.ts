@@ -6,9 +6,12 @@ import { publicProcedure, router } from '../trpc'
 export const aiRouter = router({
   createAi: publicProcedure.input(createAIInput).mutation(async ({ input }): Promise<AIData | null> => {
     const exi = await findAiByName(input.name)
-    if (exi && isVersionUpgraded(exi.version, input.version)) {
-      // 版本升级，处理逻辑
-      return await updateAi(input.name, input)
+    if (exi) {
+		if (isVersionUpgraded(exi.version, input.version)) {
+			// 版本升级，处理逻辑
+			return await updateAi(input.name, input)
+		}
+		return null
     }
 
     return await insertAi({

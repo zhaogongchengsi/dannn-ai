@@ -11,6 +11,7 @@
   },
   "include": [
     "src/**/*.ts",
+    "./module.d.ts",
     "../../event/src/**/*.ts",
   ],
   "exclude": [

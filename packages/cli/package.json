@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "./dist/index.js",
+  "types": "./types.d.ts",
   "bin": {
     "dannn": "./dist/index.js"
   },

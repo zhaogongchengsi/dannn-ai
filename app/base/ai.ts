@@ -22,6 +22,8 @@ export async function registerAI(config: CreateAIInput) {
 	const newAI = await client.trpc.ai.createAi.mutate(data)
 
 	client.socket.emit(AiEvent.create, newAI)
+
+	return newAI
 }
 
 export async function getAllAIs() {

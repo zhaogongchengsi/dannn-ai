@@ -91,7 +91,13 @@ export class ExtensionProcess {
       }
 
       const extensionNeedEnv = manifest?.permissions?.env ? Object.fromEntries(manifest.permissions.env.map(key => [key, process.env[key]])) : {}
-      const env = { ...extensionNeedEnv, ...this._config.env }
+
+      const env = { 
+        ...extensionNeedEnv, 
+        ...this._config.env,
+        DANNN_PROCESS_ID: String(this.id), 
+        DANNN_PROCESS_PID: String(this.pid)
+      }
 
       const iProcess = new Worker(mainFile, {
         env,

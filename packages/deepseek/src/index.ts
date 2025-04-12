@@ -1,7 +1,20 @@
-import { room } from '../../../app/base/index'
+import { defineExtension } from '../../../app/base/index'
+import icon from './icon.svg'
 
-console.log('room', process.type)
+defineExtension(async (ctx) => {
+	const key = process.env['DEEPSEEK_API_KEY']
 
-room.onRoomCreated((rooms) => {
-	console.log('Room created:', rooms)
+	console.log('DeepSeek extension activated key: ' + key)
+
+	const ai = await ctx.ai.registerAI({
+		name: 'deepseek-chat',
+		title: "DeepSeek Chat",
+		description: 'DeepSeek Chat AI',
+		avatar: icon,	
+		type: 'chat',
+		version: '0.0.1',
+		createdBy: 'local',
+	})
+
+	console.log('DeepSeek extension activated AI: ' + ai?.name)
 })
