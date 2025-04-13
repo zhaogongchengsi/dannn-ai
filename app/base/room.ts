@@ -27,6 +27,13 @@ export async function getAllRooms(): Promise<RoomData[]> {
   return rooms
 }
 
+export async function setAiToRoom(roomId: number, aiId: number): Promise<{
+  roomId: number | null
+  aiId: number | null
+}> {
+  return await client.trpc.room.addAiToRoom.mutate({ roomId, aiId })
+}
+
 export function onRoomCreated(callback: (room: Omit<RoomData, 'participant'>) => void) {
   const subscription = roomCreated$.subscribe(callback)
   return () => subscription.unsubscribe()

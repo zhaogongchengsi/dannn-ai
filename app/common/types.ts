@@ -22,6 +22,7 @@ export interface RoomData {
 }
 
 export interface AIData {
+  id: number
   name: string
   title: string
   version: string

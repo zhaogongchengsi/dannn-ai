@@ -35,7 +35,7 @@ const aiParticipants = computed(() => {
 
 const notParticipate = computed(() => {
   return aiStore.ais.filter((ai) => {
-    return !aiParticipants.value.some(participant => participant.name === ai.name)
+    return !aiParticipants.value.some(participant => participant.id === ai.id)
   })
 })
 
@@ -44,7 +44,7 @@ function onAddAiButtonClick() {
     return
   }
   selectAiValue.value.forEach((aiId) => {
-    // chatStore.setAiToChat(chatStore.currentChat!.id, aiId)
+    chatStore.addAiToChat(chatStore.currentChat!.id, aiId)
   })
 }
 </script>

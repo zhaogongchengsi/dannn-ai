@@ -2,6 +2,7 @@ import type { AIData, MakeFieldsOptional, RoomData } from '../../../common/types
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
 import { ais, chatParticipants, rooms } from '../schema'
+import lodash from 'lodash'
 
 export type InfoRoom = typeof rooms.$inferSelect
 
@@ -20,32 +21,34 @@ export async function insertRoom(chat: MakeFieldsOptional<InsertChat, 'descripti
   }).returning().get()
 }
 
-export async function getAllRooms(): Promise<RoomData[]> {
-  const roomsWithAis = await db
+export async function getRoomParticipants(roomId: number): Promise<AIData[]> {
+  const participants = await db
     .select({
-      room: rooms,
-      ai: ais,
+      ais: ais,
     })
-    .from(rooms)
-    .leftJoin(chatParticipants, eq(rooms.id, chatParticipants.roomId))
-    .leftJoin(ais, eq(chatParticipants.aiId, ais.name))
+    .from(chatParticipants)
+    .leftJoin(ais, eq(chatParticipants.aiId, ais.id))
+    .where(eq(chatParticipants.roomId, roomId))
     .all()
 
-  const groupedRooms = roomsWithAis.reduce((acc, { room, ai }) => {
-    const existingRoom = acc.find(r => r.id === room.id)
-    if (existingRoom) {
-      if (ai) {
-        existingRoom.participant.push(ai)
-      }
-    }
-    else {
-      acc.push({
+  return lodash.compact(participants.map(({ ais }) => ais))
+}
+
+export async function getAllRooms(): Promise<RoomData[]> {
+  const roomsList = await db
+    .select()
+    .from(rooms)
+    .all()
+
+  const groupedRooms = await Promise.all(
+    roomsList.map(async room => {
+      const participants = await getRoomParticipants(room.id)
+      return {
         ...room,
-        participant: ai ? [ai] : [],
-      })
-    }
-    return acc
-  }, [] as RoomData[])
+        participant: participants,
+      }
+    }),
+  )
 
   return groupedRooms
 }
@@ -56,19 +59,11 @@ export async function getRoomById(id: number): Promise<RoomData | undefined> {
     return undefined
   }
 
-  const aiList = await db
-    .select({
-      ai: ais,
-    })
-    .from(rooms)
-    .leftJoin(chatParticipants, eq(rooms.id, chatParticipants.roomId))
-    .leftJoin(ais, eq(chatParticipants.aiId, ais.name))
-    .where(eq(rooms.id, id))
-    .all()
+  const participants = await getRoomParticipants(room.id)
 
   return {
     ...room,
-    participant: aiList.map(({ ai }) => ai!),
+    participant: participants,
   }
 }
 
@@ -87,4 +82,24 @@ export async function updateRoomById(
 
 export async function deleteRoomById(id: number) {
   await db.delete(rooms).where(eq(rooms.id, id))
+}
+
+export async function addAiToRoom(roomId: number, aiId: number) {
+  // Check if the room exists
+  const roomExists = await db.select().from(rooms).where(eq(rooms.id, roomId)).get()
+  if (!roomExists) {
+    throw new Error(`Room with id ${roomId} does not exist`)
+  }
+
+  // Check if the AI exists
+  const aiExists = await db.select().from(ais).where(eq(ais.id, aiId)).get()
+  if (!aiExists) {
+    throw new Error(`AI with name ${aiId} does not exist`)
+  }
+
+  // Add the AI to the room
+  return await db.insert(chatParticipants).values({
+    roomId,
+    aiId: aiExists.id,
+  }).returning().get()
 }

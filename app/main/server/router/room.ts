@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { getAllRooms, insertRoom } from '../../database/service/room'
+import { addAiToRoom, getAllRooms, insertRoom } from '../../database/service/room'
 import { publicProcedure, router } from '../trpc'
 
 export const roomRouter = router({
@@ -18,5 +18,14 @@ export const roomRouter = router({
   }),
   getAllRooms: publicProcedure.query(async () => {
     return await getAllRooms()
+  }),
+  addAiToRoom: publicProcedure.input(
+    z.object({
+      roomId: z.number(),
+      aiId: z.number(),
+    }),
+  ).mutation(async ({ input }) => {
+    // Assuming there is a function to handle adding AI to a room
+    return await addAiToRoom(input.roomId, input.aiId)
   }),
 })
