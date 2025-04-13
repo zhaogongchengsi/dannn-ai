@@ -48,7 +48,7 @@ export function onAIJoined(callback: (data: JoinAIToRoom) => void) {
   return () => subscription.unsubscribe()
 }
 
-export function onAIJoinedWithRoomId(roomId: number, callback: (roomId: number) => void) {
+export function onAIJoinedWithRoomId(roomId: number, callback: (r: JoinAIToRoom) => void) {
   const subscription = joinedAI$.pipe(filter(data => data.roomId === roomId)).subscribe(callback)
   return () => subscription.unsubscribe()
 }
