@@ -1,5 +1,5 @@
 import type { AiConfig, AIData } from '../../../common/types'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { db } from '../db'
 import { ais } from '../schema'
 
@@ -7,6 +7,14 @@ export type InfoAI = typeof ais.$inferSelect
 
 export function findAiByName(name: string) {
   return db.select().from(ais).where(eq(ais.name, name)).get()
+}
+
+export async function findAiByCreateByAndName(createdBy: string, name: string): Promise<AIData | undefined> {
+  return await db
+    .select()
+    .from(ais)
+    .where(and(eq(ais.createdBy, createdBy), eq(ais.name, name)))
+    .get()
 }
 
 export async function insertAi(config: AiConfig): Promise<AIData> {
@@ -28,6 +36,9 @@ export async function insertAi(config: AiConfig): Promise<AIData> {
     tags: config.tags ? config.tags.join(',') : null,
     configuration: config.configuration ? JSON.stringify(config.configuration) : null,
     createdBy: config.createdBy || null,
+    id: 0,
+    author: config.author || null,
+    deletedAt: null,
   }
   return await db.insert(ais).values(info).returning().get()
 }

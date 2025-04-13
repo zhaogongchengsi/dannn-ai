@@ -1,20 +1,30 @@
 import { int, integer, primaryKey, sqliteTable as table, text } from 'drizzle-orm/sqlite-core'
 
 export const ais = table('ais', {
-  name: text('id').primaryKey().unique(),
-  title: text('username').notNull(),
-  version: text('email').notNull(),
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  title: text('title').notNull(),
+  version: text('version').notNull(),
+
+  author: text('author'),
   avatar: text('avatar'),
   description: text('description'),
   role: text('role'),
   prompt: text('prompt'),
+
   type: text('type').notNull(),
   models: text('models').notNull(),
+
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
+  deletedAt: text('deleted_at'),
+
   isActive: int('is_active').notNull().default(1),
+
   lastUsedAt: text('last_used_at'),
+
   versionHistory: text('version_history'),
+
   tags: text('tags'),
   configuration: text('configuration'),
   createdBy: text('created_by'),
@@ -39,11 +49,11 @@ export const rooms = table('rooms', {
 export const chatParticipants = table(
   'chat_participants',
   {
-    aiName: text('ai_name'),
+    aiId: integer('ai_id'),
     roomId: integer('room_id'),
   },
   table => [
-    primaryKey({ columns: [table.aiName, table.roomId] }),
+    primaryKey({ columns: [table.aiId, table.roomId] }),
   ],
 )
 

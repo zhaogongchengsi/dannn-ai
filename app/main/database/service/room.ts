@@ -1,7 +1,7 @@
-import type { MakeFieldsOptional, RoomData } from '../../../common/types'
+import type { AIData, MakeFieldsOptional, RoomData } from '../../../common/types'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
-import { rooms } from '../schema'
+import { ais, chatParticipants, rooms } from '../schema'
 
 export type InfoRoom = typeof rooms.$inferSelect
 
@@ -21,11 +21,55 @@ export async function insertRoom(chat: MakeFieldsOptional<InsertChat, 'descripti
 }
 
 export async function getAllRooms(): Promise<RoomData[]> {
-  return await db.select().from(rooms).all()
+  const roomsWithAis = await db
+    .select({
+      room: rooms,
+      ai: ais,
+    })
+    .from(rooms)
+    .leftJoin(chatParticipants, eq(rooms.id, chatParticipants.roomId))
+    .leftJoin(ais, eq(chatParticipants.aiId, ais.name))
+    .all()
+
+  const groupedRooms = roomsWithAis.reduce((acc, { room, ai }) => {
+    const existingRoom = acc.find(r => r.id === room.id)
+    if (existingRoom) {
+      if (ai) {
+        existingRoom.participant.push(ai)
+      }
+    }
+    else {
+      acc.push({
+        ...room,
+        participant: ai ? [ai] : [],
+      })
+    }
+    return acc
+  }, [] as RoomData[])
+
+  return groupedRooms
 }
 
 export async function getRoomById(id: number): Promise<RoomData | undefined> {
-  return await db.select().from(rooms).where(eq(rooms.id, id)).get()
+  const room = await db.select().from(rooms).where(eq(rooms.id, id)).get()
+  if (!room) {
+    return undefined
+  }
+
+  const aiList = await db
+    .select({
+      ai: ais,
+    })
+    .from(rooms)
+    .leftJoin(chatParticipants, eq(rooms.id, chatParticipants.roomId))
+    .leftJoin(ais, eq(chatParticipants.aiId, ais.name))
+    .where(eq(rooms.id, id))
+    .all()
+
+  return {
+    ...room,
+    participant: aiList.map(({ ai }) => ai!),
+  }
 }
 
 export async function updateRoomById(

@@ -1,17 +1,20 @@
 import type { AIData } from '../../../common/types'
 import { createAIInput } from '../../../common/schema'
-import { findAiByName, getAllAis, insertAi, updateAi } from '../../database/service/ai'
+import { findAiByCreateByAndName, getAllAis, insertAi, updateAi } from '../../database/service/ai'
 import { publicProcedure, router } from '../trpc'
 
 export const aiRouter = router({
-  createAi: publicProcedure.input(createAIInput).mutation(async ({ input }): Promise<AIData | null> => {
-    const exi = await findAiByName(input.name)
+  registerAi: publicProcedure.input(createAIInput).mutation(async ({ input }): Promise<AIData | null> => {
+    if (!input.createdBy) {
+      throw new Error('createdBy is required')
+    }
+    const exi = await findAiByCreateByAndName(input.name, input.createdBy)
     if (exi) {
-		if (isVersionUpgraded(exi.version, input.version)) {
-			// 版本升级，处理逻辑
-			return await updateAi(input.name, input)
-		}
-		return null
+      if (isVersionUpgraded(exi.version, input.version)) {
+        // 版本升级，处理逻辑
+        return await updateAi(input.name, input)
+      }
+      return null
     }
 
     return await insertAi({

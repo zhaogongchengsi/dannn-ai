@@ -12,7 +12,7 @@ export const createAIInput = z.object({
   models: z.string().optional(),
   tags: z.array(z.string()).optional(),
   configuration: z.record(z.any()).optional(),
-  createdBy: z.string().optional(),
+  createdBy: z.string(),
 })
 
 export type CreateAIInput = z.infer<typeof createAIInput>

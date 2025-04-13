@@ -11,23 +11,9 @@ const app = createApp(App)
 app.use(pinia)
 app.use(router)
 
-let ok = false
-window.dannn.ipc.on('window.show', async () => {
-  document.startViewTransition(() => {
-    if (!ok) {
-      app.mount('#app')
-      ok = true
-    }
-  })
-})
-
 async function bootstrap() {
   await initMarkdownIt()
-  window.dannn.ipc.send('window.ready')
-  await new Promise(resolve => setTimeout(resolve, 100))
-  if (!ok) {
-    requestAnimationFrame(bootstrap)
-  }
+  app.mount('#app')
 }
 
-requestAnimationFrame(bootstrap)
+bootstrap()

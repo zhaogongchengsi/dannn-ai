@@ -24,18 +24,18 @@ import { computed, ref } from 'vue'
 
 const chatStore = useChatStore()
 const aiStore = useAIStore()
-
 const selectAiValue = ref([])
 
 const aiParticipants = computed(() => {
-  return aiStore.ais.filter((ai) => {
-    return chatStore.currentChat?.participants.includes(ai.id)
-  })
+  if (!chatStore.currentChat) {
+    return []
+  }
+  return chatStore.currentChat.participant
 })
 
 const notParticipate = computed(() => {
   return aiStore.ais.filter((ai) => {
-    return !chatStore.currentChat?.participants.includes(ai.id)
+    return !aiParticipants.value.some(participant => participant.name === ai.name)
   })
 })
 
@@ -44,7 +44,7 @@ function onAddAiButtonClick() {
     return
   }
   selectAiValue.value.forEach((aiId) => {
-    chatStore.setAiToChat(chatStore.currentChat!.id, aiId)
+    // chatStore.setAiToChat(chatStore.currentChat!.id, aiId)
   })
 }
 </script>
@@ -76,7 +76,7 @@ function onAddAiButtonClick() {
             </span>
           </div>
           <ul v-else class="flex flex-col gap-2 my-4">
-            <li v-for="ai of aiParticipants" :key="ai.id">
+            <li v-for="ai of aiParticipants" :key="ai.name">
               <div class="flex items-center gap-2">
                 <span class="text-xl font-bold">{{ ai.name }}</span>
                 <span>{{ ai.type }}</span>

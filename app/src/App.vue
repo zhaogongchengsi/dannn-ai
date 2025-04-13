@@ -22,7 +22,7 @@ import ChatAdd from './views/chat-add.vue'
 
 const config = useConfig()
 
-const rooms = ref<any[]>([])
+const chatStore = useChatStore()
 
 const toasterTheme = computed(() => {
   const mode = config.mode.value
@@ -50,7 +50,7 @@ const toasterTheme = computed(() => {
               </SidebarGroupAction>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem v-for="chat of rooms" :key="chat.id">
+                  <SidebarMenuItem v-for="chat of chatStore.rooms" :key="chat.id">
                     <SidebarMenuButton as-child>
                       <RouterLink :to="`/chat?chatId=${chat.id}`">
                         {{ chat.title }}

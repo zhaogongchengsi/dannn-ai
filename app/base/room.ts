@@ -10,13 +10,13 @@ export interface CreateRoomOptions {
 }
 
 const client = BaseClient.getInstance()
-const roomCreated$ = new Subject<RoomData>()
+const roomCreated$ = new Subject<Omit<RoomData, 'participant'>>()
 
-client.socket.on(RoomEvent.create, (room: RoomData) => {
+client.socket.on(RoomEvent.create, (room: Omit<RoomData, 'participant'>) => {
   roomCreated$.next(room)
 })
 
-export async function createRoom(opt: CreateRoomOptions): Promise<RoomData> {
+export async function createRoom(opt: CreateRoomOptions): Promise<Omit<RoomData, 'participant'>> {
   const newRooms = await client.trpc.room.createRoom.mutate(opt)
   client.socket.emit(RoomEvent.create, newRooms)
   return newRooms
@@ -27,8 +27,7 @@ export async function getAllRooms(): Promise<RoomData[]> {
   return rooms
 }
 
-export function onRoomCreated(callback: (room: RoomData) => void) {
+export function onRoomCreated(callback: (room: Omit<RoomData, 'participant'>) => void) {
   const subscription = roomCreated$.subscribe(callback)
   return () => subscription.unsubscribe()
 }
-

@@ -1,11 +1,9 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { useChatStore } from '@/stores/chat'
 import { Bot, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
 
-const chatStore = useChatStore()
 const value = ref('')
 
 function onSend() {
@@ -14,12 +12,7 @@ function onSend() {
     return
   }
 
-  if (!chatStore.currentChat || !chatStore.currentChat?.participants) {
-    console.warn('no current chat')
-    return
-  }
-
-  chatStore.question(message)
+  console.log('send message', message)
   value.value = ''
 }
 </script>

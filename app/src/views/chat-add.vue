@@ -11,11 +11,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { useChatStore } from '@/stores/chat'
-import { toTypedSchema } from '@vee-validate/zod'
 import { Plus } from 'lucide-vue-next'
-import { useForm } from 'vee-validate'
+import { z } from 'zod'
 
+const chatStore = useChatStore()
+
+const createChatSchemas = z.object({
+  title: z.string().min(1, '请输入聊天名称').max(20, '聊天名称过长'),
+  description: z.string().optional(),
+  systemPrompt: z.string().optional(),
+})
+
+async function onFormSubmit(values: Record<string, any>) {
+  await chatStore.addRoom({
+    title: values.title,
+    description: values.description,
+  })
+}
 </script>
 
 <template>
@@ -30,11 +42,11 @@ import { useForm } from 'vee-validate'
           选择你需要的 AI 加入群聊
         </DialogDescription>
       </DialogHeader>
-      <!-- <AutoForm
-        :form="form" :schema="createChatSchemas" :field-config="{
+      <AutoForm
+        :schema="createChatSchemas" :field-config="{
           title: {
-            label: '聊天名称',
-            description: '群聊的名称',
+            label: '房间名称',
+            description: '房间的名称',
           },
           description: {
             label: '描述',
@@ -54,7 +66,7 @@ import { useForm } from 'vee-validate'
             创建
           </Button>
         </DialogFooter>
-      </AutoForm> -->
+      </AutoForm>
     </DialogContent>
   </Dialog>
 </template>

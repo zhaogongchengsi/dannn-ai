@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
 import { Worker } from 'node:worker_threads'
+import { normalize } from 'pathe'
 import { z } from 'zod'
 
 export const PluginManifestSchema = z.object({
@@ -92,11 +93,12 @@ export class ExtensionProcess {
 
       const extensionNeedEnv = manifest?.permissions?.env ? Object.fromEntries(manifest.permissions.env.map(key => [key, process.env[key]])) : {}
 
-      const env = { 
-        ...extensionNeedEnv, 
+      const env = {
+        ...extensionNeedEnv,
         ...this._config.env,
-        DANNN_PROCESS_ID: String(this.id), 
-        DANNN_PROCESS_PID: String(this.pid)
+        DANNN_PROCESS_ID: String(this.id),
+        DANNN_PROCESS_PID: String(this.pid),
+        DANNN_PROCESS_PATH: normalize(this._path),
       }
 
       const iProcess = new Worker(mainFile, {

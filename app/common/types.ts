@@ -18,6 +18,7 @@ export interface RoomData {
   isLocked: number
   isPinned: number
   isArchived: number
+  participant: AIData[]
 }
 
 export interface AIData {
@@ -44,6 +45,7 @@ export interface AiConfig {
   name: string
   title: string
   avatar?: string
+  author?: string
   version: string
   description?: string
   role?: string

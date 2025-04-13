@@ -193,21 +193,12 @@ export class Window extends EventEmitter<WindowEvents> {
   async show() {
     if (this.isReady) {
       this.send('window.show')
-      this.window?.webContents.once('did-start-loading', () => {
-        ipcMain.once('window.ready', () => {
-          this.show()
-        })
-      })
+      this.show()
     }
     else if (this.waitReadyPromise) {
       await this.waitReadyPromise.promise
       this.send('window.show')
-      this.waitReadyPromise = null
-      this.window?.webContents.once('did-start-loading', () => {
-        ipcMain.once('window.ready', () => {
-          this.show()
-        })
-      })
+      this.show()
     }
     else {
       throw new Error('Window is not ready')

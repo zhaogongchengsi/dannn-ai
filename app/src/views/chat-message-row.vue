@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-import type { AIMessage } from '@/lib/database/models'
 import { vHtmlLazy } from '@/directives/v-html-lazy'
 import { markdownToHtml } from '@/lib/shiki'
 import { useDateFormat } from '@vueuse/core'
@@ -12,7 +11,7 @@ defineOptions({
   },
 })
 
-const props = defineProps<{ message: AIMessage, index: number }>()
+const props = defineProps<{ message: any, index: number }>()
 const formatted = useDateFormat(new Date(props.message.timestamp), 'YYYY-MM-DD HH:mm (ddd)')
 
 const content = computed(() => {

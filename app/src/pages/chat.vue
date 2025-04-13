@@ -2,6 +2,18 @@
 import ChatFooterBody from '@/views/chat-footer-body.vue'
 import ChatFooterHeader from '@/views/chat-footer-header.vue'
 import ChatPageContent from '@/views/chat-page-content.vue'
+
+const chatStore = useChatStore()
+const router = useRoute()
+
+watchEffect(() => {
+  const id = router.query.chatId
+  if (!id) {
+    return
+  }
+
+  chatStore.setCurrentChatID(Number(id))
+})
 </script>
 
 <template>

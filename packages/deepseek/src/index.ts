@@ -6,7 +6,7 @@ defineExtension(async (ctx) => {
 
 	console.log('DeepSeek extension activated key: ' + key)
 
-	const ai = await ctx.ai.registerAI({
+	const ai = await ctx.ai.register({
 		name: 'deepseek-chat',
 		title: "DeepSeek Chat",
 		description: 'DeepSeek Chat AI',
