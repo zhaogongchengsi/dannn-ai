@@ -57,3 +57,25 @@ export interface AiConfig {
   configuration?: Record<string, any>
   createdBy?: string
 }
+
+
+export interface InfoMessage {
+  status: string | null;
+  id: string;
+  content: string;
+  messageType: "json" | "text" | "image" | "markdown" | "system" | "file" | "audio" | "video" | "command";
+  sortBy: number;
+  createdAt: string;
+  functionResponse: string | null;
+  roomId: number;
+  reference: string | null;
+  senderType: "ai" | "human";
+  senderId: string | null;
+  parentId: string | null;
+  meta: string | null;
+  isAIAutoChat: number;
+  isStreaming: number;
+  streamGroupId: string | null;
+  streamIndex: number | null;
+  functionCall: string | null;
+}

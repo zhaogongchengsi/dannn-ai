@@ -16,3 +16,23 @@ export const createAIInput = z.object({
 })
 
 export type CreateAIInput = z.infer<typeof createAIInput>
+
+
+export const question = z.object({
+  content: z.string(),
+  messageType: z.enum(['text', 'image', 'audio', 'video', 'file']),
+  roomId: z.number(),
+  reference: z.string().optional(),
+})
+
+export const answer = z.object({
+  content: z.string(),
+  messageType: z.enum(['text', 'image', 'audio', 'video', 'file']),
+  roomId: z.number(),
+  reference: z.string().optional(),
+  functionResponse: z.string().optional(),
+  aiId: z.number(),
+  
+})
+
+export type Question = z.infer<typeof question>

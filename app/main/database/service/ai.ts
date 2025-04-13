@@ -9,6 +9,10 @@ export function findAiByName(name: string) {
   return db.select().from(ais).where(eq(ais.name, name)).get()
 }
 
+export function findAiById(id: number) {
+  return db.select().from(ais).where(eq(ais.id, id)).get()
+}
+
 export async function findAiByCreateByAndName(createdBy: string, name: string): Promise<AIData | undefined> {
   return await db
     .select()
@@ -43,8 +47,8 @@ export async function insertAi(config: AiConfig): Promise<AIData> {
   return await db.insert(ais).values(info).returning().get()
 }
 
-export async function updateAi(name: string, updates: Partial<AiConfig>): Promise<AIData | null> {
-  const existingAi = await findAiByName(name)
+export async function updateAi(id: number, updates: Partial<AiConfig>): Promise<AIData | null> {
+  const existingAi = await findAiById(id)
   if (!existingAi) {
     return null
   }
@@ -62,7 +66,7 @@ export async function updateAi(name: string, updates: Partial<AiConfig>): Promis
   return await db
     .update(ais)
     .set(updatedInfo)
-    .where(eq(ais.name, name))
+    .where(eq(ais.id, id))
     .returning()
     .get()
 }

@@ -1,5 +1,5 @@
 import type { AIData } from 'common/types'
-import { getAllAIs } from 'base/ai'
+import { getAllAIs } from 'base/api/ai'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 

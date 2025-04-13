@@ -4,7 +4,7 @@ import { findAiByCreateByAndName, getAllAis, insertAi, updateAi } from '../../da
 import { publicProcedure, router } from '../trpc'
 
 export const aiRouter = router({
-  registerAi: publicProcedure.input(createAIInput).mutation(async ({ input }): Promise<AIData | null> => {
+  registerAi: publicProcedure.input(createAIInput).mutation(async ({ input }): Promise<AIData> => {
     if (!input.createdBy) {
       throw new Error('createdBy is required')
     }
@@ -12,9 +12,9 @@ export const aiRouter = router({
     if (exi) {
       if (isVersionUpgraded(exi.version, input.version)) {
         // 版本升级，处理逻辑
-        return await updateAi(input.name, input)
+        return (await updateAi(exi.id, input))!
       }
-      return null
+      return exi
     }
 
     return await insertAi({

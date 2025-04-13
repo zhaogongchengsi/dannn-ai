@@ -1,7 +1,7 @@
 import type { AIData, MakeFieldsOptional, RoomData } from '../../../common/types'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
-import { ais, chatParticipants, rooms } from '../schema'
+import { ais, chatParticipants, messages, rooms } from '../schema'
 import lodash from 'lodash'
 
 export type InfoRoom = typeof rooms.$inferSelect
@@ -32,6 +32,17 @@ export async function getRoomParticipants(roomId: number): Promise<AIData[]> {
     .all()
 
   return lodash.compact(participants.map(({ ais }) => ais))
+}
+
+export async function getRoomMessages(roomId: number) {
+  const messageList = await db
+    .select()
+    .from(messages) // Assuming 'messages' is the table name for storing messages
+    .where(eq(messages.roomId, roomId))
+    .orderBy(messages.sortBy)
+    .all()
+
+  return messageList
 }
 
 export async function getAllRooms(): Promise<RoomData[]> {

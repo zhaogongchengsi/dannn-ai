@@ -43,6 +43,7 @@ export const rooms = table('rooms', {
   isLocked: int('is_locked').notNull(),
   isPinned: int('is_pinned').notNull(),
   isArchived: int('is_archived').notNull(),
+  lastMessage: integer('last_message_at').default(0), // 最后消息 id
 })
 
 // // 在 chat_participants 中建立 AI 和 chat 的关联

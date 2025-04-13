@@ -1,38 +1,25 @@
-import type { CreateAIInput } from '../common/schema'
-import { Subject } from 'rxjs'
-import { AiEvent } from '../common/event'
-import { createAIInput } from '../common/schema'
-import { BaseClient } from './client'
-import { formatZodError } from './utils'
+import { AIData } from "common/types"
 
-const client = BaseClient.getInstance()
+export class AI {
+	private readonly _config: AIData
+	constructor(config: AIData) {
+		this._config = config
+	}
 
-const aiCreated$ = new Subject<CreateAIInput>()
+	bindEvents() {
+		
+	}
 
-client.socket.on(AiEvent.create, (ai: CreateAIInput) => {
-  aiCreated$.next(ai)
-})
 
-export async function registerAI(config: CreateAIInput) {
-  const { success, data, error } = createAIInput.safeParse(config)
+	get config() {
+		return this._config
+	}
 
-  if (!success) {
-    throw new Error(`Invalid AI config: ${formatZodError(error)}`)
-  }
+	get id() {
+		return this._config.id
+	}
 
-  const newAI = await client.trpc.ai.registerAi.mutate(data)
-
-  client.socket.emit(AiEvent.create, newAI)
-
-  return newAI
-}
-
-export async function getAllAIs() {
-  const ais = await client.trpc.ai.getAllAis.query()
-  return ais
-}
-
-export function onAIRegistered(callback: (ai: CreateAIInput) => void) {
-  const subscription = aiCreated$.subscribe(callback)
-  return () => subscription.unsubscribe()
+	get name() {
+		return this._config.name
+	}
 }

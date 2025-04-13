@@ -1,6 +1,6 @@
-import type { CreateRoomOptions } from 'base/room'
+import type { CreateRoomOptions } from 'base/api/room'
 import type { RoomData } from 'common/types'
-import { createRoom, getAllRooms, setAiToRoom } from 'base/room'
+import { createRoom, getAllRooms, setAiToRoom } from 'base/api/room'
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 
