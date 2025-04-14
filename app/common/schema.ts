@@ -19,19 +19,20 @@ export type CreateAIInput = z.infer<typeof createAIInput>
 
 export const question = z.object({
   content: z.string(),
-  messageType: z.enum(['text', 'image', 'audio', 'video', 'file']),
+  type: z.enum(['text', 'image', 'audio', 'video', 'file']),
   roomId: z.number(),
   reference: z.string().optional(),
+  roomParticipants: z.array(z.number()),
 })
 
 export const answer = z.object({
   content: z.string(),
-  messageType: z.enum(['text', 'image', 'audio', 'video', 'file']),
+  type: z.enum(['text', 'image', 'audio', 'video', 'file']),
   roomId: z.number(),
   reference: z.string().optional(),
   functionResponse: z.string().optional(),
   aiId: z.number(),
-
 })
 
 export type Question = z.infer<typeof question>
+export type Answer = z.infer<typeof answer>

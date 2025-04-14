@@ -43,7 +43,7 @@ export async function createQuestion(question: Question): Promise<InfoMessage> {
     const message: InfoMessage = {
       id: randomUUID(),
       content: question.content,
-      messageType: question.messageType,
+      messageType: question.type,
       sortBy: newLastMessage,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

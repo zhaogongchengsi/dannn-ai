@@ -8,7 +8,9 @@ export const aiRouter = router({
     if (!input.createdBy) {
       throw new Error('createdBy is required')
     }
-    const exi = await findAiByCreateByAndName(input.name, input.createdBy)
+
+    const exi = await findAiByCreateByAndName(input.createdBy, input.name)
+
     if (exi) {
       if (isVersionUpgraded(exi.version, input.version)) {
         // 版本升级，处理逻辑

@@ -14,7 +14,7 @@ export function defineExtension(func: (ctx: ExtensionContext) => (void | Promise
 
     const data = await registerAI({
       ...config,
-      createdBy: createBy,
+      createdBy: JSON.stringify(createBy),
     })
 
     return new AI(data)

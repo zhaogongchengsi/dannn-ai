@@ -1,5 +1,6 @@
 import { defineExtension } from 'base/index'
 import icon from './icon.svg'
+import { InfoMessage } from 'common/types'
 
 defineExtension(async (ctx) => {
 	const key = process.env['DEEPSEEK_API_KEY']
@@ -14,6 +15,10 @@ defineExtension(async (ctx) => {
 		type: 'chat',
 		version: '0.0.1',
 		createdBy: 'local',
+	})
+
+	ai.onQuestion(async (question: InfoMessage) => {
+		console.log('DeepSeek extension activated question: ' + question.content)
 	})
 
 	console.log(ai)

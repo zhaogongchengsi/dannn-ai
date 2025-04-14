@@ -1,7 +1,7 @@
 import type { Question } from 'common/schema'
 import type { InfoMessage } from 'common/types'
 import { ChannelEvent } from 'common/event'
-import { Subject } from 'rxjs'
+import { filter, Subject } from 'rxjs'
 import { BaseClient } from './client'
 
 export interface UserMessageData {
@@ -17,13 +17,27 @@ export interface AiMessageData {
   aiId: number | null
 }
 
-const messageSubject$ = new Subject<InfoMessage>()
+export type QuestionMessageMeta = InfoMessage & {
+  roomParticipants: number[]
+}
+
+const questionMessageSubject$ = new Subject<QuestionMessageMeta>()
 const client = BaseClient.getInstance()
 
+client.socket.on(ChannelEvent.question, (message: QuestionMessageMeta) => {
+  questionMessageSubject$.next(message)
+})
+
 export async function sendQuestion(message: Question) {
-  const questionMessage = await client.trpc.message.createQuestion.mutate(message)
-  client.socket.emit(ChannelEvent.question, questionMessage)
-  messageSubject$.next(questionMessage)
+  const questionMessage: InfoMessage = await client.trpc.message.createQuestion.mutate(message)
+  client.socket.emit(ChannelEvent.question, {
+    ...questionMessage,
+    roomParticipants: message.roomParticipants,
+  })
+}
+
+export async function onQuestionWithAiId(aiId: number, callback: (message: QuestionMessageMeta) => void) {
+  questionMessageSubject$.pipe(filter(message => message.roomParticipants.includes(aiId))).subscribe(callback)
 }
 
 export function sendAnswer() {}

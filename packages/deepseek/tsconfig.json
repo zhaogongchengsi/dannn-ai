@@ -13,7 +13,7 @@
         "../../app/base/*"
       ],
       "common/*": [
-        "./../app/common/*"
+        "../../app/common/*"
       ],
     }
   },
