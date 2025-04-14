@@ -1,6 +1,7 @@
 // directives/v-html-lazy.ts
 
 import type { Directive } from 'vue'
+
 interface RenderCacheItem {
   id: string
   element: HTMLElement
@@ -10,7 +11,6 @@ interface RenderCacheItem {
 }
 
 const renderPool = new Map<string, RenderCacheItem>()
-
 
 export const vHtmlLazy: Directive<HTMLElement, string> = {
   mounted(el, binding) {
@@ -22,15 +22,16 @@ export const vHtmlLazy: Directive<HTMLElement, string> = {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
             console.log('元素进入视口', entry.target)
             const item = renderPool.get(id)
             if (item) {
               el.replaceChildren(...container.children)
             }
-          } else {
-            console.log('元素离开视口');
+          }
+          else {
+            console.log('元素离开视口')
             container.replaceChildren(...el.children)
             el.replaceChildren(placeholder)
           }
@@ -40,7 +41,7 @@ export const vHtmlLazy: Directive<HTMLElement, string> = {
         root: null, // 默认为视口
         threshold: 0.1, // 10% 可见时就算进入视口
         rootMargin: '100px',
-      }
+      },
     )
 
     observer.observe(el)
@@ -50,7 +51,7 @@ export const vHtmlLazy: Directive<HTMLElement, string> = {
       element: container,
       height,
       observer,
-      placeholder
+      placeholder,
     })
   },
   unmounted(el, binding) {
@@ -87,7 +88,7 @@ function render(id: string, html: string, width = 500, className = '') {
   document.body.removeChild(container)
 
   const placeholder = document.createElement('div')
-  
+
   placeholder.style.height = `${height}px`
 
   return {

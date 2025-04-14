@@ -10,7 +10,7 @@ export const useAIStore = defineStore('dannn-ai', () => {
     ais.push(...data)
   })
 
-  function findAiById (id: number) {
+  function findAiById(id: number) {
     return ais.find(ai => ai.id === id)
   }
 

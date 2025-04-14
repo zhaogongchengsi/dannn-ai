@@ -1,10 +1,10 @@
-import { InfoMessage } from 'common/types'
+import type { InfoMessage } from 'common/types'
+import { question } from 'common/schema'
 import { createQuestion } from '../../database/service/message'
 import { publicProcedure, router } from '../trpc'
-import { question } from 'common/schema'
 
 export const messageRouter = router({
-	createQuestion: publicProcedure.input(question).mutation(async ({ input }) :Promise<InfoMessage> => {
-		return await createQuestion(input)
-	}),
+  createQuestion: publicProcedure.input(question).mutation(async ({ input }): Promise<InfoMessage> => {
+    return await createQuestion(input)
+  }),
 })

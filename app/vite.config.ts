@@ -49,8 +49,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      "base": resolve(__dirname, './base'),
-      "common": resolve(__dirname, './common'),
+      'base': resolve(__dirname, './base'),
+      'common': resolve(__dirname, './common'),
     },
   },
 })

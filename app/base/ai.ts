@@ -1,25 +1,24 @@
-import { AIData } from "common/types"
+import type { AIData } from 'common/types'
 
 export class AI {
-	private readonly _config: AIData
-	constructor(config: AIData) {
-		this._config = config
-	}
+  private readonly _config: AIData
+  constructor(config: AIData) {
+    this._config = config
+  }
 
-	bindEvents() {
-		
-	}
+  bindEvents() {
 
+  }
 
-	get config() {
-		return this._config
-	}
+  get config() {
+    return this._config
+  }
 
-	get id() {
-		return this._config.id
-	}
+  get id() {
+    return this._config.id
+  }
 
-	get name() {
-		return this._config.name
-	}
+  get name() {
+    return this._config.name
+  }
 }

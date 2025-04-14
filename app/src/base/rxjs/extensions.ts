@@ -5,7 +5,7 @@ import { join } from 'pathe'
 import { ReplaySubject, Subject } from 'rxjs'
 import { formatZodError } from '../common/zod'
 import { ExtensionWorker } from '../worker/worker'
-import { sendAnswerFromWorker, sendQuestionToWorker, subscribeToWorkerQuestions } from './channel'
+import { sendAnswerFromWorker, subscribeToWorkerQuestions } from './channel'
 import { APP_EXTENSION_CONFIG_NAME } from './constant'
 
 const workers: Map<string, ExtensionWorker> = new Map()

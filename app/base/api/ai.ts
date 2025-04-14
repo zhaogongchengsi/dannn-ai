@@ -1,10 +1,10 @@
+import type { AIData } from 'common/types'
 import type { CreateAIInput } from '../../common/schema'
 import { Subject } from 'rxjs'
 import { AiEvent } from '../../common/event'
 import { createAIInput } from '../../common/schema'
-import { BaseClient } from './client'
 import { formatZodError } from '../utils'
-import { AIData } from 'common/types'
+import { BaseClient } from './client'
 
 const client = BaseClient.getInstance()
 

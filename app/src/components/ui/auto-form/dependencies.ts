@@ -1,9 +1,10 @@
 import type { Ref } from 'vue'
 import type * as z from 'zod'
+import type { Dependency, EnumValues } from './interface'
 import { createContext } from 'reka-ui'
 import { useFieldValue, useFormValues } from 'vee-validate'
 import { computed, ref, watch } from 'vue'
-import { type Dependency, DependencyType, type EnumValues } from './interface'
+import { DependencyType } from './interface'
 import { getFromPath, getIndexIfArray } from './utils'
 
 export const [injectDependencies, provideDependencies] = createContext<Ref<Dependency<z.infer<z.ZodObject<any>>>[] | undefined>>('AutoFormDependencies')
@@ -37,7 +38,7 @@ export default function useDependencies(
 
     if (index >= 0 && sourceInitial.join(',') === targetInitial.join(',')) {
       const [_currentLast, ...currentInitial] = fieldName.split('.').toReversed()
-      return getFromPath(form.value, currentInitial.join('.') + sourceLast);
+      return getFromPath(form.value, currentInitial.join('.') + sourceLast)
     }
 
     return getFromPath(form.value, source)
