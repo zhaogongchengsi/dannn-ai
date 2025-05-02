@@ -69,7 +69,7 @@ export interface InfoMessage {
   roomId: number
   reference: string | null
   senderType: 'ai' | 'human'
-  senderId: string | null
+  senderId: number | null
   parentId: string | null
   meta: string | null
   isAIAutoChat: number

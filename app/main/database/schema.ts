@@ -76,7 +76,7 @@ export const messages = table('messages', {
   senderType: text('sender_type', {
     enum: ['ai', 'human'], // 类型约束（不是强约束，仅提供类型提示）
   }).notNull(),
-  senderId: text('sender_id'), // ai 用 aiName，human 固定写死为 "local" 就行
+  senderId: integer('sender_id'), // ai 用 ai id，human 固定写死为 0 就行
   parentId: text('parent_id'), // 上下文关联 ✅
   status: text('status'), // 消息状态：pending/success/error
   meta: text('meta'), // AI 生成详情、tokens 等

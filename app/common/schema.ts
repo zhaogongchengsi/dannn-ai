@@ -32,6 +32,9 @@ export const answer = z.object({
   reference: z.string().optional(),
   functionResponse: z.string().optional(),
   aiId: z.number(),
+  isStreaming: z.boolean().optional(),
+  streamGroupId: z.string().optional(),
+  streamIndex: z.number().optional(),
 })
 
 export type Question = z.infer<typeof question>

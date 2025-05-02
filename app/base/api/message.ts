@@ -1,12 +1,21 @@
-import type { Question } from 'common/schema'
+import type { Answer, Question } from 'common/schema'
 import type { InfoMessage } from 'common/types'
 import { ChannelEvent } from 'common/event'
 import { filter, Subject } from 'rxjs'
 import { BaseClient } from './client'
 
 export interface UserMessageData {
+  /**
+   * 发送问题的内容
+   */
   content: string
+  /**
+   * 发送问题的房间id
+   */
   roomId: string
+  /**
+   * 当发送的问题附带了引用时，引用的消息id
+   */
   reference: string | null
 }
 
@@ -40,4 +49,6 @@ export async function onQuestionWithAiId(aiId: number, callback: (message: Quest
   questionMessageSubject$.pipe(filter(message => message.roomParticipants.includes(aiId))).subscribe(callback)
 }
 
-export function sendAnswer() {}
+export async function sendTextAnswer(answer: Answer) {
+  const questionMessage: InfoMessage = await client.trpc.message.createAiAnswer.mutate(answer)
+}
