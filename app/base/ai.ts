@@ -2,7 +2,7 @@ import type { AIData } from 'common/types'
 import type { QuestionMessageMeta } from './api/message'
 import { omit } from 'lodash'
 import { Subject } from 'rxjs'
-import { onQuestionWithAiId } from './api/message'
+import { onQuestionWithAiId, sendTextAnswer } from './api/message'
 
 export type UserMessage = Omit<QuestionMessageMeta, 'roomParticipants'>
 
@@ -51,13 +51,45 @@ class QuestionEvent {
     this.question = question
   }
 
-  reply(content: string) {
-    return {
-      aiId: this.ai.id,
+  async reply(content: string) {
+    if (!content) {
+      throw new Error('Reply content cannot be empty')
+    }
+    await sendTextAnswer({
       content,
       roomId: this.question.roomId,
-      createdAt: new Date().toISOString(),
-    }
+      type: 'text',
+      aiId: this.ai.id,
+    })
+  }
+
+  sendStream(contentStream: AsyncIterable<string>) {
+    const roomId = this.question.roomId
+    const aiId = this.ai.id
+    const streamGroupId = `${this.question.roomId}-${this.question.id}`
+
+    return new Promise<void>((resolve, reject) => {
+      if (!contentStream) {
+        reject(new Error('Stream content cannot be empty'))
+      }
+      ; (async () => {
+        let index = 0
+        for await (const content of contentStream) {
+          if (!content) {
+            throw new Error('Stream content cannot be empty')
+          }
+          await sendTextAnswer({
+            content,
+            roomId,
+            type: 'text',
+            aiId,
+            isStreaming: true,
+            streamGroupId,
+            streamIndex: index++,
+          })
+        }
+      })().then(resolve).catch(reject)
+    })
   }
 
   get content() {

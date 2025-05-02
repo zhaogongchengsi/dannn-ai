@@ -31,10 +31,15 @@ export type QuestionMessageMeta = InfoMessage & {
 }
 
 const questionMessageSubject$ = new Subject<QuestionMessageMeta>()
+const answerMessageSubject$ = new Subject<InfoMessage>()
 const client = BaseClient.getInstance()
 
 client.socket.on(ChannelEvent.question, (message: QuestionMessageMeta) => {
   questionMessageSubject$.next(message)
+})
+
+client.socket.on(ChannelEvent.answer, (message: QuestionMessageMeta) => {
+  answerMessageSubject$.next(message)
 })
 
 export async function sendQuestion(message: Question) {
@@ -46,9 +51,21 @@ export async function sendQuestion(message: Question) {
 }
 
 export async function onQuestionWithAiId(aiId: number, callback: (message: QuestionMessageMeta) => void) {
-  questionMessageSubject$.pipe(filter(message => message.roomParticipants.includes(aiId))).subscribe(callback)
+  const subscription = questionMessageSubject$.pipe(filter(message => message.roomParticipants.includes(aiId))).subscribe(callback)
+  return () => subscription.unsubscribe()
+}
+
+export function onAnswerWithAiId(roomId: number, callback: (message: InfoMessage) => void) {
+  const subscription = answerMessageSubject$.pipe(filter(message => message.roomId === roomId)).subscribe(callback)
+  return () => subscription.unsubscribe()
+}
+
+export function onAnswerMessage(callback: (message: InfoMessage) => void) {
+  const subscription = answerMessageSubject$.subscribe(callback)
+  return () => subscription.unsubscribe()
 }
 
 export async function sendTextAnswer(answer: Answer) {
-  const questionMessage: InfoMessage = await client.trpc.message.createAiAnswer.mutate(answer)
+  const answerMessage: InfoMessage = await client.trpc.message.createAiAnswer.mutate(answer)
+  client.socket.emit(ChannelEvent.answer, answerMessage)
 }
