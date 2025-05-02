@@ -1,13 +1,27 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { sendQuestion } from 'base/api/message'
+import { onAnswerWithAiId, sendQuestion } from 'base/api/message'
 import { Bot, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 const value = ref('')
 
 const chatStore = useChatStore()
+
+watchEffect(() => {
+  if (!chatStore.currentChat) {
+    return
+  }
+
+  const chatId = chatStore.currentChat.id
+
+  console.log('current chat id on', chatId)
+
+  onAnswerWithAiId(chatId, (message) => {
+    console.log('receive message', message)
+  })
+})
 
 function onSend() {
   const message = value.value.trim()
