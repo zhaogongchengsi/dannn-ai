@@ -14,7 +14,8 @@ export class AI {
 
   private bindEvents() {
     onQuestionWithAiId(this.id, (message) => {
-      this.subject.next(omit(message, ['roomParticipants']))
+      const userMessage = omit(message, ['roomParticipants'])
+      this.subject.next(userMessage)
     })
   }
 

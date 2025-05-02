@@ -20,8 +20,4 @@ defineExtension(async (ctx) => {
 	ai.onQuestion(async (question: InfoMessage) => {
 		console.log('DeepSeek extension activated question: ' + question.content)
 	})
-
-	console.log(ai)
-
-	console.log('DeepSeek extension activated AI: ' + ai)
 })
