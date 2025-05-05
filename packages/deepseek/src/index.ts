@@ -1,10 +1,21 @@
 import { defineExtension } from 'base/index'
+import OpenAI from 'openai';
 import icon from './icon.svg'
 
 defineExtension(async (ctx) => {
 	const key = process.env['DEEPSEEK_API_KEY']
 
 	console.log('DeepSeek extension activated key: ' + key)
+
+	if (!key) {
+		console.error('DeepSeek API key is not set.')
+		return
+	}
+
+	const client = new OpenAI({
+		apiKey: key,
+		baseURL: 'https://api.deepseek.com',
+	});
 
 	const ai = await ctx.ai.register({
 		name: 'deepseek-chat',
@@ -17,8 +28,12 @@ defineExtension(async (ctx) => {
 	})
 
 	ai.onQuestion(async (event) => {
-		console.log('DeepSeek extension activated question: ' + event.content)
-
-		event.reply('DeepSeek Chat AI: ' + event.content)
+		const completion = await client.chat.completions.create({
+			messages: [
+				{ role: "user", content: event.content }
+			],
+			model: "deepseek-chat",
+		})
+		event.reply(completion.choices[0].message.content)
 	})
 })
