@@ -9,11 +9,26 @@ export const useChatStore = defineStore('dannn-chat', () => {
   const currentChatID = ref<number | null>(null)
 
   const aiStore = useAIStore()
+  const messages = useMessagesStore()
 
   const findRoomById = (id: number) => rooms.find(room => room.id === id)
 
   const currentChat = computed(() => {
     return currentChatID.value ? findRoomById(currentChatID.value) : null
+  })
+
+  const currentChatMessage = computed(() => {
+    if (!currentChatID.value) {
+      return []
+    }
+
+    const messageConfig = messages.findMessagesByRoomId(currentChatID.value)
+
+    if (!messageConfig) {
+      return []
+    }
+
+    return messageConfig.messages
   })
 
   getAllRooms().then((data) => {
@@ -55,6 +70,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
     currentChatID,
     setCurrentChatID,
     currentChat,
+    currentChatMessage,
     addRoom,
     addAiToChat,
   }

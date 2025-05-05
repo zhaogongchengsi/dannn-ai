@@ -15,6 +15,10 @@ export type RoomID = number
 export const useMessagesStore = defineStore('dannn-messages', () => {
   const messages = reactive<Map<RoomID, MessageNode>>(new Map())
 
+  function findMessagesByRoomId(roomId: RoomID) {
+    return messages.get(roomId)
+  }
+
   async function init() {
     const rooms = await getAllRooms()
     const page = 1
@@ -44,5 +48,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
   return {
     messages,
+    findMessagesByRoomId,
   }
 })
