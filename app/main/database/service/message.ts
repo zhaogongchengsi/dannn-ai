@@ -1,6 +1,6 @@
 import type { Answer, Question } from 'common/schema'
 import { randomUUID } from 'node:crypto'
-import { count, eq } from 'drizzle-orm'
+import { count, desc, eq } from 'drizzle-orm'
 import { db } from '../db'
 import { messages, rooms } from '../schema'
 
@@ -125,6 +125,35 @@ export async function getMessagesByPage(
       .from(messages)
       .where(eq(messages.roomId, roomId))
       .orderBy(messages.sortBy)
+      .limit(pageSize)
+      .offset(offset)
+      .all(),
+    db
+      .select({ count: count(messages.id) })
+      .from(messages)
+      .where(eq(messages.roomId, roomId))
+      .get(),
+  ])
+
+  return {
+    data: messagesData,
+    total: !totalCount ? 0 : Number(totalCount.count),
+  }
+}
+
+export async function getMessagesByPageDesc(
+  roomId: number,
+  page: number,
+  pageSize: number = 20,
+): Promise<{ data: InfoMessage[], total: number }> {
+  const offset = (page - 1) * pageSize
+
+  const [messagesData, totalCount] = await Promise.all([
+    db
+      .select()
+      .from(messages)
+      .where(eq(messages.roomId, roomId))
+      .orderBy(desc(messages.sortBy))
       .limit(pageSize)
       .offset(offset)
       .all(),
