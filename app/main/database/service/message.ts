@@ -69,6 +69,25 @@ export async function createQuestion(question: Question): Promise<InfoMessage> {
 
 export async function createAiAnswer(answer: Answer): Promise<InfoMessage> {
   return db.transaction(async (tx) => {
+    // 如果为流式消息，检查是否已经存在相同的 streamGroupId 的消息
+    // 如果存在，则更新内容并返回更新后的消息 防止消息碎片过多
+    if (answer.isStreaming && answer.streamGroupId) {
+      const existingMessage = await tx
+        .select()
+        .from(messages)
+        .where(eq(messages.streamGroupId, answer.streamGroupId))
+        .get()
+
+      if (existingMessage) {
+        const updatedContent = existingMessage.content + answer.content
+        await tx
+          .update(messages)
+          .set({ content: updatedContent, updatedAt: new Date().toISOString() })
+          .where(eq(messages.id, existingMessage.id))
+        return { ...existingMessage, content: updatedContent }
+      }
+    }
+
     const lastMessage = await tx
       .select({
         lastMessage: rooms.lastMessage,
@@ -168,4 +187,8 @@ export async function getMessagesByPageDesc(
     data: messagesData,
     total: !totalCount ? 0 : Number(totalCount.count),
   }
+}
+
+export async function clearAllMessages(): Promise<void> {
+  await db.delete(messages).execute()
 }
