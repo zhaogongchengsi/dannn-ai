@@ -42,6 +42,16 @@ client.socket.on(ChannelEvent.answer, (message: QuestionMessageMeta) => {
   answerMessageSubject$.next(message)
 })
 
+/**
+ * 异步函数，用于发送问题消息。
+ *
+ * @param message - 包含问题内容的 `Question` 对象。
+ * @returns 一个 Promise，表示问题消息的创建和发送过程。
+ *
+ * 此函数会执行以下操作：
+ * 1. 调用 `client.trpc.message.createQuestion.mutate` 方法创建问题消息。
+ * 2. 使用 `client.socket.emit` 方法通过指定的频道事件发送问题消息。
+ */
 export async function sendQuestion(message: Question) {
   const questionMessage: InfoMessage = await client.trpc.message.createQuestion.mutate(message)
   client.socket.emit(ChannelEvent.question, {
@@ -50,22 +60,74 @@ export async function sendQuestion(message: Question) {
   })
 }
 
+/**
+ * 监听指定 AI ID 的问题消息。
+ *
+ * @param aiId - AI 的唯一标识符。
+ * @param callback - 当接收到包含指定 AI ID 的问题消息时调用的回调函数。
+ * @returns 一个函数，用于取消订阅监听。
+ *
+ * @remarks
+ * 该函数会订阅 `questionMessageSubject$`，并过滤出 `roomParticipants` 中包含指定 AI ID 的消息。
+ * 当符合条件的消息到达时，会调用提供的回调函数。
+ */
 export async function onQuestionWithAiId(aiId: number, callback: (message: QuestionMessageMeta) => void) {
   const subscription = questionMessageSubject$.pipe(filter(message => message.roomParticipants.includes(aiId))).subscribe(callback)
   return () => subscription.unsubscribe()
 }
 
-export function onAnswerWithAiId(roomId: number, callback: (message: InfoMessage) => void) {
+/**
+ * 监听指定房间 ID 的回答消息。
+ *
+ * @param roomId - 房间的唯一标识符。
+ * @param callback - 当接收到属于指定房间的回答消息时调用的回调函数。
+ * @returns 一个函数，用于取消订阅监听。
+ *
+ * @remarks
+ * 该函数会订阅 `answerMessageSubject$`，并过滤出 `roomId` 等于指定值的消息。
+ * 当符合条件的消息到达时，会调用提供的回调函数。
+ */
+export function onAnswerWithRoomId(roomId: number, callback: (message: InfoMessage) => void) {
   const subscription = answerMessageSubject$.pipe(filter(message => message.roomId === roomId)).subscribe(callback)
   return () => subscription.unsubscribe()
 }
 
+/**
+ * 监听所有回答消息。
+ *
+ * @param callback - 当接收到回答消息时调用的回调函数。
+ * @returns 一个函数，用于取消订阅监听。
+ *
+ * @remarks
+ * 该函数会订阅 `answerMessageSubject$`，并在有新回答消息时调用提供的回调函数。
+ */
 export function onAnswerMessage(callback: (message: InfoMessage) => void) {
   const subscription = answerMessageSubject$.subscribe(callback)
   return () => subscription.unsubscribe()
 }
 
+/**
+ * 异步函数，用于发送文本回答。
+ *
+ * @param answer - 包含回答内容的 `Answer` 对象。
+ * @returns 一个 Promise，表示回答消息的创建和发送过程。
+ *
+ * 此函数会执行以下操作：
+ * 1. 调用 `client.trpc.message.createAiAnswer.mutate` 方法创建 AI 回答消息。
+ * 2. 使用 `client.socket.emit` 方法通过指定的频道事件发送回答消息。
+ */
 export async function sendTextAnswer(answer: Answer) {
   const answerMessage: InfoMessage = await client.trpc.message.createAiAnswer.mutate(answer)
   client.socket.emit(ChannelEvent.answer, answerMessage)
+}
+
+export async function getMessagesByPage(roomId: number, page: number, pageSize: number): Promise<{
+  data: InfoMessage[]
+  total: number
+}> {
+  return await client.trpc.message.getMessageByPage.query({
+    roomId,
+    page,
+    pageSize,
+  })
 }

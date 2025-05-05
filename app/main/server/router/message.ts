@@ -1,6 +1,8 @@
 import type { InfoMessage } from 'common/types'
+import { pageConfig } from 'common/page'
 import { answer, question } from 'common/schema'
-import { createAiAnswer, createQuestion } from '../../database/service/message'
+import { z } from 'zod'
+import { createAiAnswer, createQuestion, getMessagesByPage } from '../../database/service/message'
 import { publicProcedure, router } from '../trpc'
 
 export const messageRouter = router({
@@ -9,5 +11,10 @@ export const messageRouter = router({
   }),
   createAiAnswer: publicProcedure.input(answer).mutation(async ({ input }): Promise<InfoMessage> => {
     return await createAiAnswer(input)
+  }),
+  getMessageByPage: publicProcedure.input(pageConfig.extend({
+    roomId: z.number(),
+  })).query(async ({ input }) => {
+    return await getMessagesByPage(input.roomId, input.page, input.pageSize)
   }),
 })
