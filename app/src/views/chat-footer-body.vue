@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { onAnswerWithAiId, sendQuestion } from 'base/api/message'
+import { onAnswerWithRoomId, sendQuestion } from 'base/api/message'
 import { Bot, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
 
@@ -18,7 +18,7 @@ watchEffect(() => {
 
   console.log('current chat id on', chatId)
 
-  onAnswerWithAiId(chatId, (message) => {
+  onAnswerWithRoomId(chatId, (message) => {
     console.log('receive message', message)
   })
 })

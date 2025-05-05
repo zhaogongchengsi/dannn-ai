@@ -24,6 +24,8 @@ const config = useConfig()
 
 const chatStore = useChatStore()
 
+useMessagesStore()
+
 const toasterTheme = computed(() => {
   const mode = config.mode.value
   if (mode === 'auto') {
