@@ -1,4 +1,5 @@
 import type { AIData } from 'common/types'
+import type { OpenAI } from 'openai'
 import type { QuestionMessageMeta } from './api/message'
 import { omit } from 'lodash'
 import { Subject } from 'rxjs'
@@ -60,6 +61,36 @@ class QuestionEvent {
       roomId: this.question.roomId,
       type: 'text',
       aiId: this.ai.id,
+    })
+  }
+
+  async sendOpenAIStream(contentStream: AsyncIterable<OpenAI.ChatCompletionChunk>) {
+    const roomId = this.question.roomId
+    const aiId = this.ai.id
+    const streamGroupId = `${this.question.roomId}-${this.question.id}`
+
+    return new Promise<void>((resolve, reject) => {
+      if (!contentStream) {
+        reject(new Error('Stream content cannot be empty'))
+      }
+      ;(async () => {
+        let index = 0
+        for await (const chunk of contentStream) {
+          const content = chunk.choices?.[0]?.delta?.content
+          if (!content) {
+            continue // Skip empty chunks
+          }
+          await sendTextAnswer({
+            content,
+            roomId,
+            type: 'text',
+            aiId,
+            isStreaming: true,
+            streamGroupId,
+            streamIndex: index++,
+          })
+        }
+      })().then(resolve).catch(reject)
     })
   }
 

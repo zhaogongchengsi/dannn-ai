@@ -147,6 +147,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   }
 
   onAllMessages((message: InfoMessage) => {
+    console.log('Received message:', message)
     addMessagesByRoomId(message.roomId, [message])
   })
 

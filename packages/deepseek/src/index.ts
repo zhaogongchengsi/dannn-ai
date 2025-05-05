@@ -33,7 +33,9 @@ defineExtension(async (ctx) => {
 				{ role: "user", content: event.content }
 			],
 			model: "deepseek-chat",
+			stream: true,
 		})
-		event.reply(completion.choices[0].message.content)
+
+		event.sendOpenAIStream(completion)
 	})
 })
