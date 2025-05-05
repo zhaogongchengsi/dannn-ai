@@ -37,4 +37,5 @@ export enum MessageEvent {
 export enum ChannelEvent {
   question = 'question',
   answer = 'answer',
+  all = 'all',
 }

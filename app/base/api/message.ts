@@ -32,14 +32,21 @@ export type QuestionMessageMeta = InfoMessage & {
 
 const questionMessageSubject$ = new Subject<QuestionMessageMeta>()
 const answerMessageSubject$ = new Subject<InfoMessage>()
+const allMessagesSubject$ = new Subject<InfoMessage>()
 const client = BaseClient.getInstance()
 
 client.socket.on(ChannelEvent.question, (message: QuestionMessageMeta) => {
+  allMessagesSubject$.next(message)
   questionMessageSubject$.next(message)
 })
 
-client.socket.on(ChannelEvent.answer, (message: QuestionMessageMeta) => {
+client.socket.on(ChannelEvent.answer, (message: InfoMessage) => {
+  allMessagesSubject$.next(message)
   answerMessageSubject$.next(message)
+})
+
+client.socket.on(ChannelEvent.all, (message: InfoMessage) => {
+  allMessagesSubject$.next(message)
 })
 
 /**
@@ -58,6 +65,25 @@ export async function sendQuestion(message: Question) {
     ...questionMessage,
     roomParticipants: message.roomParticipants,
   })
+  client.socket.emit(ChannelEvent.all, questionMessage)
+  allMessagesSubject$.next(questionMessage)
+}
+
+/**
+ * 异步函数，用于发送文本回答。
+ *
+ * @param answer - 包含回答内容的 `Answer` 对象。
+ * @returns 一个 Promise，表示回答消息的创建和发送过程。
+ *
+ * 此函数会执行以下操作：
+ * 1. 调用 `client.trpc.message.createAiAnswer.mutate` 方法创建 AI 回答消息。
+ * 2. 使用 `client.socket.emit` 方法通过指定的频道事件发送回答消息。
+ */
+export async function sendTextAnswer(answer: Answer) {
+  const answerMessage: InfoMessage = await client.trpc.message.createAiAnswer.mutate(answer)
+  client.socket.emit(ChannelEvent.answer, answerMessage)
+  client.socket.emit(ChannelEvent.all, answerMessage)
+  allMessagesSubject$.next(answerMessage)
 }
 
 /**
@@ -107,20 +133,16 @@ export function onAnswerMessage(callback: (message: InfoMessage) => void) {
 }
 
 /**
- * 异步函数，用于发送文本回答。
+ * 异步函数，用于分页获取指定房间的消息。
  *
- * @param answer - 包含回答内容的 `Answer` 对象。
- * @returns 一个 Promise，表示回答消息的创建和发送过程。
+ * @param roomId - 房间的唯一标识符。
+ * @param page - 当前页码，从 1 开始。
+ * @param pageSize - 每页包含的消息数量。
+ * @returns 一个 Promise，包含消息数据和总消息数量。
  *
- * 此函数会执行以下操作：
- * 1. 调用 `client.trpc.message.createAiAnswer.mutate` 方法创建 AI 回答消息。
- * 2. 使用 `client.socket.emit` 方法通过指定的频道事件发送回答消息。
+ * 此函数会调用 `client.trpc.message.getMessageByPage.query` 方法，
+ * 根据提供的房间 ID、页码和每页大小获取对应的消息数据。
  */
-export async function sendTextAnswer(answer: Answer) {
-  const answerMessage: InfoMessage = await client.trpc.message.createAiAnswer.mutate(answer)
-  client.socket.emit(ChannelEvent.answer, answerMessage)
-}
-
 export async function getMessagesByPage(roomId: number, page: number, pageSize: number): Promise<{
   data: InfoMessage[]
   total: number
@@ -130,4 +152,16 @@ export async function getMessagesByPage(roomId: number, page: number, pageSize: 
     page,
     pageSize,
   })
+}
+
+/**
+ * 订阅所有消息的回调函数。
+ *
+ * @param callback - 一个回调函数，当有新的消息时会被调用。
+ *                   该函数接收一个 `InfoMessage` 类型的参数，表示接收到的消息。
+ * @returns 一个函数，用于取消订阅消息。
+ */
+export function onAllMessages(callback: (message: InfoMessage) => void) {
+  const subscription = allMessagesSubject$.subscribe(callback)
+  return () => subscription.unsubscribe()
 }

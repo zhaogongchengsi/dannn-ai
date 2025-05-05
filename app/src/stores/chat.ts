@@ -2,7 +2,6 @@ import type { CreateRoomOptions } from 'base/api/room'
 import type { RoomData } from 'common/types'
 import { createRoom, getAllRooms, setAiToRoom } from 'base/api/room'
 import { defineStore } from 'pinia'
-import { reactive, ref } from 'vue'
 
 export const useChatStore = defineStore('dannn-chat', () => {
   const rooms = reactive<RoomData[]>([])

@@ -9,20 +9,6 @@ const value = ref('')
 
 const chatStore = useChatStore()
 
-watchEffect(() => {
-  if (!chatStore.currentChat) {
-    return
-  }
-
-  const chatId = chatStore.currentChat.id
-
-  console.log('current chat id on', chatId)
-
-  onAnswerWithRoomId(chatId, (message) => {
-    console.log('receive message', message)
-  })
-})
-
 function onSend() {
   const message = value.value.trim()
   if (message.length === 0) {
@@ -33,8 +19,6 @@ function onSend() {
     console.error('请先选择一个聊天')
     return
   }
-
-  console.log('send message', message)
 
   sendQuestion({
     content: message,
