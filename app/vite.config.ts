@@ -42,6 +42,7 @@ export default defineConfig({
         setting: resolve(__dirname, 'setting.html'),
       },
     },
+    outDir: resolve(__dirname, './dannn_dist'),
   },
   server: {
     port: 3001,

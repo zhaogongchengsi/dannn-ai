@@ -17,6 +17,12 @@ const config = new Config()
 const window = new Window()
 let extensionProcessList: ExtensionProcess[] | null = null
 
+const gotSingleInstanceLock = app.requestSingleInstanceLock()
+
+if (!gotSingleInstanceLock) {
+  app.quit()
+}
+
 async function bootstrap() {
   await migrateDb()
 
@@ -79,14 +85,11 @@ ipcMain.handle('env.get', async (_, keys: string[]) => {
 bootstrap()
 
 process.on('SIGINT', () => {
-  console.log('Received SIGINT. Cleaning up...')
-
   // 执行清理操作，例如关闭所有窗口
   app.quit()
 })
 
 process.on('SIGTERM', () => {
-  console.log('Received SIGTERM. Cleaning up...')
   app.quit()
 })
 

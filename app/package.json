@@ -3,15 +3,16 @@
   "type": "module",
   "version": "0.0.0",
   "description": "",
-  "main": "./dist/index.mjs",
+  "main": "./dannn_dist/index.mjs",
   "scripts": {
     "build:rpc": "unbuild",
     "build:app": "dannn build -m prod",
-    "dev:app": "dannn build -m dev",
     "build": "vite build && pnpm run build:app",
+    "dev:app": "dannn build -m dev",
     "dev": "vite",
     "run": "electron .",
     "start": "pnpm run dev:app && pnpm run run",
+    "package": "electron-builder -w",
     "lint": "eslint . --fix",
     "test": "vitest",
     "gen": "drizzle-kit generate",
@@ -26,24 +27,40 @@
       "alias": {
         "base": "./base",
         "common": "./common"
-      }
+      },
+      "outdir": "./dannn_dist"
     }
   },
   "build": {
     "files": [
-      "dist/**/*",
+      "dannn_dist/**/*",
       "./index.html",
       "drizzle/**/*"
     ],
     "asar": true,
     "appId": "com.zhaozunhong.app",
-    "productName": "dannn ai",
+    "productName": "Dannn AI",
     "mac": {
       "target": "dmg"
     },
     "win": {
       "target": "nsis"
-    }
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "./public/favicon.ico",
+      "uninstallerIcon": "./public/favicon.ico",
+      "uninstallDisplayName": "Uninstall Dannn AI",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Dannn AI"
+    },
+    "appImage": {
+      "artifactName": "${name}-setup.${ext}"
+    },
+    "npmRebuild": false
   },
   "dependencies": {
     "@libsql/client": "^0.15.2",
@@ -59,7 +76,6 @@
     "crc": "^4.3.2",
     "dexie": "^4.0.11",
     "drizzle-orm": "^0.41.0",
-    "electron": "^35.0.3",
     "electron-log": "^5.3.2",
     "fs-extra": "^11.3.0",
     "get-port-please": "^3.1.2",
@@ -99,6 +115,8 @@
     "@types/markdown-it": "^14.1.2",
     "@vitejs/plugin-vue": "^5.2.3",
     "drizzle-kit": "^0.30.6",
+    "electron": "^35.0.3",
+    "electron-builder": "^26.0.12",
     "tailwindcss": "3",
     "tailwindcss-animate": "^1.0.7",
     "unbuild": "^3.5.0",
