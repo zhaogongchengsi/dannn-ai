@@ -8,8 +8,16 @@ import { EXTENSIONS_ROOT } from './constant'
 import { migrateDb } from './database/db'
 import { extensionLoadAll } from './extension-loader'
 import { Config } from './lib/config'
+import { logger } from './lib/logger'
 import { Window } from './lib/window'
 import { createServer } from './server/server'
+
+logger.initialize()
+
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception:', err)
+  app.quit()
+})
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -24,6 +32,8 @@ if (!gotSingleInstanceLock) {
 }
 
 async function bootstrap() {
+  logger.info('Bootstrap...')
+
   await migrateDb()
 
   await config.init()
@@ -91,9 +101,4 @@ process.on('SIGINT', () => {
 
 process.on('SIGTERM', () => {
   app.quit()
-})
-
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught exception:', err)
-  // app.quit()
 })

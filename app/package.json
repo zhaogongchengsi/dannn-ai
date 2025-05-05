@@ -35,8 +35,12 @@
     "files": [
       "dannn_dist/**/*",
       "./index.html",
-      "drizzle/**/*"
+      "drizzle/**/*",
+      "node_modules/**/*"
     ],
+    "directories": {
+      "buildResources": "public"
+    },
     "asar": true,
     "appId": "com.zhaozunhong.app",
     "productName": "Dannn AI",
