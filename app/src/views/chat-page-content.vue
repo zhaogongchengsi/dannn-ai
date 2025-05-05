@@ -17,15 +17,6 @@ watchOnce(() => virtEl.value, () => {
 
 <template>
   <div ref="el" class="h-full w-full">
-    <!-- <div v-if="!chatStore.currentChat">
-    <div class="flex items-center justify-center h-full text-zinc-500 dark:text-zinc-400">
-      <span>请选择一个聊天</span>
-    </div>
-  </div>
-  <div v-if="!chatStore.currentChat || !chatStore.currentChat.messages || chatStore.currentChat.messages.length === 0"
-    class="flex items-center justify-center h-full text-zinc-500 dark:text-zinc-400">
-    <span>暂无消息</span>
-  </div> -->
     <VirtList ref="virtEl" item-key="id" :list="chatStore.currentChatMessage" :style="{ height: `${height}px` }" :min-size="20">
       <template #default="{ itemData, index }">
         <ChatMessageRow :message="itemData" :index="index" />

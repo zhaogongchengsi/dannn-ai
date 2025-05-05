@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { onAnswerWithRoomId, sendQuestion } from 'base/api/message'
+import { sendQuestion } from 'base/api/message'
 import { Bot, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
 
