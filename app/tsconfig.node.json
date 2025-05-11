@@ -16,6 +16,7 @@
     "./drizzle.config.ts",
     "./build.config.ts",
     "common/types.ts",
+    "modules/**/*.ts",
     "env.d.ts"
   ],
   "exclude": [

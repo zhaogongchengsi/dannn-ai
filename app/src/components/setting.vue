@@ -7,6 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
@@ -15,6 +17,28 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Settings } from 'lucide-vue-next'
+
+const config = useConfig()
+
+const mode = computed({
+  get: () => config.mode.value,
+  set: (value) => {
+    config.mode.value = value
+    config.set('theme', value)
+  },
+})
+
+function onToggleDevtools() {
+  window.dannn.ipc.invoke('window.toggle-devtools')
+}
+
+function onKeyDown(event: KeyboardEvent) {
+  if (event.ctrlKey && event.key === 'd') {
+    onToggleDevtools()
+  }
+}
+
+useEventListener('keydown', onKeyDown)
 </script>
 
 <template>
@@ -45,49 +69,41 @@ import { Settings } from 'lucide-vue-next'
           <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuGroup>
-      <DropdownMenuSeparator />
       <DropdownMenuGroup>
         <DropdownMenuItem>
           <span>Team</span>
         </DropdownMenuItem>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <span>Invite users</span>
+            <span>Theme</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
-              <DropdownMenuItem>
-                <span>Email</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <span>Message</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <span>More...</span>
-              </DropdownMenuItem>
+              <DropdownMenuRadioGroup v-model="mode">
+                <DropdownMenuRadioItem value="light">
+                  <span>light</span>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">
+                  <span>dark</span>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">
+                  <span>system</span>
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
-        <DropdownMenuItem>
-          <span>New Team</span>
-          <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-        </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>
-        <span>GitHub</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem>
-        <span>Support</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem disabled>
-        <span>API</span>
+      <DropdownMenuItem as-child>
+        <a href="https://github.com/zhaogongchengsi/dannn-ai">GitHub</a>
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>
-        <span>Log out</span>
-        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+      <DropdownMenuItem @click="onToggleDevtools">
+        <span>Open Devtools</span>
+        <DropdownMenuShortcut>
+          <span class="text-xs">Ctrl D</span>
+        </DropdownMenuShortcut>
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>

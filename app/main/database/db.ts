@@ -19,7 +19,7 @@ function getDatabaseMigrate() {
     return resolve(process.resourcesPath, 'drizzle')
   }
   else {
-    return resolve(__dirname, '../drizzle')
+    return resolve(process.cwd(), 'drizzle')
   }
 }
 

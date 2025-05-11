@@ -2,9 +2,11 @@ import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { Worker } from 'node:worker_threads'
 import { dirname, normalize } from 'pathe'
 import { z } from 'zod'
+import { logger } from './logger'
 
 export const PluginManifestSchema = z.object({
   name: z.string().regex(/^[^\s!@#$%^&*()+=[\]{};':"\\|,.<>/?]*$/, { message: 'Name cannot contain illegal characters or spaces' }),
@@ -34,6 +36,8 @@ export interface IExtensionProcessInfo {
 export interface IExtensionConfig {
   env: Record<string, string>
 }
+
+const _dirname = dirname(fileURLToPath(import.meta.url))
 
 export class ExtensionProcess {
   private static ID_COUNTER = 0
@@ -107,6 +111,7 @@ export class ExtensionProcess {
 
       const iProcess = new Worker(mainFile, {
         env,
+        // execArgv: ['--loader', pathToFileURL(normalize(resolve(_dirname, './loader.mjs'))).href],
         stdout: true,
         stderr: true,
       })
@@ -145,7 +150,7 @@ export class ExtensionProcess {
    * @param code 退出代码
    */
   private handleExit(code: number): void {
-    console.log(`Extension process exited with code ${code}`)
+    logger.info(`Extension process exited with code ${code}`)
     ExtensionProcess.all.delete(this.pid)
   }
 
@@ -154,7 +159,7 @@ export class ExtensionProcess {
    * @param error 错误对象
    */
   private handleError(error: any): void {
-    console.error(`Extension process encountered an error: ${error?.message}`)
+    logger.error(`Extension process encountered an error: ${error?.message}`)
   }
 
   /**
@@ -162,14 +167,14 @@ export class ExtensionProcess {
    * @param message 消息内容
    */
   private handleMessage(message: any): void {
-    console.log(`Message from extension process: ${message}`)
+    logger.log(`Message from extension process: ${message}`)
   }
 
   /**
    * 处理 Worker 的上线事件
    */
   private handleOnline(): void {
-    console.log('Extension process is online')
+    logger.log('Extension process is online')
   }
 
   /**

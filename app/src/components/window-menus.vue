@@ -3,12 +3,11 @@ import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useChatStore } from '@/stores/chat'
 import chatPageTitle from '@/views/chat-page-title.vue'
-import { Expand, Home, Minimize, Minus, X } from 'lucide-vue-next'
+import { Expand, Minimize, Minus, X } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import modeToggle from './mode-toggle.vue'
+import Setting from './setting.vue'
 
-const router = useRouter()
 const chatStore = useChatStore()
 
 const isMaximized = ref(false)
@@ -52,10 +51,8 @@ const isMac = window.dannn.is.mac
     </div>
     <div class="ml-auto space-x-2">
       <SidebarTrigger />
-      <Button variant="ghost" size="icon" class="size-7" @click="router.push('/')">
-        <Home />
-      </Button>
       <mode-toggle />
+      <Setting />
       <template v-if="!isMac">
         <Button variant="ghost" size="icon" class="size-7" @click="onMinimize">
           <Minus :size="24" />

@@ -1,7 +1,7 @@
 import EventEmitter from 'node:events'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { app, BrowserWindow, ipcMain, nativeImage } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
 import logo from '../../public/icon_256X256.png'
 
@@ -133,9 +133,38 @@ export class Window extends EventEmitter<WindowEvents> {
       }
     })
 
+    ipcMain.handle(`${name}.toggle-devtools`, () => {
+      this.toggleDevTools()
+    })
+
     const send = (channel: string, ...args: any[]) => {
       this.send(`${name}.${channel}`, ...args)
     }
+
+    window.webContents.on('devtools-opened', () => {
+      send('devtools-opened')
+    })
+
+    window.webContents.on('devtools-closed', () => {
+      send('devtools-closed')
+    })
+
+    window.webContents.on('will-navigate', (event, url) => {
+      event.preventDefault()
+      if (url.startsWith('http')) {
+        shell.openExternal(url)
+      }
+    })
+
+    window.webContents.setWindowOpenHandler(({ url }) => {
+      // 阻止新窗口打开，并在默认浏览器中打开链接
+      if (url.startsWith('http') || url.startsWith('https')) {
+        shell.openExternal(url) // 在默认浏览器中打开链接
+        return { action: 'deny' } // 阻止新窗口
+      }
+
+      return { action: 'allow' } // 允许新窗口
+    })
 
     window.on('resize', () => {
       const { width, height } = this.getSize()
@@ -202,6 +231,21 @@ export class Window extends EventEmitter<WindowEvents> {
     }
     else {
       throw new Error('Window is not ready')
+    }
+  }
+
+  toggleDevTools() {
+    if (this.window) {
+      const webContents = this.window.webContents
+      if (webContents.isDevToolsOpened()) {
+        webContents.closeDevTools()
+      }
+      else {
+        webContents.openDevTools()
+      }
+    }
+    else {
+      throw new Error('Window is not created')
     }
   }
 }
