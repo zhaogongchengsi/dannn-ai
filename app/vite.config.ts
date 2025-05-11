@@ -37,12 +37,12 @@ export default defineConfig({
   },
   base: './',
   build: {
-    rollupOptions: {
-      input: {
-        index: resolve(__dirname, 'index.html'),
-        setting: resolve(__dirname, 'setting.html'),
-      },
-    },
+    // rollupOptions: {
+    //   input: {
+    //     index: resolve(__dirname, 'index.html'),
+    //     setting: resolve(__dirname, 'setting.html'),
+    //   },
+    // },
     outDir: resolve(__dirname, './dannn_dist'),
   },
   server: {
