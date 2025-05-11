@@ -71,7 +71,7 @@ useEventListener('keydown', onKeyDown)
       </DropdownMenuGroup>
       <DropdownMenuGroup>
         <DropdownMenuItem>
-          <span>Team</span>
+          <span>Plugins</span>
         </DropdownMenuItem>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
@@ -81,13 +81,13 @@ useEventListener('keydown', onKeyDown)
             <DropdownMenuSubContent>
               <DropdownMenuRadioGroup v-model="mode">
                 <DropdownMenuRadioItem value="light">
-                  <span>light</span>
+                  <span>Light</span>
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="dark">
-                  <span>dark</span>
+                  <span>Dark</span>
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="system">
-                  <span>system</span>
+                  <span>System</span>
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuSubContent>
