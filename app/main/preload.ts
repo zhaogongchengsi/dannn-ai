@@ -22,6 +22,11 @@
     return fsSync.existsSync(dir)
   }
 
+
+  function quit () {
+    ipcRenderer.invoke(`${NAME}.quit`)
+  }
+
   /**
    * 关闭窗口
    */
@@ -83,6 +88,7 @@
       unmaximize,
       minimize,
       isMaximized,
+      quit,
     },
   }
 

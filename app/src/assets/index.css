@@ -92,6 +92,11 @@
 .dragging {
   -webkit-app-region: drag;
 }
-.dragging * {
+
+.no-dragging * {
+  -webkit-app-region: no-drag;
+}
+
+.no-dragging-button {
   -webkit-app-region: no-drag;
 }

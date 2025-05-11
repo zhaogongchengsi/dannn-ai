@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
 import logo from '../../public/icon_256X256.png'
+import { logger } from './logger'
 
 const _dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -78,7 +79,7 @@ export class Window extends EventEmitter<WindowEvents> {
       height: height ?? 600,
       show: false,
       icon: this.icon,
-      // frame: isMacOS ? true : MODE === 'dev',
+      frame: isMacOS ? true : MODE === 'dev',
       titleBarStyle: isMacOS ? 'hidden' : undefined,
       titleBarOverlay: isMacOS,
       webPreferences: {
@@ -135,6 +136,19 @@ export class Window extends EventEmitter<WindowEvents> {
 
     ipcMain.handle(`${name}.toggle-devtools`, () => {
       this.toggleDevTools()
+    })
+
+    ipcMain.handle(`${name}.quit`, () => {
+      logger.info('Quit app')
+      window.close()
+      window.once('closed', () => {
+        this.window = null
+        this.settingWindow = null
+        this.isShow = false
+        this.isReady = false
+        logger.info('App quit')
+        app.quit()
+      })
     })
 
     const send = (channel: string, ...args: any[]) => {

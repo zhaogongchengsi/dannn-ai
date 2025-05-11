@@ -5,7 +5,6 @@ import { useChatStore } from '@/stores/chat'
 import chatPageTitle from '@/views/chat-page-title.vue'
 import { Expand, Minimize, Minus, X } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
-import modeToggle from './mode-toggle.vue'
 import Setting from './setting.vue'
 
 const chatStore = useChatStore()
@@ -40,18 +39,21 @@ function onUnmaximize() {
   window.dannn.window.unmaximize()
 }
 
+function onQuit() {
+  window.dannn.window.quit()
+}
+
 const isMac = window.dannn.is.mac
 // bg-[hsl(var(--background))]
 </script>
 
 <template>
-  <div class="flex items-center h-[--app-header-height]">
+  <div class="flex items-center h-[--app-header-height] dragging">
     <div class="h-full flex items-center px-4">
       <chat-page-title v-if="chatStore.currentChat" />
     </div>
     <div class="ml-auto space-x-2">
       <SidebarTrigger />
-      <mode-toggle />
       <Setting />
       <template v-if="!isMac">
         <Button variant="ghost" size="icon" class="size-7" @click="onMinimize">
@@ -63,7 +65,7 @@ const isMac = window.dannn.is.mac
         <Button v-if="isMinimized" variant="ghost" size="icon" class="size-7" @click="onMaximize">
           <Expand :size="18" />
         </Button>
-        <Button variant="ghost" size="icon" class="size-7">
+        <Button variant="ghost" size="icon" class="size-7" @click="onQuit">
           <X :size="24" />
         </Button>
       </template>
