@@ -16,3 +16,4 @@ app/dist_client
 app/client_dist
 app/sqlite.db
 app/dannn_dist
+app/resources/drizzle

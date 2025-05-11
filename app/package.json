@@ -30,7 +30,8 @@
       ],
       "alias": {
         "base": "./base",
-        "common": "./common"
+        "common": "./common",
+        "main": "./main"
       },
       "outdir": "./dannn_dist"
     }
@@ -38,13 +39,20 @@
   "build": {
     "files": [
       "dannn_dist/**/*",
-      "./index.html",
-      "drizzle/**/*",
       "node_modules/**/*"
     ],
     "directories": {
-      "buildResources": "public"
+      "buildResources": "./public"
     },
+    "extraFiles": [
+      {
+        "from": "./drizzle",
+        "to": "resources/drizzle",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "asar": true,
     "appId": "com.zhaozunhong.app",
     "productName": "Dannn AI",
@@ -72,6 +80,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.15.2",
+    "@libsql/win32-x64-msvc": "^0.5.8",
     "@shikijs/markdown-it": "^3.2.1",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/vue-table": "^8.21.2",

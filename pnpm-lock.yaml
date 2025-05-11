@@ -45,6 +45,9 @@ importers:
       '@libsql/client':
         specifier: ^0.15.2
         version: 0.15.2
+      '@libsql/win32-x64-msvc':
+        specifier: ^0.5.8
+        version: 0.5.8
       '@shikijs/markdown-it':
         specifier: ^3.2.1
         version: 3.2.1(markdown-it-async@2.2.0)
@@ -81,9 +84,6 @@ importers:
       drizzle-orm:
         specifier: ^0.41.0
         version: 0.41.0(@libsql/client@0.15.2)(gel@2.0.2)
-      electron:
-        specifier: ^35.0.3
-        version: 35.1.0
       electron-log:
         specifier: ^5.3.2
         version: 5.3.2
@@ -196,6 +196,9 @@ importers:
       drizzle-kit:
         specifier: ^0.30.6
         version: 0.30.6
+      electron:
+        specifier: ^35.0.3
+        version: 35.1.0
       electron-builder:
         specifier: ^26.0.12
         version: 26.0.12(electron-builder-squirrel-windows@26.0.12)
@@ -1298,6 +1301,11 @@ packages:
 
   '@libsql/win32-x64-msvc@0.5.4':
     resolution: {integrity: sha512-xWQyAQEsX+odBrMSXTpm3WOFeoJIX7QncCkaZcsaqdEFueOdNDIdcKAQKMoNlwtj1rCxE72RK4byw/Bflf6Jgg==}
+    cpu: [x64]
+    os: [win32]
+
+  '@libsql/win32-x64-msvc@0.5.8':
+    resolution: {integrity: sha512-8hKczus0swLEvXu8N0znWdyFo5QzFnE9mnz7G/sb+eVn+zpPlT6ZdFHZdhQzev9C0to7kvYDj03qESTUIwDiqg==}
     cpu: [x64]
     os: [win32]
 
@@ -6450,6 +6458,8 @@ snapshots:
 
   '@libsql/win32-x64-msvc@0.5.4':
     optional: true
+
+  '@libsql/win32-x64-msvc@0.5.8': {}
 
   '@malept/cross-spawn-promise@2.0.0':
     dependencies:

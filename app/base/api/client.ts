@@ -4,6 +4,7 @@ import type { Socket } from 'socket.io-client'
 import type { AppRouter } from '../../main/server/router'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { io } from 'socket.io-client'
+import { isWindows } from 'std-env'
 
 const host = '127.0.0.1'
 
@@ -46,6 +47,8 @@ function createClient(): {
   trpc: TRPCClient<AppRouter>
   socket: Socket
 } {
+  const process = isWindows ? globalThis.process : window.process
+
   if (
     typeof process === 'undefined'
     || typeof process.env === 'undefined'

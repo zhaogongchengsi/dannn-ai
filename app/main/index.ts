@@ -12,8 +12,6 @@ import { logger } from './lib/logger'
 import { Window } from './lib/window'
 import { createServer } from './server/server'
 
-logger.initialize()
-
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught exception:', err)
   app.quit()

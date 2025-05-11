@@ -35,6 +35,7 @@ export default defineConfig({
       plugins: [tailwind()],
     },
   },
+  base: './',
   build: {
     rollupOptions: {
       input: {

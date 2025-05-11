@@ -45,7 +45,7 @@ export class Window extends EventEmitter<WindowEvents> {
       height: height ?? 600,
       show: false,
       icon: this.icon,
-      frame: isMacOS ? true : MODE === 'dev',
+      // frame: isMacOS ? true : MODE === 'dev',
       parent: this.window,
       titleBarStyle: isMacOS ? 'hidden' : undefined,
       titleBarOverlay: isMacOS,
@@ -78,7 +78,7 @@ export class Window extends EventEmitter<WindowEvents> {
       height: height ?? 600,
       show: false,
       icon: this.icon,
-      frame: isMacOS ? true : MODE === 'dev',
+      // frame: isMacOS ? true : MODE === 'dev',
       titleBarStyle: isMacOS ? 'hidden' : undefined,
       titleBarOverlay: isMacOS,
       webPreferences: {
@@ -94,7 +94,7 @@ export class Window extends EventEmitter<WindowEvents> {
       this.window.webContents.openDevTools()
     }
     else {
-      this.window.loadFile('./index.html')
+      this.window.loadFile('./dannn_dist/index.html')
     }
 
     app.on('activate', () => {
