@@ -3,6 +3,10 @@
   "type": "module",
   "version": "0.0.0",
   "description": "",
+  "author": {
+    "name": "zhaozunhong",
+    "email": "zzh1586169624@163.com"
+  },
   "main": "./dannn_dist/index.mjs",
   "scripts": {
     "build:rpc": "unbuild",
