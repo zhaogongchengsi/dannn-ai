@@ -1,19 +1,6 @@
 <script setup lang='ts'>
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-} from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
-import WindowMenus from '@/components/window-menus.vue'
 import { useConfig } from '@/composables/config'
 import ChatAdd from '@/views/chat-add.vue'
 import { computed } from 'vue'
@@ -26,6 +13,7 @@ const router = useRoute<'/chat/[id]/'>()
 watchEffect(() => {
   const id = router.params.id
   if (!id) {
+    chatStore.setCurrentChatID(0)
     return
   }
 
@@ -44,36 +32,28 @@ const toasterTheme = computed(() => {
 </script>
 
 <template>
-  <SidebarProvider class="sidebar">
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>聊天群</SidebarGroupLabel>
-          <SidebarGroupAction>
-            <ChatAdd />
-          </SidebarGroupAction>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem v-for="chat of chatStore.rooms" :key="chat.id">
-                <SidebarMenuButton as-child>
-                  <RouterLink
-                    :to="`/chat/${chat.id}/`"
-                  >
-                    {{ chat.title }}
-                  </RouterLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
-    <section class="w-full h-screen relative">
-      <WindowMenus />
+  <div class="flex" style="height: calc(100vh - var(--app-header-height))">
+    <div class="w-64 border-r border-t">
+      <div class="flex items-center gap-2 justify-end h-14 px-2 border-b">
+        <ChatAdd />
+      </div>
+      <ul class="py-3">
+        <li v-for="chat in chatStore.rooms" :key="chat.id" class="w-full h-10">
+          <RouterLink
+            :to="`/chat/${chat.id}/`" class="flex p-1 items-center size-full"
+            active-class="bg-blue-500 text-white font-bold"
+          >
+            {{ chat.title }}
+          </RouterLink>
+        </li>
+      </ul>
+    </div>
+
+    <section class="flex-1 h-full relative">
       <ScrollArea class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-header-height))' }">
         <router-view />
       </ScrollArea>
     </section>
-  </SidebarProvider>
+  </div>
   <Toaster :theme="toasterTheme" />
 </template>

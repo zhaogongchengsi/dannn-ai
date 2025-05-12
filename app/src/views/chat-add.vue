@@ -36,8 +36,11 @@ async function onFormSubmit(values: Record<string, any>) {
 
 <template>
   <Dialog v-model:open="isOpen">
-    <DialogTrigger>
-      <Plus class="size-5" />
+    <DialogTrigger class="w-full">
+      <Button class="w-full">
+        <Plus class="size-5" />
+        <span>添加聊天</span>
+      </Button>
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
