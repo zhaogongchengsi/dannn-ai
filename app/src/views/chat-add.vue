@@ -15,6 +15,7 @@ import { Plus } from 'lucide-vue-next'
 import { z } from 'zod'
 
 const chatStore = useChatStore()
+const isOpen = ref(false)
 
 const createChatSchemas = z.object({
   title: z.string().min(1, '请输入聊天名称').max(20, '聊天名称过长'),
@@ -27,11 +28,14 @@ async function onFormSubmit(values: Record<string, any>) {
     title: values.title,
     description: values.description,
   })
+    .finally(() => {
+      isOpen.value = false
+    })
 }
 </script>
 
 <template>
-  <Dialog>
+  <Dialog v-model:open="isOpen">
     <DialogTrigger>
       <Plus class="size-5" />
     </DialogTrigger>

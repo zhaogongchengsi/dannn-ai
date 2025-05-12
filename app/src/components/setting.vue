@@ -98,6 +98,9 @@ useEventListener('keydown', onKeyDown)
       <DropdownMenuItem as-child>
         <a href="https://github.com/zhaogongchengsi/dannn-ai">GitHub</a>
       </DropdownMenuItem>
+      <DropdownMenuItem as-child>
+        <a href="https://github.com/zhaogongchengsi/dannn-ai/issues">Help</a>
+      </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem @click="onToggleDevtools">
         <span>Open Devtools</span>

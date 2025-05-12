@@ -23,6 +23,14 @@ import ChatAdd from './views/chat-add.vue'
 const config = useConfig()
 
 const chatStore = useChatStore()
+const route = useRoute<'/chat'>()
+
+watch(() => route.query.chatId, (id) => {
+  if (!id) {
+    return
+  }
+  chatStore.setCurrentChatID(Number(id))
+})
 
 useMessagesStore()
 
@@ -54,7 +62,7 @@ const toasterTheme = computed(() => {
                 <SidebarMenu>
                   <SidebarMenuItem v-for="chat of chatStore.rooms" :key="chat.id">
                     <SidebarMenuButton as-child>
-                      <RouterLink :to="`/chat?chatId=${chat.id}`">
+                      <RouterLink :to="`/chat?chatId=${chat.id}`" :class="{ 'bg-blue-500 text-white font-bold': chat.id === chatStore.currentChatID }">
                         {{ chat.title }}
                       </RouterLink>
                     </SidebarMenuButton>
