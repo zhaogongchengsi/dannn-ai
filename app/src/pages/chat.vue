@@ -8,10 +8,10 @@ import { computed } from 'vue'
 const config = useConfig()
 
 const chatStore = useChatStore()
-const router = useRoute<'/chat/[id]/'>()
+const route = useRoute<'/chat/[id]/'>()
 
 watchEffect(() => {
-  const id = router.params.id
+  const id = route.params.id
   if (!id) {
     chatStore.setCurrentChatID(0)
     return
