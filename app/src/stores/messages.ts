@@ -82,7 +82,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
     if (messageNode) {
       function upsertMessage(newMessage: MessageItem) {
-        const existingMessageIndex = messageNode!.messages.findIndex(msg => msg.id === newMessage.id)
+        const existingMessageIndex = messageNode!.messages.findLastIndex(msg => msg.id === newMessage.id)
         if (existingMessageIndex !== -1) {
           messageNode!.messages = [
             ...messageNode!.messages.slice(0, existingMessageIndex),
@@ -98,7 +98,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
       mergedMessages.forEach((message) => {
         if (message.isStreaming) {
-          const existingMessage = messageNode.messages.find(msg => msg.streamGroupId === message.streamGroupId)
+          const existingMessage = messageNode.messages.findLast(msg => msg.streamGroupId === message.streamGroupId)
           if (existingMessage) {
             const streamMessageList = sortBy(existingMessage.contentList.concat([message]), (message) => {
               return message.streamGroupId
