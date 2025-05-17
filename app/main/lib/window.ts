@@ -165,12 +165,14 @@ export class Window extends EventEmitter<WindowEvents> {
 
     window.webContents.on('will-navigate', (event, url) => {
       event.preventDefault()
-      if (url.startsWith('http')) {
+      logger.info('will-navigate', url)
+      if (url.startsWith('http') || !url.startsWith('http://localhost:3001')) {
         shell.openExternal(url)
       }
     })
 
     window.webContents.setWindowOpenHandler(({ url }) => {
+      logger.info('setWindowOpenHandler', url)
       // 阻止新窗口打开，并在默认浏览器中打开链接
       if (url.startsWith('http') || url.startsWith('https')) {
         shell.openExternal(url) // 在默认浏览器中打开链接

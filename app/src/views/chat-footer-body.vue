@@ -1,12 +1,11 @@
 <script setup lang='ts'>
+import Editor from '@/components/editor/editor.vue'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { sendQuestion } from 'base/api/message'
 import { Bot, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 const value = ref('')
-
 const chatStore = useChatStore()
 
 function onSend() {
@@ -29,12 +28,27 @@ function onSend() {
 
   value.value = ''
 }
+
+function onCtrlWithEnter(event: MouseEvent | KeyboardEvent) {
+  if (
+    event instanceof KeyboardEvent
+    && event.ctrlKey
+    && event.key === 'Enter'
+  ) {
+    event.preventDefault()
+    event.stopPropagation()
+    event.stopImmediatePropagation()
+    onSend()
+  }
+}
 </script>
 
 <template>
   <div class="p-2 flex flex-col gap-2" style="height: calc(var(--app-chat-footer-height) - var(--app-chat-footer-header-height));">
-    <div class="w-full flex-1">
-      <Textarea v-model="value" class="resize-none size-full" />
+    <div class="w-full flex-1" style="max-height: 136px">
+      <div class="border rounded-md border-muted bg-muted/50 p-2 h-full overflow-auto custom-scrollbar" @keydown.capture="onCtrlWithEnter">
+        <Editor v-model:text="value" />
+      </div>
     </div>
     <div class="flex items-center">
       <div class="flex items-center gap-2 mr-auto">

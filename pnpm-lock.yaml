@@ -42,6 +42,18 @@ importers:
 
   app:
     dependencies:
+      '@lexical/history':
+        specifier: ^0.31.1
+        version: 0.31.1
+      '@lexical/rich-text':
+        specifier: ^0.31.1
+        version: 0.31.1
+      '@lexical/text':
+        specifier: ^0.31.1
+        version: 0.31.1
+      '@lexical/utils':
+        specifier: ^0.31.1
+        version: 0.31.1
       '@libsql/client':
         specifier: ^0.15.2
         version: 0.15.2
@@ -96,6 +108,9 @@ importers:
       hookable:
         specifier: ^5.5.3
         version: 5.5.3
+      lexical:
+        specifier: ^0.31.1
+        version: 0.31.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1253,6 +1268,33 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
+  '@lexical/clipboard@0.31.1':
+    resolution: {integrity: sha512-+h5riX4c+6htFN/2xrYwYEakF//vZKMscE2UJzwrSdU9qi6S15HDMBj3jHGBG4Uu1/MvNLzj8g56x8K+yMi+hg==}
+
+  '@lexical/history@0.31.1':
+    resolution: {integrity: sha512-gNHCGT/uG189Bktly2CS/a8wmzchAt+YJ0xtPnykryxl8AF3PVdzs2viJDBGZ/y91fPeVQGLyEG/9lcjZChnRA==}
+
+  '@lexical/html@0.31.1':
+    resolution: {integrity: sha512-5GwKdQJgR/PNnYKOygr1rfUns2VJqK5mSzgLsB2mOlyLAFwogTd2AKTntksBXexzJFkM93OJ0t1QntFEkOhIaA==}
+
+  '@lexical/list@0.31.1':
+    resolution: {integrity: sha512-bSsMyAczwo7WXFH2Av8cbfyL+nTcTBw7gMeuA7q56UjSOTji4VcQlDGpk6zQ3h1xV9Ry9vbaB9D1VlgmDzhndg==}
+
+  '@lexical/rich-text@0.31.1':
+    resolution: {integrity: sha512-AB9B9zac5n7syLrghUzNNy9eRPm0kHXxkrKusVWY4QHUMC0CLl5xd928MvPSiktIaHmTeVLLX4MOFKaq6KfPXw==}
+
+  '@lexical/selection@0.31.1':
+    resolution: {integrity: sha512-5nzWd8cszqxFx0fyN4f+ZJsy5OCxZ6Q3ui8YhTHPGxh7mmGEEFBwy+O+s08ZOIB2DZO4kE6AKShsBMVZ/i95vA==}
+
+  '@lexical/table@0.31.1':
+    resolution: {integrity: sha512-cjO4FNoZcLoOkMNbVEBX0tu8l6kEjHPQU/mLxC5X1PPfXZIUsi+hTvQCDvnby07o6MgotNL5OGsiZfaQUHfXQg==}
+
+  '@lexical/text@0.31.1':
+    resolution: {integrity: sha512-1kStETP6kIPBKGr6YAPsKvHN/k55/FGBL2Zs6K67axuOageD1yoHdPao83p7mMSelEOXhtOc1v1+FnmimPPV7g==}
+
+  '@lexical/utils@0.31.1':
+    resolution: {integrity: sha512-SGd+8+kOXkGJubyn6DUYfZsnEuxGRazfqYPaGfX0x2+AL+AARqqop+gQK/1oe0gcKV8UggdLT3QkjfTDxMWsPg==}
+
   '@libsql/client@0.15.2':
     resolution: {integrity: sha512-D0No4jqDj5I+buvEyFajBugohzJXCBt9aRHCEXGrJS/9obnAO2z18Os3xgyPsWX0Yw4NQfSYaayRdowqkssmXA==}
 
@@ -1306,7 +1348,6 @@ packages:
 
   '@libsql/win32-x64-msvc@0.5.8':
     resolution: {integrity: sha512-8hKczus0swLEvXu8N0znWdyFo5QzFnE9mnz7G/sb+eVn+zpPlT6ZdFHZdhQzev9C0to7kvYDj03qESTUIwDiqg==}
-    cpu: [x64]
     os: [win32]
 
   '@malept/cross-spawn-promise@2.0.0':
@@ -3678,9 +3719,11 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
+  lexical@0.31.1:
+    resolution: {integrity: sha512-uS8yz3Soc+7h80OTXVhFSWflVJR6mqO7XoU8EXImDT1d8u8dVyitlCNs6kCz1HryTevcxHexHgGxf6kUg0IUgQ==}
+
   libsql@0.5.4:
     resolution: {integrity: sha512-GEFeWca4SDAQFxjHWJBE6GK52LEtSskiujbG3rqmmeTO9t4sfSBKIURNLLpKDDF7fb7jmTuuRkDAn9BZGITQNw==}
-    cpu: [x64, arm64, wasm32]
     os: [darwin, linux, win32]
 
   lilconfig@3.1.3:
@@ -6403,6 +6446,59 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
+  '@lexical/clipboard@0.31.1':
+    dependencies:
+      '@lexical/html': 0.31.1
+      '@lexical/list': 0.31.1
+      '@lexical/selection': 0.31.1
+      '@lexical/utils': 0.31.1
+      lexical: 0.31.1
+
+  '@lexical/history@0.31.1':
+    dependencies:
+      '@lexical/utils': 0.31.1
+      lexical: 0.31.1
+
+  '@lexical/html@0.31.1':
+    dependencies:
+      '@lexical/selection': 0.31.1
+      '@lexical/utils': 0.31.1
+      lexical: 0.31.1
+
+  '@lexical/list@0.31.1':
+    dependencies:
+      '@lexical/selection': 0.31.1
+      '@lexical/utils': 0.31.1
+      lexical: 0.31.1
+
+  '@lexical/rich-text@0.31.1':
+    dependencies:
+      '@lexical/clipboard': 0.31.1
+      '@lexical/selection': 0.31.1
+      '@lexical/utils': 0.31.1
+      lexical: 0.31.1
+
+  '@lexical/selection@0.31.1':
+    dependencies:
+      lexical: 0.31.1
+
+  '@lexical/table@0.31.1':
+    dependencies:
+      '@lexical/clipboard': 0.31.1
+      '@lexical/utils': 0.31.1
+      lexical: 0.31.1
+
+  '@lexical/text@0.31.1':
+    dependencies:
+      lexical: 0.31.1
+
+  '@lexical/utils@0.31.1':
+    dependencies:
+      '@lexical/list': 0.31.1
+      '@lexical/selection': 0.31.1
+      '@lexical/table': 0.31.1
+      lexical: 0.31.1
+
   '@libsql/client@0.15.2':
     dependencies:
       '@libsql/core': 0.15.2
@@ -9103,6 +9199,8 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
+
+  lexical@0.31.1: {}
 
   libsql@0.5.4:
     dependencies:

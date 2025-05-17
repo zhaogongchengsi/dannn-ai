@@ -82,6 +82,10 @@
     "npmRebuild": false
   },
   "dependencies": {
+    "@lexical/history": "^0.31.1",
+    "@lexical/rich-text": "^0.31.1",
+    "@lexical/text": "^0.31.1",
+    "@lexical/utils": "^0.31.1",
     "@libsql/client": "^0.15.2",
     "@libsql/win32-x64-msvc": "^0.5.8",
     "@shikijs/markdown-it": "^3.2.1",
@@ -100,6 +104,7 @@
     "fs-extra": "^11.3.0",
     "get-port-please": "^3.1.2",
     "hookable": "^5.5.3",
+    "lexical": "^0.31.1",
     "lodash": "^4.17.21",
     "lowdb": "^7.0.1",
     "lucide-vue-next": "^0.483.0",
