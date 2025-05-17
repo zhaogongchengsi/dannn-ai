@@ -78,8 +78,10 @@ import { Label } from '@/components/ui/label'
                 Or continue with
               </span>
             </div>
-            <Button class="w-full">
-              Only for local use
+            <Button type="button" variant="link" as-child class="w-full">
+              <RouterLink to="/chat">
+                Only for local use
+              </RouterLink>
             </Button>
             <div class="text-center text-sm">
               Don't have an account?

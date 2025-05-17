@@ -85,6 +85,7 @@
 
 :root {
   --app-header-height: 38px;
+  --app-chat-header-height: 56px;
   --app-chat-footer-height: 250px;
   --app-chat-footer-header-height: 50px;
 }

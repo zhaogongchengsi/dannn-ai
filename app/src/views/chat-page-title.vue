@@ -51,8 +51,8 @@ function onAddAiButtonClick() {
 
 <template>
   <Sheet>
-    <SheetTrigger>
-      <button v-if="chatStore.currentChat">
+    <SheetTrigger as-child>
+      <button v-if="chatStore.currentChat" class="px-4 h-full flex items-center">
         <h2 class="font-bold cursor-pointer select-none">
           {{ chatStore.currentChat.title }}
         </h2>

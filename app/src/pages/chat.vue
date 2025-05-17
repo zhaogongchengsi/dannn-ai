@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Toaster } from '@/components/ui/sonner'
 import { useConfig } from '@/composables/config'
 import ChatAdd from '@/views/chat-add.vue'
+import ChatHeader from '@/views/chat-header.vue'
 import { computed } from 'vue'
 
 const config = useConfig()
@@ -32,8 +33,8 @@ const toasterTheme = computed(() => {
 </script>
 
 <template>
-  <div class="flex" style="height: calc(100vh - var(--app-header-height))">
-    <div class="w-64 border-r border-t">
+  <div class="flex h-screen">
+    <div class="w-64 border-r">
       <div class="flex items-center gap-2 justify-end h-14 px-2 border-b">
         <ChatAdd />
       </div>
@@ -49,8 +50,9 @@ const toasterTheme = computed(() => {
       </ul>
     </div>
 
-    <section class="flex-1 h-full relative">
-      <ScrollArea class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-header-height))' }">
+    <section class="flex-1 h-screen relative">
+      <ChatHeader />
+      <ScrollArea class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-chat-header-height))' }">
         <router-view />
       </ScrollArea>
     </section>

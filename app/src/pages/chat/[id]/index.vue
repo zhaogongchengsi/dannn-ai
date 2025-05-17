@@ -7,9 +7,9 @@ import ChatPageContent from '@/views/chat-page-content.vue'
 </script>
 
 <template>
-  <div class="flex flex-col w-full border-t" style="height: calc(100vh - var(--app-header-height))">
+  <div class="flex flex-col w-full" style="height: calc(100vh - var(--app-chat-header-height))">
     <div
-      style="height: calc(100vh - var(--app-header-height) - var(--app-chat-footer-height) - 2px)"
+      style="height: calc(100vh - var(--app-chat-header-height) - var(--app-chat-footer-height) - 2px)"
       class="overflow-y-auto"
     >
       <PatternBackground
