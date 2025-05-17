@@ -2,8 +2,8 @@ import EventEmitter from 'node:events'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
+import logo from 'public/icon_256X256.png'
 import { isMacOS } from 'std-env'
-import logo from '../../public/icon_256X256.png'
 import { logger } from './logger'
 
 const _dirname = dirname(fileURLToPath(import.meta.url))

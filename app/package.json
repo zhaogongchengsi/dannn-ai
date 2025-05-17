@@ -31,7 +31,8 @@
       "alias": {
         "base": "./base",
         "common": "./common",
-        "main": "./main"
+        "main": "./main",
+        "public": "./public"
       },
       "outdir": "./dannn_dist"
     }
