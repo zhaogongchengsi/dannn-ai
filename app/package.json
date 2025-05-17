@@ -39,7 +39,8 @@
   "build": {
     "files": [
       "dannn_dist/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "public/**/*"
     ],
     "directories": {
       "buildResources": "./public"
