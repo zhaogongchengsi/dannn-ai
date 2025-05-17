@@ -10,7 +10,13 @@ const virtEl = useTemplateRef('virtEl')
 const chatStore = useChatStore()
 const { height } = useElementSize(el)
 
+const route = useRoute<'/chat/[id]/'>()
+
 watchOnce(() => virtEl.value, () => {
+  virtEl.value?.scrollToBottom()
+})
+
+watch(() => route.params.id, () => {
   virtEl.value?.scrollToBottom()
 })
 </script>
