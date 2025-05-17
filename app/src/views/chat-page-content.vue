@@ -17,7 +17,7 @@ watchOnce(() => virtEl.value, () => {
 
 <template>
   <div ref="el" class="h-full w-full">
-    <VirtList ref="virtEl" item-key="id" :list="chatStore.currentChatMessage" :style="{ height: `${height}px` }" :min-size="20">
+    <VirtList ref="virtEl" class="custom-scrollbar" item-key="id" :list="chatStore.currentChatMessage" :style="{ height: `${height}px` }" :min-size="20">
       <template #default="{ itemData, index }">
         <ChatMessageRow :message="itemData" :index="index" />
       </template>

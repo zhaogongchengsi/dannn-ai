@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Toaster } from '@/components/ui/sonner'
 import { useConfig } from '@/composables/config'
 import ChatAdd from '@/views/chat-add.vue'
+import ChatAvatar from '@/views/chat-avatar.vue'
 import ChatHeader from '@/views/chat-header.vue'
 import { computed } from 'vue'
 
@@ -39,12 +40,14 @@ const toasterTheme = computed(() => {
         <ChatAdd />
       </div>
       <ul class="py-3">
-        <li v-for="chat in chatStore.rooms" :key="chat.id" class="w-full h-10">
+        <li v-for="chat in chatStore.rooms" :key="chat.id" class="w-full">
           <RouterLink
-            :to="`/chat/${chat.id}/`" class="flex p-1 items-center size-full"
-            active-class="bg-blue-500 text-white font-bold"
+            :to="`/chat/${chat.id}/`"
+            class="flex p-1 items-center gap-2 size-full"
+            active-class="bg-sidebar-accent text-sidebar-accent-foreground"
           >
-            {{ chat.title }}
+            <ChatAvatar :chat="chat" />
+            <span>{{ chat.title }}</span>
           </RouterLink>
         </li>
       </ul>

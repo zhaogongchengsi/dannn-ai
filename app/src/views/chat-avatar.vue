@@ -1,21 +1,22 @@
 <script setup lang='ts'>
+import type { RoomData } from 'common/types'
+import defaultAvatar from '@/assets/default-avatar.png'
+import AvatarGroup from '@/components/avatar/avatar-group.vue'
+
 const props = defineProps<{
-  src: string
-  alt?: string
+  chat?: RoomData
 }>()
 
-const isSvgHtml = computed(() => {
-  return props.src.startsWith('<svg')
-})
-
-const isUri = computed(() => {
-  return ['file:', 'http:', 'https:'].some(item => props.src.startsWith(item))
+const src = computed(() => {
+  if (!props.chat || !props.chat.participant || props.chat.participant.length === 0) {
+    return [defaultAvatar]
+  }
+  return props.chat.participant.map(a => a.avatar!).filter(Boolean)
 })
 </script>
 
 <template>
   <div>
-    <img v-if="isUri && !isSvgHtml" :src="src" :alt="alt" class="w-8 h-8 rounded-full">
-    <div v-else class="w-8 h-8 rounded-full" v-html="src" />
+    <AvatarGroup :src="src" />
   </div>
 </template>

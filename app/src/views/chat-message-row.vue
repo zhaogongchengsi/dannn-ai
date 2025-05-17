@@ -1,10 +1,10 @@
 <script setup lang='ts'>
 import type { InfoMessage } from 'common/types'
+import Avatar from '@/components/avatar/avatar.vue'
 import { vHtmlLazy } from '@/directives/v-html-lazy'
 import { markdownToHtml } from '@/lib/shiki'
 import { useDateFormat } from '@vueuse/core'
 import { computed } from 'vue'
-import ChatAvatar from './chat-avatar.vue'
 
 defineOptions({
   name: 'ChatMessageRow',
@@ -46,10 +46,10 @@ const content = computed(() => {
 
 <template>
   <div class="w-full py-3 px-2" :class="{ 'flex gap-3': isAiSender }">
-    <div v-if="isAiSender">
-      <ChatAvatar :src="aiAvatar" alt="AI" class="w-8 h-8 rounded-full" />
+    <div v-if="isAiSender" class="shrink-0">
+      <Avatar class="size-8" :src="aiAvatar" />
     </div>
-    <div class="w-4/5 p-2 bg-zinc-100 dark:bg-zinc-800 rounded-sm" :class="{ 'ml-auto': isUserSender }">
+    <div class="w-3/5 p-2 bg-zinc-100 dark:bg-zinc-800 rounded-sm" :class="{ 'ml-auto': isUserSender }">
       <div class="flex mb-3" :class="{ 'flex-row-reverse': isUserSender }">
         <div class="prose dark:prose-invert max-w-[90%]" v-html="content" />
       </div>
