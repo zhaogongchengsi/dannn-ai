@@ -17,6 +17,7 @@
     "run": "electron .",
     "start": "pnpm run dev:app && pnpm run run",
     "package": "electron-builder -w",
+    "release": "npm run build && electron-builder -w",
     "lint": "eslint . --fix",
     "test": "vitest",
     "gen": "drizzle-kit generate",
