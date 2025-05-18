@@ -1,26 +1,46 @@
-import type { AIData } from 'common/types'
+import type { AIData, InfoMessage, RoomData } from 'common/types'
 import type { OpenAI } from 'openai'
 import type { QuestionMessageMeta } from './api/message'
 import { omit } from 'lodash'
 import { Subject } from 'rxjs'
 import { onQuestionWithAiId, sendTextAnswer } from './api/message'
+import { getRoomContextMessages, getRoomById } from './api/room'
 
 export type UserMessage = Omit<QuestionMessageMeta, 'roomParticipants'>
+
+export interface ContextMessage {
+  role: 'user' | 'assistant' | 'system'
+  content: string
+}
 
 export class AI {
   private readonly _config: AIData
   private readonly subject = new Subject<QuestionEvent>()
+  private maxContextMessages: number
+  private maxContextMessagesInitialized = false // 新增标志
 
   constructor(config: AIData) {
     this._config = config
+    this.maxContextMessages = 0
     this.bindEvents()
   }
 
   private bindEvents() {
-    onQuestionWithAiId(this.id, (message) => {
+    onQuestionWithAiId(this.id, async (message) => {
       const userMessage = omit(message, ['roomParticipants'])
-      this.subject.next(new QuestionEvent(this, userMessage))
+      const ctxMessages = await getRoomContextMessages(message.roomId)
+      const room = (await getRoomById(message.roomId))!
+      if (!this.maxContextMessagesInitialized) {
+        this.maxContextMessages = room.maxContextMessages || 5
+        this.maxContextMessagesInitialized = true
+      }
+      room.maxContextMessages = this.maxContextMessages
+      this.subject.next(new QuestionEvent(this, room, userMessage, ctxMessages))
     })
+  }
+
+  setMaxContextMessages(maxContextMessages: number) {
+    this.maxContextMessages = maxContextMessages
   }
 
   onQuestion(callback: (message: QuestionEvent) => void) {
@@ -43,13 +63,22 @@ export class AI {
 
 class QuestionEvent {
   ai: AI
+  _room: RoomData
   question: UserMessage
+  ctxMessages: InfoMessage[]
+  _maxContextMessages: number
+
   constructor(
     ai: AI,
+    room: RoomData,
     question: UserMessage,
+    ctxMessages: InfoMessage[] = [],
   ) {
     this.ai = ai
+    this._room = room
+    this._maxContextMessages = room.maxContextMessages
     this.question = question
+    this.ctxMessages = ctxMessages
   }
 
   async reply(content: string) {
@@ -62,6 +91,9 @@ class QuestionEvent {
       type: 'text',
       aiId: this.ai.id,
     })
+    .finally(() => {
+      this._maxContextMessages--
+    })
   }
 
   async sendOpenAIStream(contentStream: AsyncIterable<OpenAI.ChatCompletionChunk>) {
@@ -73,7 +105,7 @@ class QuestionEvent {
       if (!contentStream) {
         reject(new Error('Stream content cannot be empty'))
       }
-      ;(async () => {
+      ; (async () => {
         let index = 0
         for await (const chunk of contentStream) {
           const content = chunk.choices?.[0]?.delta?.content
@@ -91,6 +123,9 @@ class QuestionEvent {
           })
         }
       })().then(resolve).catch(reject)
+        .finally(() => {
+          this._maxContextMessages--
+        })
     })
   }
 
@@ -125,6 +160,22 @@ class QuestionEvent {
 
   get content() {
     return this.question.content
+  }
+
+  get room() {
+    return this._room
+  }
+
+  get maxContextMessages() {
+    return this._maxContextMessages
+  }
+
+  get contextMessage(): ContextMessage[] {
+    const list = this.ctxMessages.map((message) => ({
+      role: message.senderType === 'ai' ? 'assistant' : 'user',
+      content: message.content,
+    } as ContextMessage))
+    return list
   }
 
   get roomId() {

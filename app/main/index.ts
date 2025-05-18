@@ -42,6 +42,8 @@ async function bootstrap() {
     random: true,
   })
 
+  logger.info('Port:', port)
+
   process.env.PORT = String(port)
 
   const server = createServer(port)

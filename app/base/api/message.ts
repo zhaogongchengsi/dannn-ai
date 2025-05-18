@@ -28,6 +28,7 @@ export interface AiMessageData {
 
 export type QuestionMessageMeta = InfoMessage & {
   roomParticipants: number[]
+  roomId: number
 }
 
 const questionMessageSubject$ = new Subject<QuestionMessageMeta>()
@@ -64,6 +65,7 @@ export async function sendQuestion(message: Question) {
   client.socket.emit(ChannelEvent.question, {
     ...questionMessage,
     roomParticipants: message.roomParticipants,
+    roomId: message.roomId,
   })
   client.socket.emit(ChannelEvent.all, questionMessage)
   allMessagesSubject$.next(questionMessage)

@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import lodash from 'lodash'
 import { db } from '../db'
 import { ais, chatParticipants, messages, rooms } from '../schema'
+import { InfoMessage, getAiMessagesByCount } from './message'
 
 export type InfoRoom = typeof rooms.$inferSelect
 
@@ -113,4 +114,14 @@ export async function addAiToRoom(roomId: number, aiId: number) {
     roomId,
     aiId: aiExists.id,
   }).returning().get()
+}
+
+export async function getRoomContextMessages(roomId: number) :Promise<InfoMessage[]> {
+  const room = await getRoomById(roomId)
+
+  if (!room) {
+    throw new Error(`Room with id ${roomId} does not exist`)
+  }
+
+  return getAiMessagesByCount(roomId, room.maxContextMessages)
 }

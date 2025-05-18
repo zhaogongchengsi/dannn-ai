@@ -61,7 +61,6 @@ export async function createQuestion(question: Question): Promise<InfoMessage> {
       streamIndex: null,
       functionCall: null,
       functionResponse: null,
-      // 默认不需要添加到上下文中
       isInContext: 0,
     }
 
@@ -127,7 +126,6 @@ export async function createAiAnswer(answer: Answer): Promise<InfoMessage> {
       streamIndex: answer.streamIndex || null,
       functionCall: null,
       functionResponse: null,
-      // 默认不需要添加到上下文中
       isInContext: 0,
     }
 
@@ -206,8 +204,8 @@ export async function getAiMessagesByCount(
   return await db
     .select()
     .from(messages)
-    .where(and(eq(messages.roomId, roomId), eq(messages.senderType, 'ai')))
     .orderBy(order)
+    .where(and(eq(messages.roomId, roomId), eq(messages.isInContext, 1)))
     .limit(countNum)
     .all()
 }

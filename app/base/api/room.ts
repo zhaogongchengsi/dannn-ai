@@ -1,4 +1,4 @@
-import type { RoomData } from '../../common/types'
+import type { InfoMessage, RoomData } from 'common/types'
 import { filter, Subject } from 'rxjs'
 import { RoomEvent } from '../../common/event'
 import { BaseClient } from './client'
@@ -37,6 +37,10 @@ export async function getAllRooms(): Promise<RoomData[]> {
   return rooms
 }
 
+export async function getRoomById(id: number): Promise<RoomData | undefined> {
+  return await client.trpc.room.getRoomById.query({roomId: id})
+}
+
 export async function setAiToRoom(roomId: number, aiId: number): Promise<JoinAIToRoom> {
   const data = await client.trpc.room.addAiToRoom.mutate({ roomId, aiId })
   client.socket.emit(RoomEvent.addAi, data)
@@ -56,4 +60,8 @@ export function onAIJoinedWithRoomId(roomId: number, callback: (r: JoinAIToRoom)
 export function onRoomCreated(callback: (room: Omit<RoomData, 'participant'>) => void) {
   const subscription = roomCreated$.subscribe(callback)
   return () => subscription.unsubscribe()
+}
+
+export function getRoomContextMessages(roomId: number): Promise<InfoMessage[]> {
+  return client.trpc.room.getRoomContextMessages.query({ roomId })
 }

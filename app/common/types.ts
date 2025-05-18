@@ -19,6 +19,7 @@ export interface RoomData {
   isPinned: number
   isArchived: number
   participant: AIData[]
+  maxContextMessages: number
 }
 
 export interface AIData {
@@ -77,6 +78,5 @@ export interface InfoMessage {
   streamGroupId: string | null
   streamIndex: number | null
   functionCall: string | null
-  // 是否添加到上下文中
   isInContext: number | null
 }

@@ -1,6 +1,6 @@
 import type { AIData } from 'common/types'
 import { z } from 'zod'
-import { addAiToRoom, getAllRooms, getRoomParticipants, insertRoom } from '../../database/service/room'
+import { addAiToRoom, getAllRooms, getRoomParticipants, insertRoom, getRoomContextMessages, getRoomById } from '../../database/service/room'
 import { publicProcedure, router } from '../trpc'
 
 export const roomRouter = router({
@@ -34,4 +34,15 @@ export const roomRouter = router({
   ).query(async ({ input }): Promise<AIData[]> => {
     return await getRoomParticipants(input)
   }),
+  getRoomContextMessages: publicProcedure.input(z.object({
+    roomId: z.number(),
+  }),).query(async ({ input }) => {
+    const roomId = input.roomId
+    return await getRoomContextMessages(roomId)
+  }),
+  getRoomById: publicProcedure.input(z.object({
+    roomId: z.number(),
+  }),).query(async ({ input }) => {
+    return await getRoomById(input.roomId)
+  })
 })

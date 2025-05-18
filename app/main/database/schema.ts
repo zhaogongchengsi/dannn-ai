@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import { int, integer, primaryKey, sqliteTable as table, text } from 'drizzle-orm/sqlite-core'
 
 export const ais = table('ais', {
@@ -62,6 +63,10 @@ export const chatParticipants = table(
   ],
 )
 
+export const contextMessageRelations = relations(rooms, ({ many }) => ({
+  messages: many(messages), // 一对多
+}));
+
 export const messages = table('messages', {
   id: text('id').primaryKey(),
 
@@ -94,6 +99,5 @@ export const messages = table('messages', {
   functionCall: text('function_call'),
   functionResponse: text('function_response'),
 
-  // 确定是否需要添加到上下文中
-  isInContext: int('is_in_context').default(0),
+  isInContext: integer('is_in_context').notNull().default(0), // 是否在上下文中
 })

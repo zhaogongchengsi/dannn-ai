@@ -30,7 +30,7 @@ defineExtension(async (ctx) => {
 	ai.onQuestion(async (event) => {
 		const completion = await client.chat.completions.create({
 			messages: [
-				// { role: "system", content: "You are a helpful assistant." },
+				...event.contextMessage,
 				{ role: "user", content: event.content }
 			],
 			model: "deepseek-chat",
