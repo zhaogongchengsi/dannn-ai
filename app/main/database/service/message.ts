@@ -1,6 +1,6 @@
 import type { Answer, Question } from 'common/schema'
 import { randomUUID } from 'node:crypto'
-import { count, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 import { db } from '../db'
 import { messages, rooms } from '../schema'
 
@@ -61,6 +61,8 @@ export async function createQuestion(question: Question): Promise<InfoMessage> {
       streamIndex: null,
       functionCall: null,
       functionResponse: null,
+      // 默认不需要添加到上下文中
+      isInContext: 0,
     }
 
     return await tx.insert(messages).values(message).returning().get()
@@ -125,6 +127,8 @@ export async function createAiAnswer(answer: Answer): Promise<InfoMessage> {
       streamIndex: answer.streamIndex || null,
       functionCall: null,
       functionResponse: null,
+      // 默认不需要添加到上下文中
+      isInContext: 0,
     }
 
     return await tx.insert(messages).values(message).returning().get()
@@ -191,4 +195,19 @@ export async function getMessagesByPageDesc(
 
 export async function clearAllMessages(): Promise<void> {
   await db.delete(messages).execute()
+}
+
+export async function getAiMessagesByCount(
+  roomId: number,
+  countNum: number,
+  direction: 'asc' | 'desc' = 'desc',
+): Promise<InfoMessage[]> {
+  const order = direction === 'asc' ? messages.sortBy : desc(messages.sortBy)
+  return await db
+    .select()
+    .from(messages)
+    .where(and(eq(messages.roomId, roomId), eq(messages.senderType, 'ai')))
+    .orderBy(order)
+    .limit(countNum)
+    .all()
 }

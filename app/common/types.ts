@@ -77,4 +77,6 @@ export interface InfoMessage {
   streamGroupId: string | null
   streamIndex: number | null
   functionCall: string | null
+  // 是否添加到上下文中
+  isInContext: number | null
 }

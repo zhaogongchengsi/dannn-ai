@@ -44,6 +44,10 @@ export const rooms = table('rooms', {
   isPinned: int('is_pinned').notNull(),
   isArchived: int('is_archived').notNull(),
   lastMessage: integer('last_message_at').default(0), // 最后消息 id
+  // 最大设置的上下文消息数量
+  maxContextMessages: int('max_context_messages').notNull().default(3),
+  // 多少轮聊天后提示词会被重新加入到上下文中
+  memoryInterval: int('memory_interval').notNull().default(15), // 每隔多少轮将提示词加入对话，0 表示不自动加入
 })
 
 // // 在 chat_participants 中建立 AI 和 chat 的关联
@@ -89,4 +93,7 @@ export const messages = table('messages', {
   // 扩展结构化回复（可选）
   functionCall: text('function_call'),
   functionResponse: text('function_response'),
+
+  // 确定是否需要添加到上下文中
+  isInContext: int('is_in_context').default(0),
 })
