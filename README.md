@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/icon_128x128.png" alt="Dannn AI Logo" width="120" />
+  <img src="./app/public/icon_128x128.png" alt="Dannn AI Logo" width="120" />
 </p>
 
 # Dannn AI
