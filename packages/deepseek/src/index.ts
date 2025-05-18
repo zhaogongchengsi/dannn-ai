@@ -29,22 +29,17 @@ defineExtension(async (ctx) => {
 
 	ai.onQuestion(async (event) => {
 		event.thinking()
-
-		console.log(event.contextMessage)
-
-		setTimeout(() => {
+		const completion = await client.chat.completions.create({
+			messages: [
+				...event.contextMessage,
+				{ role: "user", content: event.content }
+			],
+			model: "deepseek-chat",
+			stream: true,
+		})
+		.finally(() => {
 			event.endThink()
-		}, 3000)
-		
-		// const completion = await client.chat.completions.create({
-		// 	messages: [
-		// 		...event.contextMessage,
-		// 		{ role: "user", content: event.content }
-		// 	],
-		// 	model: "deepseek-chat",
-		// 	stream: true,
-		// })
-
-		// event.sendOpenAIStream(completion)
+		})
+		event.sendOpenAIStream(completion)
 	})
 })

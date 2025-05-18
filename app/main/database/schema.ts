@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations } from 'drizzle-orm'
 import { int, integer, primaryKey, sqliteTable as table, text } from 'drizzle-orm/sqlite-core'
 
 export const ais = table('ais', {
@@ -62,10 +62,6 @@ export const chatParticipants = table(
     primaryKey({ columns: [table.aiId, table.roomId] }),
   ],
 )
-
-export const contextMessageRelations = relations(rooms, ({ many }) => ({
-  messages: many(messages), // 一对多
-}));
 
 export const messages = table('messages', {
   id: text('id').primaryKey(),

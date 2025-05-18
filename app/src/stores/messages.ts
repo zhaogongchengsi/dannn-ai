@@ -1,14 +1,13 @@
 import type { InfoMessage } from 'common/types'
 import { getMessagesByPage, onAllMessages } from 'base/api/message'
-import { getAllRooms, onAiEndThink, onAiThinking } from 'base/api/room'
-import { sortBy } from 'lodash'
+import { getAllRooms, onAiEndThink, onAiThinking, updateAIMessageContextFalse, updateAIMessageContextTrue } from 'base/api/room'
 
-export interface MessageItem extends InfoMessage {
-  contentList: InfoMessage[]
+export interface ThinkingMessage extends InfoMessage {
+  type: 'thinking'
 }
 
 export interface MessageNode {
-  messages: MessageItem[]
+  messages: (InfoMessage | ThinkingMessage)[]
   page: number
   pageSize: number
   total: number
@@ -28,60 +27,17 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   }
 
   const sortMessages = (messageList: InfoMessage[]) => {
-    return sortBy(messageList, (message) => {
-      return message.sortBy
+    return messageList.sort((a, b) => {
+      return a.sortBy - b.sortBy
     })
   }
 
-  function mergeStreamingMessages(messages: InfoMessage[]): MessageItem[] {
-    // 按 streamGroupId 分组
-    const groupedMessages = messages.reduce((groups, message) => {
-      if (message.isStreaming && message.streamGroupId) {
-        if (!groups[message.streamGroupId]) {
-          groups[message.streamGroupId] = []
-        }
-        groups[message.streamGroupId].push(message)
-      }
-      else {
-        // 非流式消息直接放入一个特殊组
-        if (!groups['non-streaming']) {
-          groups['non-streaming'] = []
-        }
-        groups['non-streaming'].push(message)
-      }
-      return groups
-    }, {} as Record<string, InfoMessage[]>)
-
-    const mergedMessages: MessageItem[] = []
-
-    // 合并流式消息
-    for (const [groupId, groupMessages] of Object.entries(groupedMessages)) {
-      if (groupId === 'non-streaming') {
-        // 非流式消息直接加入结果
-        mergedMessages.push(...groupMessages.map(message => ({ ...message, contentList: [message] })))
-      }
-      else {
-        // 按 streamIndex 排序
-        const sortedMessages = groupMessages.sort((a, b) => (a.streamIndex ?? 0) - (b.streamIndex ?? 0))
-
-        mergedMessages.push({
-          ...sortedMessages[0],
-          content: sortedMessages.map(message => message.content).join(''), // 合并内容
-          contentList: groupMessages,
-        })
-      }
-    }
-
-    return mergedMessages
-  }
-
-  function addMessagesByRoomId(roomId: RoomID, messageList: InfoMessage[], options: { page?: number, pageSize?: number, total?: number } = {}) {
+  function addMessagesByRoomId(roomId: RoomID, messageList: (InfoMessage | ThinkingMessage)[], options: { page?: number, pageSize?: number, total?: number } = {}) {
     const messageNode = messages.get(roomId)
     const sortMessagesList = sortMessages(messageList)
-    const mergedMessages = mergeStreamingMessages(sortMessagesList)
 
     if (messageNode) {
-      function upsertMessage(newMessage: MessageItem) {
+      function upsertMessage(newMessage: InfoMessage) {
         const existingMessageIndex = messageNode!.messages.findLastIndex(msg => msg.id === newMessage.id)
         if (existingMessageIndex !== -1) {
           messageNode!.messages = [
@@ -96,34 +52,83 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
         messageNode!.total = messageNode!.messages.length
       }
 
-      mergedMessages.forEach((message) => {
-        if (message.isStreaming) {
-          const existingMessage = messageNode.messages.findLast(msg => msg.streamGroupId === message.streamGroupId)
-          if (existingMessage) {
-            const streamMessageList = sortBy(existingMessage.contentList.concat([message]), (message) => {
-              return message.streamGroupId
-            })
-            existingMessage.content = streamMessageList.map(message => message.content).join('')
-            upsertMessage(existingMessage)
-          }
-          else {
-            upsertMessage(message)
-          }
-        }
-        else {
-          upsertMessage(message)
-        }
+      sortMessagesList.forEach((message) => {
+        upsertMessage(message)
       })
     }
     else {
       messages.set(roomId, {
-        messages: mergedMessages,
+        messages: sortMessagesList,
         page: PAGE,
         pageSize: PAGE_SIZE,
-        total: mergedMessages.length,
+        total: sortMessagesList.length,
         loading: false,
         ...options,
       })
+    }
+  }
+
+  function deleteMessagesByRoomId(roomId: RoomID, messageId: string) {
+    const messageNode = messages.get(roomId)
+    if (messageNode) {
+      messageNode.messages = messageNode.messages.filter(
+        msg => !(msg.id === messageId),
+      )
+      messageNode.total = messageNode.messages.length
+    }
+  }
+
+  function addThinkingMessagesByRoomId(roomId: RoomID, aiId: number) {
+    const messageNode = messages.get(roomId)
+
+    if (messageNode) {
+      const lastMessage = messageNode.messages.at(-1)
+      const message: ThinkingMessage = {
+        type: 'thinking',
+        status: null,
+        id: `${roomId}-${aiId}`,
+        content: '思考中...',
+        messageType: 'text',
+        sortBy: lastMessage?.sortBy ? lastMessage.sortBy + 1 : 0,
+        createdAt: new Date().toISOString(),
+        functionResponse: null,
+        roomId,
+        reference: null,
+        senderType: 'ai',
+        senderId: aiId,
+        parentId: null,
+        meta: null,
+        isAIAutoChat: 0,
+        isStreaming: 0,
+        streamGroupId: null,
+        streamIndex: null,
+        functionCall: null,
+        isInContext: null,
+      }
+
+      addMessagesByRoomId(roomId, [message])
+    }
+  }
+
+  async function updateMessageContextTrue(roomId: number, messageId: string) {
+    const messageNode = messages.get(roomId)
+    await updateAIMessageContextTrue(messageId)
+    if (messageNode) {
+      const message = messageNode.messages.find(msg => msg.id === messageId)
+      if (message) {
+        message.isInContext = 1
+      }
+    }
+  }
+
+  async function updateMessageContextFalse(roomId: number, messageId: string) {
+    const messageNode = messages.get(roomId)
+    await updateAIMessageContextFalse(messageId)
+    if (messageNode) {
+      const message = messageNode.messages.find(msg => msg.id === messageId)
+      if (message) {
+        message.isInContext = 0
+      }
     }
   }
 
@@ -147,23 +152,26 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   }
 
   onAiThinking((data) => {
-    console.log('onAiThinking', data)
+    addThinkingMessagesByRoomId(data.roomId, data.aiId)
   })
 
   onAiEndThink((data) => {
-    console.log('onAiEndThink', data)
+    const messageNode = messages.get(data.roomId)
+    if (messageNode) {
+      deleteMessagesByRoomId(data.roomId, `${data.roomId}-${data.aiId}`)
+    }
   })
 
   onAllMessages((message: InfoMessage) => {
     addMessagesByRoomId(message.roomId, [message])
   })
 
-  console.log('init messages store')
-
   init()
 
   return {
     messages,
     findMessagesByRoomId,
+    updateMessageContextTrue,
+    updateMessageContextFalse,
   }
 })

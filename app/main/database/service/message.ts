@@ -209,3 +209,29 @@ export async function getAiMessagesByCount(
     .limit(countNum)
     .all()
 }
+
+export async function updateAIMessageContextTrue(
+  messageId: string,
+): Promise<InfoMessage> {
+  const updatedMessages = await db
+    .update(messages)
+    .set({ isInContext: 1, updatedAt: new Date().toISOString() })
+    .where(eq(messages.id, messageId))
+    .returning()
+    .get()
+
+  return updatedMessages
+}
+
+export async function updateAIMessageContextFalse(
+  messageId: string,
+): Promise<InfoMessage> {
+  const updatedMessages = await db
+    .update(messages)
+    .set({ isInContext: 0, updatedAt: new Date().toISOString() })
+    .where(eq(messages.id, messageId))
+    .returning()
+    .get()
+
+  return updatedMessages
+}

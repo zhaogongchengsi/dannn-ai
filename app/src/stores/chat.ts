@@ -6,7 +6,6 @@ import { defineStore } from 'pinia'
 export const useChatStore = defineStore('dannn-chat', () => {
   const rooms = reactive<RoomData[]>([])
   const currentChatID = ref<number | null>(null)
-  const thinking = reactive<Map<number, number[]>>(new Map())
   const aiStore = useAIStore()
   const messages = useMessagesStore()
 

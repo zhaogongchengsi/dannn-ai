@@ -2,7 +2,6 @@ import type { InfoMessage, RoomData } from 'common/types'
 import { filter, Subject } from 'rxjs'
 import { RoomEvent } from '../../common/event'
 import { BaseClient } from './client'
-import { generateRandomString } from 'base/utils'
 
 export interface CreateRoomOptions {
   title: string
@@ -43,13 +42,11 @@ client.socket.on(RoomEvent.addAi, (data: JoinAIToRoom) => {
 })
 
 export function onAiThinking(callback: (data: thinkingPreload) => void) {
-  console.log('onAiThinking')
   const subscription = thinking$.subscribe(callback)
   return () => subscription.unsubscribe()
 }
 
 export function onAiEndThink(callback: (data: thinkingPreload) => void) {
-  console.log('onAiEndThink')
   const subscription = endThink$.subscribe(callback)
   return () => subscription.unsubscribe()
 }
@@ -74,7 +71,7 @@ export async function getAllRooms(): Promise<RoomData[]> {
 }
 
 export async function getRoomById(id: number): Promise<RoomData | undefined> {
-  return await client.trpc.room.getRoomById.query({roomId: id})
+  return await client.trpc.room.getRoomById.query({ roomId: id })
 }
 
 export async function setAiToRoom(roomId: number, aiId: number): Promise<JoinAIToRoom> {
@@ -100,4 +97,12 @@ export function onRoomCreated(callback: (room: Omit<RoomData, 'participant'>) =>
 
 export function getRoomContextMessages(roomId: number): Promise<InfoMessage[]> {
   return client.trpc.room.getRoomContextMessages.query({ roomId })
+}
+
+export function updateAIMessageContextFalse(messageId: string): Promise<InfoMessage> {
+  return client.trpc.room.updateAIMessageContextFalse.mutate({ messageId })
+}
+
+export function updateAIMessageContextTrue(messageId: string): Promise<InfoMessage> {
+  return client.trpc.room.updateAIMessageContextTrue.mutate({ messageId })
 }

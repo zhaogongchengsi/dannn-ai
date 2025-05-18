@@ -1,9 +1,10 @@
 import type { AIData, MakeFieldsOptional, RoomData } from '../../../common/types'
+import type { InfoMessage } from './message'
 import { eq } from 'drizzle-orm'
 import lodash from 'lodash'
 import { db } from '../db'
 import { ais, chatParticipants, messages, rooms } from '../schema'
-import { InfoMessage, getAiMessagesByCount } from './message'
+import { getAiMessagesByCount } from './message'
 
 export type InfoRoom = typeof rooms.$inferSelect
 
@@ -116,7 +117,7 @@ export async function addAiToRoom(roomId: number, aiId: number) {
   }).returning().get()
 }
 
-export async function getRoomContextMessages(roomId: number) :Promise<InfoMessage[]> {
+export async function getRoomContextMessages(roomId: number): Promise<InfoMessage[]> {
   const room = await getRoomById(roomId)
 
   if (!room) {

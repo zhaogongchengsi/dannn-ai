@@ -1,19 +1,26 @@
 <script setup lang='ts'>
 import type { InfoMessage } from 'common/types'
 import Avatar from '@/components/avatar/avatar.vue'
-import { vHtmlLazy } from '@/directives/v-html-lazy'
+import {
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu'
 import { markdownToHtml } from '@/lib/shiki'
 import { useDateFormat } from '@vueuse/core'
+import { CheckCheck, Loader } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 defineOptions({
   name: 'ChatMessageRow',
-  directives: {
-    htmlLazy: vHtmlLazy,
-  },
 })
 
 const props = defineProps<{ message: InfoMessage, index: number }>()
+const emit = defineEmits<{
+  (e: 'updateInContext', roomId: number, id: string, value: boolean): void
+}>()
 const formatted = useDateFormat(new Date(props.message.createdAt), 'YYYY-MM-DD HH:mm (ddd)')
 
 const aiStore = useAIStore()
@@ -30,6 +37,10 @@ const aiAvatar = computed(() => {
   return avatar
 })
 
+const isAIThinkingMessage = computed(() => {
+  return (props.message as any)?.type === 'thinking'
+})
+
 // 是否是用户发送的消息
 const isUserSender = computed(() => {
   return props.message.senderType === 'human'
@@ -39,10 +50,21 @@ const isAiSender = computed(() => {
   return props.message.senderType === 'ai'
 })
 
+const inContext = computed(() => {
+  return props.message.isInContext === 1
+})
+
 const content = computed(() => {
   const message = props.message
   return markdownToHtml(message.content, config.mode.value === 'dark' ? 'vitesse-dark' : 'vitesse-light')
 })
+
+function updateInContext(value: boolean) {
+  if (isAIThinkingMessage.value) {
+    return
+  }
+  emit('updateInContext', props.message.roomId, props.message.id, value)
+}
 </script>
 
 <template>
@@ -50,14 +72,32 @@ const content = computed(() => {
     <div v-if="isAiSender" class="shrink-0">
       <Avatar class="size-8" :src="aiAvatar" />
     </div>
-    <div class="w-3/5 p-2 bg-zinc-100 dark:bg-zinc-800 rounded-sm" :class="{ 'ml-auto': isUserSender }">
-      <div class="flex mb-3" :class="{ 'flex-row-reverse': isUserSender }">
-        <div class="prose dark:prose-invert max-w-[90%]" v-html="content" />
+    <ContextMenu as-child>
+      <div class="w-3/5 p-2 bg-zinc-100 dark:bg-zinc-800 rounded-sm" :class="{ 'ml-auto': isUserSender }">
+        <ContextMenuTrigger as-child>
+          <div>
+            <div class="flex mb-3" :class="{ 'flex-row-reverse': isUserSender }">
+              <div v-if="isAIThinkingMessage">
+                <Loader :size="24" class="animate-spin" />
+              </div>
+              <div v-else class="prose dark:prose-invert max-w-[90%]" v-html="content" />
+            </div>
+            <div class="flex justify-between items-center" :class="{ 'flex-row-reverse': isUserSender }">
+              <p>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ isUserSender ? '我' : 'AI' }}</span>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400 mx-2">{{ formatted }}</span>
+              </p>
+              <CheckCheck v-if="inContext" class="text-zinc-500" :size="20" />
+            </div>
+          </div>
+        </ContextMenuTrigger>
       </div>
-      <div class="flex" :class="{ 'flex-row-reverse': isUserSender }">
-        <span class="text-sm text-zinc-500 dark:text-zinc-400">{{ isUserSender ? '我' : 'AI' }}</span>
-        <span class="text-sm text-zinc-500 dark:text-zinc-400 mx-2">{{ formatted }}</span>
-      </div>
-    </div>
+      <ContextMenuContent>
+        <ContextMenuCheckboxItem :model-value="message.isInContext === 1" @update:model-value="updateInContext">
+          添加到上下文
+        </ContextMenuCheckboxItem>
+        <ContextMenuItem>Copy</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   </div>
 </template>

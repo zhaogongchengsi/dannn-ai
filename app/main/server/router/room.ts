@@ -1,6 +1,7 @@
 import type { AIData } from 'common/types'
 import { z } from 'zod'
-import { addAiToRoom, getAllRooms, getRoomParticipants, insertRoom, getRoomContextMessages, getRoomById } from '../../database/service/room'
+import { updateAIMessageContextFalse, updateAIMessageContextTrue } from '../../database/service/message'
+import { addAiToRoom, getAllRooms, getRoomById, getRoomContextMessages, getRoomParticipants, insertRoom } from '../../database/service/room'
 import { publicProcedure, router } from '../trpc'
 
 export const roomRouter = router({
@@ -36,13 +37,25 @@ export const roomRouter = router({
   }),
   getRoomContextMessages: publicProcedure.input(z.object({
     roomId: z.number(),
-  }),).query(async ({ input }) => {
+  })).query(async ({ input }) => {
     const roomId = input.roomId
     return await getRoomContextMessages(roomId)
   }),
   getRoomById: publicProcedure.input(z.object({
     roomId: z.number(),
-  }),).query(async ({ input }) => {
+  })).query(async ({ input }) => {
     return await getRoomById(input.roomId)
-  })
+  }),
+  updateAIMessageContextTrue: publicProcedure.input(z.object({
+    messageId: z.string(),
+  })).mutation(async ({ input }) => {
+    // Assuming there is a function to handle updating AI message context
+    return await updateAIMessageContextTrue(input.messageId)
+  }),
+  updateAIMessageContextFalse: publicProcedure.input(z.object({
+    messageId: z.string(),
+  })).mutation(async ({ input }) => {
+    // Assuming there is a function to handle updating AI message context
+    return await updateAIMessageContextFalse(input.messageId)
+  }),
 })

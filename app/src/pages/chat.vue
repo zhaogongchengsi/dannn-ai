@@ -34,7 +34,7 @@ const toasterTheme = computed(() => {
 </script>
 
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-screen" aria-hidden>
     <div class="w-64 border-r">
       <div class="flex items-center gap-2 justify-end h-14 px-2 border-b">
         <ChatAdd />
