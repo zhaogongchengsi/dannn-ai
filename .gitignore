@@ -17,3 +17,4 @@ app/client_dist
 app/sqlite.db
 app/dannn_dist
 app/resources/drizzle
+app/electron-builder.json

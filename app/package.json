@@ -17,10 +17,11 @@
     "run": "electron .",
     "start": "pnpm run dev:app && pnpm run run",
     "package": "electron-builder -w",
-    "release": "npm run build && electron-builder -w",
+    "release": "npm run gen:build-config && npm run build && electron-builder -w -c electron-builder.json",
     "lint": "eslint . --fix",
     "test": "vitest",
-    "gen": "drizzle-kit generate",
+    "gen:db": "drizzle-kit generate",
+    "gen:build-config": "node ./scripts/gen-electron-builder-config.cjs",
     "studio": "drizzle-kit studio"
   },
   "dannn": {
@@ -38,6 +39,12 @@
       "outdir": "./dannn_dist"
     }
   },
+  "electronKeepDeps": [
+    "zod",
+    "@trpc/client",
+    "socket.io-client",
+    "std-env"
+  ],
   "build": {
     "files": [
       "dannn_dist/**/*",
