@@ -4,7 +4,7 @@ import type { QuestionMessageMeta } from './api/message'
 import { omit } from 'lodash'
 import { Subject } from 'rxjs'
 import { onQuestionWithAiId, sendTextAnswer } from './api/message'
-import { getRoomContextMessages, getRoomById, thinking, endThink } from './api/room'
+import { endThink, getRoomById, getRoomContextMessages, thinking } from './api/room'
 
 export type UserMessage = Omit<QuestionMessageMeta, 'roomParticipants'>
 
@@ -82,15 +82,13 @@ class QuestionEvent {
     this.ctxMessages = ctxMessages
   }
 
-  thinking () {
-    console.log('thinking', this.question.roomId, this.ai.id)
+  thinking() {
     thinking(this.question.roomId, this.ai.id)
     this._thinking = true
   }
 
-  endThink () {
+  endThink() {
     if (this._thinking) {
-      console.log('endThink', this.question.roomId, this.ai.id)
       endThink(this.question.roomId, this.ai.id)
       this._thinking = false
     }
@@ -107,21 +105,21 @@ class QuestionEvent {
       type: 'text',
       aiId: this.ai.id,
     })
-    .finally(() => {
-      this._maxContextMessages--
-    })
+      .finally(() => {
+        this._maxContextMessages--
+      })
   }
 
   async sendOpenAIStream(contentStream: AsyncIterable<OpenAI.ChatCompletionChunk>) {
     const roomId = this.question.roomId
     const aiId = this.ai.id
     const streamGroupId = `${this.question.roomId}-${this.question.id}`
-    this.endThink();
+    this.endThink()
 
     return new Promise<void>((resolve, reject) => {
       if (!contentStream) {
         reject(new Error('Stream content cannot be empty'))
-      }  
+      }
       ; (async () => {
         let index = 0
         for await (const chunk of contentStream) {
@@ -139,10 +137,9 @@ class QuestionEvent {
             streamIndex: index++,
           })
         }
-      })().then(resolve).catch(reject)
-        .finally(() => {
-          this._maxContextMessages--
-        })
+      })().then(resolve).catch(reject).finally(() => {
+        this._maxContextMessages--
+      })
     })
   }
 
@@ -150,7 +147,7 @@ class QuestionEvent {
     const roomId = this.question.roomId
     const aiId = this.ai.id
     const streamGroupId = `${this.question.roomId}-${this.question.id}`
-    this.endThink();
+    this.endThink()
 
     return new Promise<void>((resolve, reject) => {
       if (!contentStream) {
@@ -189,7 +186,7 @@ class QuestionEvent {
   }
 
   get contextMessage(): ContextMessage[] {
-    const list = this.ctxMessages.map((message) => ({
+    const list = this.ctxMessages.map(message => ({
       role: message.senderType === 'ai' ? 'assistant' : 'user',
       content: message.content,
     } as ContextMessage))
