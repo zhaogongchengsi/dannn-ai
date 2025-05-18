@@ -1,4 +1,6 @@
 <script setup lang='ts'>
+import defaultAvatar from '@/assets/default-avatar.png'
+import Avatar from '@/components/avatar/avatar.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -52,7 +54,7 @@ function onAddAiButtonClick() {
 <template>
   <Sheet>
     <SheetTrigger as-child>
-      <button v-if="chatStore.currentChat" class="px-4 h-full flex items-center gap-3">
+      <button v-if="chatStore.currentChat" class="px-4 h-full flex items-center gap-3 no-dragging-button">
         <h2 class="font-bold cursor-pointer select-none">
           {{ chatStore.currentChat.title }}
         </h2>
@@ -77,12 +79,17 @@ function onAddAiButtonClick() {
             </span>
           </div>
           <ul v-else class="flex flex-col gap-2 my-4">
-            <li v-for="ai of aiParticipants" :key="ai.name">
-              <div class="flex items-center gap-2">
-                <span class="text-xl font-bold">{{ ai.name }}</span>
-                <span>{{ ai.type }}</span>
+            <li v-for="ai of aiParticipants" :key="ai.name" class="flex items-center gap-4 border p-2 rounded-md">
+              <Avatar class="size-10" :src="ai.avatar ?? defaultAvatar" />
+              <div class="flex-1">
+                <div class="w-full flex items-center justify-between gap-2">
+                  <span class="font-bold">{{ ai.name }}</span>
+                  <span class="text-sm text-zinc-500">{{ ai.type }}</span>
+                </div>
+                <p class="text-sm text-zinc-500">
+                  {{ ai.description }}
+                </p>
               </div>
-              <p>{{ ai.description }}</p>
             </li>
           </ul>
           <Dialog>
@@ -100,8 +107,9 @@ function onAddAiButtonClick() {
               </DialogHeader>
 
               <ToggleGroup v-if="notParticipate.length !== 0" v-model="selectAiValue" type="multiple" variant="outline">
-                <ToggleGroupItem v-for="ai of notParticipate" :key="ai.id" :value="ai.id">
-                  {{ ai.name }}
+                <ToggleGroupItem v-for="ai of notParticipate" :key="ai.id" :value="ai.id" class="flex items-center gap-2 p-2 rounded-md">
+                  <Avatar class="size-6" :src="ai.avatar ?? defaultAvatar" />
+                  <span class="text-sm">{{ ai.name }}</span>
                 </ToggleGroupItem>
               </ToggleGroup>
               <div v-else class="flex items-center justify-center h-24 text-gray-500">
@@ -111,7 +119,7 @@ function onAddAiButtonClick() {
               </div>
 
               <DialogFooter>
-                <Button variant="ghost" :disable="selectAiValue.length === 0" size="sm" class="w-full" @click="onAddAiButtonClick">
+                <Button :disable="selectAiValue.length === 0" size="sm" class="w-full" @click="onAddAiButtonClick">
                   添加
                 </Button>
               </DialogFooter>

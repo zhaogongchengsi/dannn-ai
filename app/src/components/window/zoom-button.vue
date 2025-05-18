@@ -30,10 +30,10 @@ function onUnmaximize() {
 </script>
 
 <template>
-  <Button v-if="isMaximized" variant="ghost" size="icon" class="size-7 flex justify-center items-center" @click="onUnmaximize">
+  <Button v-if="isMaximized" variant="ghost" size="icon" class="size-7 flex justify-center items-center no-dragging-button" @click="onUnmaximize">
     <Minimize :size="16" />
   </Button>
-  <Button v-if="isMinimized" variant="ghost" size="icon" class="size-7 flex justify-center items-center" @click="onMaximize">
+  <Button v-if="isMinimized" variant="ghost" size="icon" class="size-7 flex justify-center items-center no-dragging-button" @click="onMaximize">
     <Expand :size="18" />
   </Button>
 </template>

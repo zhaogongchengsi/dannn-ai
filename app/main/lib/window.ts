@@ -166,7 +166,13 @@ export class Window extends EventEmitter<WindowEvents> {
     window.webContents.on('will-navigate', (event, url) => {
       event.preventDefault()
       logger.info('will-navigate', url)
-      if (url.startsWith('http') || !url.startsWith('http://localhost:3001')) {
+
+      if (url.startsWith('http://localhost:3001')) {
+        window.webContents.reload()
+        return
+      }
+
+      if (url.startsWith('http')) {
         shell.openExternal(url)
       }
     })

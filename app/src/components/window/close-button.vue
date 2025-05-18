@@ -8,7 +8,7 @@ function onQuit() {
 </script>
 
 <template>
-  <Button variant="ghost" size="icon" class="size-7 flex justify-center items-center hover:text-red-600" @click="onQuit">
+  <Button variant="ghost" size="icon" class="size-7 flex justify-center items-center hover:text-red-600 no-dragging-button" @click="onQuit">
     <X :size="24" />
   </Button>
 </template>

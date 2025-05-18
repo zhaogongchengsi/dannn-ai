@@ -9,7 +9,7 @@ import LoginForm from '@/views/logo-from.vue'
 
 <template>
   <div class="w-screen h-screen bg-muted flex flex-col">
-    <div class="flex justify-end items-center h-14 px-2 border-b gap-6">
+    <div class="flex justify-end items-center h-14 px-2 border-b gap-6 dragging">
       <ModeToggle />
       <WindowMinusButton v-if="!isMacOS" />
       <WindowZoomButton v-if="!isMacOS" />

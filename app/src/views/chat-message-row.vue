@@ -17,6 +17,7 @@ const props = defineProps<{ message: InfoMessage, index: number }>()
 const formatted = useDateFormat(new Date(props.message.createdAt), 'YYYY-MM-DD HH:mm (ddd)')
 
 const aiStore = useAIStore()
+const config = useConfig()
 
 const aiAvatar = computed(() => {
   let avatar = 'https://api.dicebear.com/5.x/initials/svg?seed=AI&backgroundColor=F0F0F0&fontFamily=Arial&fontSize=50&width=100&height=100'
@@ -40,7 +41,7 @@ const isAiSender = computed(() => {
 
 const content = computed(() => {
   const message = props.message
-  return markdownToHtml(message.content)
+  return markdownToHtml(message.content, config.mode.value === 'dark' ? 'vitesse-dark' : 'vitesse-light')
 })
 </script>
 

@@ -8,7 +8,7 @@ function onMinimize() {
 </script>
 
 <template>
-  <Button variant="ghost" size="icon" class="size-7 flex justify-center items-center" @click="onMinimize">
+  <Button variant="ghost" size="icon" class="size-7 flex justify-center items-center no-dragging-button" @click="onMinimize">
     <Minus :size="24" />
   </Button>
 </template>
