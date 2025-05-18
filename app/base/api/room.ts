@@ -2,6 +2,7 @@ import type { InfoMessage, RoomData } from 'common/types'
 import { filter, Subject } from 'rxjs'
 import { RoomEvent } from '../../common/event'
 import { BaseClient } from './client'
+import { generateRandomString } from 'base/utils'
 
 export interface CreateRoomOptions {
   title: string
@@ -14,17 +15,52 @@ export interface JoinAIToRoom {
   aiId: number | null
 }
 
+export interface thinkingPreload {
+  roomId: number
+  aiId: number
+}
+
 const client = BaseClient.getInstance()
 const roomCreated$ = new Subject<Omit<RoomData, 'participant'>>()
+const thinking$ = new Subject<thinkingPreload>()
+const endThink$ = new Subject<thinkingPreload>()
 const joinedAI$ = new Subject<JoinAIToRoom>()
 
 client.socket.on(RoomEvent.create, (room: Omit<RoomData, 'participant'>) => {
   roomCreated$.next(room)
 })
 
+client.socket.on(RoomEvent.thinking, (preload: thinkingPreload) => {
+  thinking$.next(preload)
+})
+
+client.socket.on(RoomEvent.endThink, (preload: thinkingPreload) => {
+  endThink$.next(preload)
+})
+
 client.socket.on(RoomEvent.addAi, (data: JoinAIToRoom) => {
   joinedAI$.next(data)
 })
+
+export function onAiThinking(callback: (data: thinkingPreload) => void) {
+  console.log('onAiThinking')
+  const subscription = thinking$.subscribe(callback)
+  return () => subscription.unsubscribe()
+}
+
+export function onAiEndThink(callback: (data: thinkingPreload) => void) {
+  console.log('onAiEndThink')
+  const subscription = endThink$.subscribe(callback)
+  return () => subscription.unsubscribe()
+}
+
+export function thinking(roomId: number, aiId: number) {
+  client.socket.emit(RoomEvent.thinking, { roomId, aiId })
+}
+
+export function endThink(roomId: number, aiId: number) {
+  client.socket.emit(RoomEvent.endThink, { roomId, aiId })
+}
 
 export async function createRoom(opt: CreateRoomOptions): Promise<Omit<RoomData, 'participant'>> {
   const newRooms = await client.trpc.room.createRoom.mutate(opt)

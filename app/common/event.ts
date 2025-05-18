@@ -6,6 +6,8 @@ export enum RoomEvent {
   delete = 'room:delete',
   message = 'room:message',
   addAi = 'room:addAi',
+  thinking = "thinking",
+  endThink = "endThink",
 }
 
 export enum AiEvent {

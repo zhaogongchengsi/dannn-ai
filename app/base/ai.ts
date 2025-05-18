@@ -4,7 +4,7 @@ import type { QuestionMessageMeta } from './api/message'
 import { omit } from 'lodash'
 import { Subject } from 'rxjs'
 import { onQuestionWithAiId, sendTextAnswer } from './api/message'
-import { getRoomContextMessages, getRoomById } from './api/room'
+import { getRoomContextMessages, getRoomById, thinking, endThink } from './api/room'
 
 export type UserMessage = Omit<QuestionMessageMeta, 'roomParticipants'>
 
@@ -67,6 +67,7 @@ class QuestionEvent {
   question: UserMessage
   ctxMessages: InfoMessage[]
   _maxContextMessages: number
+  _thinking: boolean = false
 
   constructor(
     ai: AI,
@@ -81,10 +82,25 @@ class QuestionEvent {
     this.ctxMessages = ctxMessages
   }
 
+  thinking () {
+    console.log('thinking', this.question.roomId, this.ai.id)
+    thinking(this.question.roomId, this.ai.id)
+    this._thinking = true
+  }
+
+  endThink () {
+    if (this._thinking) {
+      console.log('endThink', this.question.roomId, this.ai.id)
+      endThink(this.question.roomId, this.ai.id)
+      this._thinking = false
+    }
+  }
+
   async reply(content: string) {
     if (!content) {
       throw new Error('Reply content cannot be empty')
     }
+    this.endThink()
     await sendTextAnswer({
       content,
       roomId: this.question.roomId,
@@ -100,11 +116,12 @@ class QuestionEvent {
     const roomId = this.question.roomId
     const aiId = this.ai.id
     const streamGroupId = `${this.question.roomId}-${this.question.id}`
+    this.endThink();
 
     return new Promise<void>((resolve, reject) => {
       if (!contentStream) {
         reject(new Error('Stream content cannot be empty'))
-      }
+      }  
       ; (async () => {
         let index = 0
         for await (const chunk of contentStream) {
@@ -133,6 +150,7 @@ class QuestionEvent {
     const roomId = this.question.roomId
     const aiId = this.ai.id
     const streamGroupId = `${this.question.roomId}-${this.question.id}`
+    this.endThink();
 
     return new Promise<void>((resolve, reject) => {
       if (!contentStream) {

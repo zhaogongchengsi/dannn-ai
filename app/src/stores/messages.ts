@@ -1,6 +1,6 @@
 import type { InfoMessage } from 'common/types'
 import { getMessagesByPage, onAllMessages } from 'base/api/message'
-import { getAllRooms } from 'base/api/room'
+import { getAllRooms, onAiEndThink, onAiThinking } from 'base/api/room'
 import { sortBy } from 'lodash'
 
 export interface MessageItem extends InfoMessage {
@@ -146,9 +146,19 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
+  onAiThinking((data) => {
+    console.log('onAiThinking', data)
+  })
+
+  onAiEndThink((data) => {
+    console.log('onAiEndThink', data)
+  })
+
   onAllMessages((message: InfoMessage) => {
     addMessagesByRoomId(message.roomId, [message])
   })
+
+  console.log('init messages store')
 
   init()
 

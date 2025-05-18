@@ -21,22 +21,30 @@ defineExtension(async (ctx) => {
 		name: 'deepseek-chat',
 		title: "DeepSeek Chat",
 		description: 'DeepSeek Chat AI',
-		avatar: icon,	
+		avatar: icon,
 		type: 'chat',
 		version: '0.0.1',
 		createdBy: 'local',
 	})
 
 	ai.onQuestion(async (event) => {
-		const completion = await client.chat.completions.create({
-			messages: [
-				...event.contextMessage,
-				{ role: "user", content: event.content }
-			],
-			model: "deepseek-chat",
-			stream: true,
-		})
+		event.thinking()
 
-		event.sendOpenAIStream(completion)
+		console.log(event.contextMessage)
+
+		setTimeout(() => {
+			event.endThink()
+		}, 3000)
+		
+		// const completion = await client.chat.completions.create({
+		// 	messages: [
+		// 		...event.contextMessage,
+		// 		{ role: "user", content: event.content }
+		// 	],
+		// 	model: "deepseek-chat",
+		// 	stream: true,
+		// })
+
+		// event.sendOpenAIStream(completion)
 	})
 })
