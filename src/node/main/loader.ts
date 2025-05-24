@@ -24,7 +24,6 @@ type DefaultLoad = (
 ) => Promise<{ format: string, source: string | Buffer }>
 
 export async function resolve(specifier: string, context: ResolveContext, defaultResolve: DefaultResolve) {
-  console.log(`Resolving: ${specifier}`)
   return defaultResolve(specifier, context, defaultResolve)
 }
 

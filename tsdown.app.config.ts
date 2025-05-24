@@ -19,4 +19,6 @@ export default defineConfig({
   },
   external: ['electron'],
   copy: './public',
+  outDir: './app_dist',
+  clean: process.env.MODE === 'dev',
 })

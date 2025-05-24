@@ -30,42 +30,6 @@ export class Window extends EventEmitter<WindowEvents> {
     this.icon = nativeImage.createFromPath(resolve(__dirname, './public/icon_256X256.png'))
   }
 
-  async createSettingWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
-    await app.whenReady()
-
-    if (!this.window) {
-      throw new Error('Window is not created')
-    }
-
-    this.settingWindow = new BrowserWindow({
-      width: width ?? 800,
-      height: height ?? 600,
-      show: false,
-      icon: this.icon,
-      // frame: isMacOS ? true : MODE === 'dev',
-      parent: this.window,
-      titleBarStyle: isMacOS ? 'hidden' : undefined,
-      titleBarOverlay: isMacOS,
-      webPreferences: {
-        nodeIntegration: true,
-        additionalArguments: [`--name=setting`],
-        webSecurity: false,
-        preload: this.preload,
-      },
-    })
-
-    if (MODE === 'dev') {
-      this.settingWindow.loadURL('http://localhost:3001/setting.html')
-      this.settingWindow.webContents.openDevTools()
-    }
-    else {
-      this.settingWindow.loadFile('./setting.html')
-    }
-
-    this.initEvent('setting', this.settingWindow)
-    this.settingWindow.on('resized', () => this.emit('setting.resized'))
-  }
-
   async createWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
     this.isShow = false
     await app.whenReady()
@@ -75,7 +39,7 @@ export class Window extends EventEmitter<WindowEvents> {
       height: height ?? 600,
       show: false,
       icon: this.icon,
-      frame: isMacOS ? true : MODE === 'dev',
+      frame: isMacOS ? true : !app.isPackaged,
       titleBarStyle: isMacOS ? 'hidden' : undefined,
       titleBarOverlay: isMacOS,
       webPreferences: {
@@ -86,12 +50,12 @@ export class Window extends EventEmitter<WindowEvents> {
       },
     })
 
-    if (MODE === 'dev') {
+    if (!app.isPackaged) {
       this.window.loadURL('http://localhost:3001')
       this.window.webContents.openDevTools()
     }
     else {
-      this.window.loadFile('./dannn_dist/index.html')
+      this.window.loadFile(resolve(__dirname, './index.html'))
     }
 
     app.on('activate', () => {
@@ -224,16 +188,6 @@ export class Window extends EventEmitter<WindowEvents> {
     else {
       await this.createWindow(opt)
       await this.display(opt)
-    }
-  }
-
-  async displaySetting(opt?: WindowOptions) {
-    if (this.settingWindow) {
-      this.settingWindow.show()
-    }
-    else {
-      await this.createSettingWindow(opt)
-      await this.displaySetting(opt)
     }
   }
 

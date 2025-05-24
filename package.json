@@ -2,77 +2,23 @@
   "name": "dannn-app",
   "type": "module",
   "version": "0.0.0",
-  "description": "",
+  "description": "AI group chat",
   "author": {
     "name": "zhaozunhong",
     "email": "zzh1586169624@163.com"
   },
-  "main": "./dist/index.js",
+  "main": "./app_dist/index.js",
   "scripts": {
-    "build:app": "tsdown -c ./tsdown.app.config.ts --env.MODE=prod",
-    "dev:app": "tsdown -c ./tsdown.app.config.ts --env.MODE=dev --on-success \"electron .\"",
-    "build": "vite build && pnpm run build:app",
+    "package": "vite build && pnpm run build:app",
+    "build:app": "tsdown --env.MODE=prod -c ./tsdown.app.config.ts --on-success \"electron-builder -w -c ./electron-builder.js\"",
+    "build": "vite build",
     "dev": "vite",
-    "run": "electron .",
-    "start": "pnpm run dev:app && pnpm run run",
-    "package": "electron-builder -w",
-    "release": "npm run gen:build-config && npm run build && electron-builder -w -c electron-builder.json",
-    "lint": "eslint . --fix",
+    "dev:app": "tsdown --env.MODE=dev -c ./tsdown.app.config.ts --on-success \"electron .\"",
     "test": "vitest",
     "gen:db": "drizzle-kit generate",
-    "gen:build-config": "node ./scripts/gen-electron-builder-config.cjs",
     "studio": "drizzle-kit studio",
+    "lint": "eslint . --fix",
     "postinstall": "electron-builder install-app-deps"
-  },
-  "electronKeepDeps": [
-    "zod",
-    "@trpc/client",
-    "socket.io-client",
-    "std-env"
-  ],
-  "build": {
-    "files": [
-      "dannn_dist/**/*",
-      "node_modules/**/*",
-      "public/**/*"
-    ],
-    "directories": {
-      "buildResources": "./public"
-    },
-    "extraFiles": [
-      {
-        "from": "./drizzle",
-        "to": "resources/drizzle",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "asar": true,
-    "appId": "com.zhaozunhong.app",
-    "productName": "Dannn AI",
-    "mac": {
-      "target": "dmg"
-    },
-    "win": {
-      "target": "nsis",
-      "icon": "./public/favicon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowElevation": true,
-      "allowToChangeInstallationDirectory": true,
-      "installerIcon": "./public/favicon.ico",
-      "uninstallerIcon": "./public/favicon.ico",
-      "uninstallDisplayName": "Uninstall Dannn AI",
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Dannn AI"
-    },
-    "appImage": {
-      "artifactName": "${name}-setup.${ext}"
-    },
-    "npmRebuild": false
   },
   "dependencies": {
     "@lexical/history": "^0.31.1",

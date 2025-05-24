@@ -1,8 +1,10 @@
 export default {
   files: [
-    'dannn_dist/**/*',
+    'app_dist/**/*',
     'node_modules/**/*',
     'public/**/*',
+    'package.json',
+    '!.dannn',
   ],
   directories: {
     buildResources: './public',

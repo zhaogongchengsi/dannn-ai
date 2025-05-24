@@ -75,7 +75,6 @@
       },
     },
     is,
-    mode: MODE,
     readFile,
     readDir,
     exists,

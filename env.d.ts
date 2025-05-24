@@ -47,7 +47,7 @@ interface Dannn {
     win: boolean
     linux: boolean
   }
-  mode: 'prod' | 'dev'
+  // mode: 'prod' | 'dev'
   readFile: (path: string, encoding?: BufferEncoding) => Promise<string>
   readDir: (path: string) => Promise<string[]>
   exists: (dir: string) => Promise<boolean>

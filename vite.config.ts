@@ -37,13 +37,7 @@ export default defineConfig({
   },
   base: './',
   build: {
-    // rollupOptions: {
-    //   input: {
-    //     index: resolve(__dirname, 'index.html'),
-    //     setting: resolve(__dirname, 'setting.html'),
-    //   },
-    // },
-    outDir: resolve(__dirname, './dannn_dist'),
+    outDir: resolve(__dirname, './app_dist'),
   },
   server: {
     port: 3001,
