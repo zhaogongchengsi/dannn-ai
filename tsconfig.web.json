@@ -24,7 +24,6 @@
     "./auto-imports.d.ts",
     "vite.config.ts",
     "./types.ts",
-    "env.d.ts",
     "./typed-router.d.ts"
   ],
   "exclude": [
