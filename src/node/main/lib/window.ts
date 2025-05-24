@@ -1,12 +1,8 @@
 import EventEmitter from 'node:events'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
-// import logo from 'public/icon_256X256.png'
+import { resolve } from 'node:path'
+import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
 import { logger } from './logger'
-
-const _dirname = dirname(fileURLToPath(import.meta.url))
 
 export interface WindowOptions {
   width?: number
@@ -30,8 +26,8 @@ export class Window extends EventEmitter<WindowEvents> {
   constructor(name?: string) {
     super()
     this.name = name || this.name
-    this.preload = resolve(_dirname, './preload.mjs')
-    // this.icon = nativeImage.createFromPath(resolve(_dirname, logo))
+    this.preload = resolve(__dirname, './preload.js')
+    this.icon = nativeImage.createFromPath(resolve(__dirname, './public/icon_256X256.png'))
   }
 
   async createSettingWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {

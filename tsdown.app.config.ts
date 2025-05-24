@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
@@ -14,7 +15,8 @@ export default defineConfig({
     '.png': 'dataurl',
   },
   define: {
-    MODE: JSON.stringify('dev'),
+    MODE: JSON.stringify(process.env.MODE || 'dev'),
   },
   external: ['electron'],
+  copy: './public',
 })

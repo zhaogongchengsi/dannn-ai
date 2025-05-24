@@ -1,5 +1,5 @@
 {
-  "name": "@dannn/app",
+  "name": "dannn-app",
   "type": "module",
   "version": "0.0.0",
   "description": "",
@@ -9,8 +9,8 @@
   },
   "main": "./dist/index.js",
   "scripts": {
-    "build:app": "tsdown -c ./tsdown.app.config.ts",
-    "dev:app": "tsdown -c ./tsdown.app.config.ts --on-success \"electron .\"",
+    "build:app": "tsdown -c ./tsdown.app.config.ts --env.MODE=prod",
+    "dev:app": "tsdown -c ./tsdown.app.config.ts --env.MODE=dev --on-success \"electron .\"",
     "build": "vite build && pnpm run build:app",
     "dev": "vite",
     "run": "electron .",
@@ -21,22 +21,8 @@
     "test": "vitest",
     "gen:db": "drizzle-kit generate",
     "gen:build-config": "node ./scripts/gen-electron-builder-config.cjs",
-    "studio": "drizzle-kit studio"
-  },
-  "dannn": {
-    "build": {
-      "entries": [
-        "./main/index.ts",
-        "./main/preload.ts"
-      ],
-      "alias": {
-        "base": "./base",
-        "common": "./common",
-        "main": "./main",
-        "public": "./public"
-      },
-      "outdir": "./dannn_dist"
-    }
+    "studio": "drizzle-kit studio",
+    "postinstall": "electron-builder install-app-deps"
   },
   "electronKeepDeps": [
     "zod",

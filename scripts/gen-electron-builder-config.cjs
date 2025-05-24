@@ -9,9 +9,9 @@ console.log('正在生成 electron-builder.json...')
 console.log('当前目录：', __dirname)
 // 读取 package.json
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-const keepDeps = pkg.electronKeepDeps || [];
+const keepDeps = pkg.electronKeepDeps || []
 // 获取所有 dependencies
-const dependencies = Object.keys(pkg.dependencies || {}).filter(dep => keepDeps.includes(dep));
+const dependencies = Object.keys(pkg.dependencies || {}).filter(dep => keepDeps.includes(dep))
 
 // 生成 extraFiles 配置
 const extraFiles = [
