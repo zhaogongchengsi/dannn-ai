@@ -1,4 +1,4 @@
-// import type { ExtensionProcess } from './lib/extension'
+import type { ExtensionProcess } from './lib/extension'
 import { existsSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import process from 'node:process'
@@ -7,8 +7,8 @@ import { getPort } from 'get-port-please'
 import { migrateDb } from '../database/db'
 import { createServer } from '../server/server'
 import { EXTENSIONS_ROOT } from './constant'
-// import { extensionLoadAll } from './extension-loader'
 import { Config } from './lib/config'
+import { extensionLoadAll } from './lib/extension'
 import { logger } from './lib/logger'
 import { Window } from './lib/window'
 
@@ -21,7 +21,7 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
 const config = new Config()
 const window = new Window()
-// let extensionProcessList: ExtensionProcess[] | null = null
+let extensionProcessList: ExtensionProcess[] | null = null
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
 
@@ -50,13 +50,13 @@ async function bootstrap() {
 
   await server.start()
 
-  // extensionProcessList = await extensionLoadAll(port)
+  extensionProcessList = await extensionLoadAll(port)
 
   app.on('before-quit', () => {
     server.stop()
-    // extensionProcessList?.forEach((extension) => {
-    //   extension.close()
-    // })
+    extensionProcessList?.forEach((extension) => {
+      extension.close()
+    })
   })
 
   const windowConfig = config.get('window')

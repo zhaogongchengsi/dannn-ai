@@ -1,9 +1,13 @@
 import type { PackageJson } from 'pkg-types'
 import { existsSync } from 'node:fs'
-import { readFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
+import { pathToFileURL } from 'node:url'
 import { Worker } from 'node:worker_threads'
+import { app } from 'electron'
+import { join, normalize } from 'pathe'
+import { EXTENSIONS_ROOT } from '../constant'
 import { logger } from './logger'
 
 const configName = 'package.json'
@@ -75,17 +79,21 @@ export class ExtensionProcess {
         throw new Error('Manifest is not defined')
       }
 
+      const nodeModulesRoot = app.isPackaged ? app.getPath('exe') : resolve(app.getAppPath(), 'node_modules')
+
       const env = {
         ...extensionNeedEnv,
         ...this._config.env,
         DANNN_PROCESS_ID: String(this.id),
         DANNN_PROCESS_PID: String(this.pid),
-        DANNN_PROCESS_PATH: this._path.toLowerCase(),
+        DANNN_PROCESS_PATH: normalize(this._path),
+        DANNN_MODULES_PATH: normalize(process.env.DANNN_MODULES_PATH || nodeModulesRoot),
       }
 
-      const iProcess = new Worker(mainFile, {
+      const iProcess = new Worker(join(__dirname, 'extension-loader.js'), {
         env,
-        // execArgv: ['--loader', pathToFileURL(normalize(resolve(_dirname, './loader.mjs'))).href],
+        // TODO: 这里希望使用 loader 来加载模块
+        // execArgv: ['--loader', pathToFileURL(normalize(resolve(__dirname, 'loader.js'))).href],
         stdout: true,
         stderr: true,
       })
@@ -172,4 +180,32 @@ export class ExtensionProcess {
     }
     ExtensionProcess.all.delete(this.pid)
   }
+}
+
+export async function extensionLoadAll(port: number) {
+  const processes = []
+
+  try {
+    const dirs = await readdir(EXTENSIONS_ROOT)
+
+    for (const dir of dirs) {
+      const eProcess = new ExtensionProcess(join(EXTENSIONS_ROOT, dir), {
+        env: {
+          PORT: String(port),
+        },
+      })
+      try {
+        await eProcess.start()
+        processes.push(eProcess)
+      }
+      catch (err) {
+        console.error(`Failed to load extension ${dir}`, err)
+      }
+    }
+  }
+  catch (err: any) {
+    console.error(`Failed to load extensions`, err)
+  }
+
+  return processes
 }

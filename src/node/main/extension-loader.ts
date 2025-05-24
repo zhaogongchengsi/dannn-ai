@@ -1,32 +1,41 @@
-import { readdir } from 'node:fs/promises'
-import { join } from 'pathe'
-import { EXTENSIONS_ROOT } from './constant'
-import { ExtensionProcess } from './lib/extension'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import process from 'node:process'
+import { pathToFileURL } from 'node:url'
+import { resolvePackageJSON } from 'pkg-types'
 
-export async function extensionLoadAll(port: number) {
-  const processes = []
-
-  try {
-    const dirs = await readdir(EXTENSIONS_ROOT)
-
-    for (const dir of dirs) {
-      const eProcess = new ExtensionProcess(join(EXTENSIONS_ROOT, dir), {
-        env: {
-          PORT: String(port),
-        },
-      })
-      try {
-        await eProcess.start()
-        processes.push(eProcess)
-      }
-      catch (err) {
-        console.error(`Failed to load extension ${dir}`, err)
-      }
-    }
-  }
-  catch (err: any) {
-    console.error(`Failed to load extensions`, err)
-  }
-
-  return processes
+if (!process.env.DANNN_PROCESS_PATH || !process.env.DANNN_PROCESS_PATH) {
+  throw new Error('DANNN_PROCESS_PATH is not defined')
 }
+
+;(async () => {
+  const pkgPath = await resolvePackageJSON(process.env.DANNN_PROCESS_PATH)
+
+  if (!pkgPath) {
+    throw new Error('Package not found')
+  }
+
+  const contents = await readFile(pkgPath, { encoding: 'utf8' })
+
+  const pkg = JSON.parse(contents)
+
+  if (!pkg) {
+    throw new Error('Package is not valid')
+  }
+
+  if (!pkg.main) {
+    throw new Error('Package main is not defined')
+  }
+
+  const path = join(process.env.DANNN_PROCESS_PATH!, pkg.main)
+
+  import(pathToFileURL(path).href)
+    .then((module) => {
+      if (module || typeof module.activate !== 'function') {
+        module.activate()
+      }
+    })
+    .catch((err) => {
+      console.error('Error loading module:', err)
+    })
+})()

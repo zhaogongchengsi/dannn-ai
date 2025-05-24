@@ -4,6 +4,8 @@ export default defineConfig({
   entry: [
     './src/node/main/index.ts',
     './src/node/main/preload.ts',
+    './src/node/main/loader.ts',
+    './src/node/main/extension-loader.ts',
   ],
   alias: {
     '~': './src',

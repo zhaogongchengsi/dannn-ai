@@ -1,3 +1,5 @@
+import { join } from 'lodash'
+
 export default {
   files: [
     'app_dist/**/*',
@@ -17,6 +19,17 @@ export default {
         '**/*',
       ],
     },
+    ...([
+      'openai',
+      'socket.io-client',
+      'std-env',
+    ].map(item => ({
+      from: join('node_modules', item),
+      to: join('node_modules', item),
+      filter: [
+        '**/*',
+      ],
+    }))),
   ],
   asar: true,
   appId: 'com.zhaozunhong.app',
