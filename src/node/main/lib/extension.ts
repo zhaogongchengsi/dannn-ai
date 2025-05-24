@@ -1,43 +1,22 @@
+import type { PackageJson } from 'pkg-types'
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
 import { Worker } from 'node:worker_threads'
-import { dirname } from 'pathe'
-import { z } from 'zod'
 import { logger } from './logger'
 
-export const PluginManifestSchema = z.object({
-  name: z.string().regex(/^[^\s!@#$%^&*()+=[\]{};':"\\|,.<>/?]*$/, { message: 'Name cannot contain illegal characters or spaces' }),
-  version: z.string(),
-  icon: z.string().url().optional(),
-  description: z.string().optional(),
-  author: z.string().optional(),
-  homepage: z.string().url().optional(),
-  // 可以进一步约束为以 './' 开头并以 '.js' 或 '.cjs' 结尾的路径
-  main: z.string().regex(/^\.\/.*\.(js|cjs)$/, { message: 'Must start with \'./\' and end with \'.js\' or \'.cjs\'' }),
-  permissions: z.object({
-    env: z.array(z.string()).optional(),
-  }).optional(),
-})
-
-const configName = 'dannn.json'
-
-// 如果你要推导类型
-export type PluginManifest = z.infer<typeof PluginManifestSchema>
+const configName = 'package.json'
 
 export interface IExtensionProcessInfo {
   readonly pid: number
   readonly id: string
-  readonly manifest: PluginManifest
+  readonly manifest: PackageJson
 }
 
 export interface IExtensionConfig {
   env: Record<string, string>
 }
-
-const _dirname = dirname(fileURLToPath(import.meta.url))
 
 export class ExtensionProcess {
   private static ID_COUNTER = 0
@@ -45,7 +24,7 @@ export class ExtensionProcess {
   private readonly pid = process.pid
   private static readonly all = new Map<number, IExtensionProcessInfo>()
   process: Worker | null = null
-  manifest: PluginManifest | null = null
+  manifest: PackageJson | null = null
   static getAll(): IExtensionProcessInfo[] {
     return Array.from(ExtensionProcess.all.values())
   }
@@ -62,7 +41,7 @@ export class ExtensionProcess {
     this._config = config
   }
 
-  private async readManifest(): Promise<PluginManifest> {
+  private async readManifest(): Promise<PackageJson> {
     const configFile = resolve(this._path, configName)
     if (!configFile.endsWith('.json') || !existsSync(configFile)) {
       throw new Error(`Config file ${configFile} does not exist or is not a JSON file`)
@@ -70,16 +49,8 @@ export class ExtensionProcess {
 
     try {
       const value = await readFile(configFile, 'utf-8')
-
-      const { success, data, error } = PluginManifestSchema.safeParse(JSON.parse(value))
-
-      if (!success) {
-        throw new Error(`Invalid config file ${configFile}: ${error}`)
-      }
-
-      this.manifest = data
-
-      return data
+      this.manifest = JSON.parse(value) as PackageJson
+      return this.manifest
     }
     catch (e) {
       throw new Error(`Failed to read config file ${configFile}: ${e}`)
@@ -90,12 +61,15 @@ export class ExtensionProcess {
     try {
       performance.mark('start-extension')
       const manifest = await this.readManifest()
+      if (!manifest || !manifest.main) {
+        return
+      }
       const mainFile = resolve(this._path, manifest.main)
       if (!existsSync(mainFile)) {
         throw new Error(`Main file ${mainFile} does not exist`)
       }
 
-      const extensionNeedEnv = manifest?.permissions?.env ? Object.fromEntries(manifest.permissions.env.map(key => [key, process.env[key]])) : {}
+      const extensionNeedEnv = manifest?.permissions?.env ? Object.fromEntries(manifest.permissions.env.map((key: string) => [key, process.env[key]])) : {}
 
       if (!this.manifest) {
         throw new Error('Manifest is not defined')
@@ -106,7 +80,7 @@ export class ExtensionProcess {
         ...this._config.env,
         DANNN_PROCESS_ID: String(this.id),
         DANNN_PROCESS_PID: String(this.pid),
-        DANNN_PROCESS_PATH: this.manifest.name.toLowerCase(),
+        DANNN_PROCESS_PATH: this._path.toLowerCase(),
       }
 
       const iProcess = new Worker(mainFile, {
