@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.base.json", // 继承 tsconfig.base.json
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": "./",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "src/node/main/**/*.ts",
+    "src/node/**/*.ts",
+    "src/common/**/*.ts",
+    "src/base/**/*.ts",
+    "env.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

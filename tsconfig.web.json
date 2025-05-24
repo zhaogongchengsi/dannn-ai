@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.base.json", // 继承 tsconfig.base.json
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": "./",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "composite": true,
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/base/**/*.ts",
+    "src/common/**/*.ts",
+    "src/**/*.vue",
+    "./auto-imports.d.ts",
+    "vite.config.ts",
+    "./types.ts",
+    "env.d.ts",
+    "./typed-router.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/node/main/**/*.ts",
+    "src/node/**/*.ts"
+  ]
+}
