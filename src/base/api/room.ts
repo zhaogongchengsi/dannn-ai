@@ -1,7 +1,7 @@
 import type { InfoMessage, RoomData } from '~/common/types'
 import { filter, Subject } from 'rxjs'
 import { RoomEvent } from '~/common/event'
-import { Client } from '../client'
+import { client } from '../client'
 
 export interface CreateRoomOptions {
   title: string
@@ -19,7 +19,6 @@ export interface thinkingPreload {
   aiId: number
 }
 
-const client = new Client()
 const roomCreated$ = new Subject<Omit<RoomData, 'participant'>>()
 const thinking$ = new Subject<thinkingPreload>()
 const endThink$ = new Subject<thinkingPreload>()
@@ -105,10 +104,4 @@ export function updateAIMessageContextFalse(messageId: string): Promise<InfoMess
 
 export function updateAIMessageContextTrue(messageId: string): Promise<InfoMessage> {
   return client.trpc.room.updateAIMessageContextTrue.mutate({ messageId })
-}
-
-export class RoomClient extends Client {
-  constructor() {
-    super()
-  }
 }

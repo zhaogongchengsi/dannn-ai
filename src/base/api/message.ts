@@ -2,7 +2,7 @@ import type { Answer, Question } from '~/common/schema'
 import type { InfoMessage } from '~/common/types'
 import { filter, Subject } from 'rxjs'
 import { ChannelEvent } from '~/common/event'
-import { Client } from '../client'
+import { client } from '../client'
 
 export interface UserMessageData {
   /**
@@ -31,11 +31,9 @@ export type QuestionMessageMeta = InfoMessage & {
   roomId: number
 }
 
-const client = new Client()
 const questionMessageSubject$ = new Subject<QuestionMessageMeta>()
 const answerMessageSubject$ = new Subject<InfoMessage>()
 const allMessagesSubject$ = new Subject<InfoMessage>()
-
 
 client.on(ChannelEvent.question, (message: QuestionMessageMeta) => {
   allMessagesSubject$.next(message)

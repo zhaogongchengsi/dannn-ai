@@ -3,7 +3,7 @@ import type { AIData } from '~/common/types'
 import { Subject } from 'rxjs'
 import { AiEvent } from '~/common/event'
 import { createAIInput } from '~/common/schema'
-import { Client } from '../client'
+import { client } from '../client'
 import { formatZodError } from '../utils'
 
 const aiCreated$ = new Subject<CreateAIInput>()
@@ -34,10 +34,4 @@ export async function getAllAIs() {
 export function onAIRegistered(callback: (ai: CreateAIInput) => void) {
   const subscription = aiCreated$.subscribe(callback)
   return () => subscription.unsubscribe()
-}
-
-export class AIClient extends Client {
-  constructor() {
-    super()
-  }
 }

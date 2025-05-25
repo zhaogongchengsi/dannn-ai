@@ -1,3 +1,5 @@
+import { withResolvers } from '@zunh/promise-kit'
+
 export type BridgeHandler = (...data: any[]) => any
 
 export interface BridgeRequestCommon {
@@ -166,7 +168,7 @@ export class Bridge implements IBridge {
     }
   }
 
-  on(name: string, handler: (data: BridgeRequestEvent) => void) {
+  on(name: string, handler: (data: any) => void) {
     if (!this.events.has(name)) {
       this.events.set(name, new Set())
     }
@@ -196,7 +198,7 @@ export class Bridge implements IBridge {
   }
 
   invoke<T>(name: string, ...args: any[]) {
-    const promiser = Promise.withResolvers<T>()
+    const promiser = withResolvers<T>()
     const id = this.randomAlphaString(16)
     this.waitResponse.set(id, promiser)
     promiser.promise.finally(() => {
