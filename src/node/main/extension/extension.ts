@@ -9,6 +9,8 @@ import { Worker } from 'node:worker_threads'
 import { app } from 'electron'
 import { join, normalize } from 'pathe'
 import { Bridge } from '~/common/bridge'
+import { registerRouterToBridge } from '~/common/router'
+import { databaseRouter } from '~/node/database/router'
 import { logger } from '../lib/logger'
 
 const configName = 'package.json'
@@ -57,6 +59,8 @@ export class ExtensionProcess extends Bridge {
     this._config = config
     this._window = window
 
+    // 赋予扩展进程的 操控database 的权限 并且避免被转发
+    registerRouterToBridge(this, databaseRouter, 'database')
     // 将win的所有的消息转发的扩展进程
     window.forwardTo(this, data => data.name.startsWith('window.'))
     // 将扩展进程的消息转发到win

@@ -1,7 +1,8 @@
-import type { AIData, MakeFieldsOptional, RoomData } from '../../../common/types'
 import type { InfoMessage } from './message'
+import type { AIData, MakeFieldsOptional, RoomData } from '~/common/types'
 import { eq } from 'drizzle-orm'
 import lodash from 'lodash'
+import { router } from '~/common/router'
 import { db } from '../db'
 import { ais, chatParticipants, messages, rooms } from '../schema'
 import { getAiMessagesByCount } from './message'
@@ -126,3 +127,15 @@ export async function getRoomContextMessages(roomId: number): Promise<InfoMessag
 
   return getAiMessagesByCount(roomId, room.maxContextMessages)
 }
+
+export const room = router({
+  getAllRooms,
+  insertRoom,
+  getRoomParticipants,
+  getRoomMessages,
+  getRoomById,
+  updateRoomById,
+  deleteRoomById,
+  addAiToRoom,
+  getRoomContextMessages,
+})

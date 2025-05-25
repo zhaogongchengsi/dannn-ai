@@ -1,6 +1,7 @@
-import type { Answer, Question } from '@/common/schema'
+import type { Answer, Question } from '~/common/schema'
 import { randomUUID } from 'node:crypto'
 import { and, count, desc, eq } from 'drizzle-orm'
+import { router } from '~/common/router'
 import { db } from '../db'
 import { messages, rooms } from '../schema'
 
@@ -235,3 +236,15 @@ export async function updateAIMessageContextFalse(
 
   return updatedMessages
 }
+
+export const message = router({
+  updateAIMessageContextFalse,
+  updateAIMessageContextTrue,
+  getAiMessagesByCount,
+  clearAllMessages,
+  getMessagesByPageDesc,
+  getMessagesByPage,
+  createQuestion,
+  createAiAnswer,
+  getLastMessageForRoom,
+})

@@ -3,6 +3,8 @@ import { resolve } from 'node:path'
 import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
 import { Bridge } from '~/common/bridge'
+import { registerRouterToBridge } from '~/common/router'
+import { databaseRouter } from '~/node/database/router'
 import { logger } from './logger'
 
 export interface WindowOptions {
@@ -34,6 +36,8 @@ export class Window extends Bridge {
         this.onMessage(args)
       }
     })
+    // 赋予扩展进程的 操控database 的权限 并且避免被转发
+    registerRouterToBridge(this, databaseRouter, 'database')
   }
 
   async createWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {

@@ -1,3 +1,5 @@
+import type { Bridge } from './bridge'
+
 type AnyFn = (...args: any[]) => any
 
 interface RouterRecord {
@@ -24,4 +26,17 @@ export function router<T extends RouterRecord>(record: T): RouterReturn<T> {
     }
   }
   return result
+}
+
+export function registerRouterToBridge(bridge: Bridge, record: RouterRecord, prefix = '') {
+  for (const key in record) {
+    const value = record[key]
+    const fullName = prefix ? `${prefix}.${key}` : key
+    if (typeof value === 'function') {
+      bridge.register(fullName, value)
+    }
+    else if (typeof value === 'object' && value !== null) {
+      registerRouterToBridge(bridge, value as RouterRecord, fullName)
+    }
+  }
 }

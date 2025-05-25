@@ -1,5 +1,6 @@
 import type { AiConfig, AIData } from '~/common/types'
 import { and, eq } from 'drizzle-orm'
+import { router } from '~/common/router'
 import { db } from '../db'
 import { ais } from '../schema'
 
@@ -74,3 +75,12 @@ export async function updateAi(id: number, updates: Partial<AiConfig>): Promise<
 export function getAllAis(): Promise<AIData[]> {
   return db.select().from(ais).all()
 }
+
+export const ai = router({
+  findAiByCreateByAndName,
+  findAiByName,
+  findAiById,
+  insertAi,
+  updateAi,
+  getAllAis,
+})
