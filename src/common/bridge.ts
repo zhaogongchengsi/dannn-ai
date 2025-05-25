@@ -1,11 +1,9 @@
-import { Subject } from 'rxjs'
-
 export type BridgeHandler = (...data: any[]) => any
 
 export interface BridgeRequestEvent {
   type: 'event'
   name: string
-  args: any[]
+  preload: any[]
 }
 
 export interface BridgeRequestInvoke {
@@ -30,12 +28,13 @@ export interface IBridge {
   onMessage: (data: BridgeRequest) => void
 }
 
-export class Bridge extends Subject<BridgeRequest> implements IBridge {
+export class Bridge implements IBridge {
   methods: Map<string, BridgeHandler> = new Map()
   waitResponse: Map<string, PromiseWithResolvers<any>> = new Map()
+  events: Map<string, Set<BridgeHandler>> = new Map()
 
   constructor() {
-    super()
+    
   }
 
   /**
@@ -48,9 +47,19 @@ export class Bridge extends Subject<BridgeRequest> implements IBridge {
     throw new Error('send method not implemented')
   }
 
+  private emitEvent(name: string, ...args: any[]) {
+    const handlers = this.events.get(name)
+    if (handlers) {
+      handlers.forEach((handler) => {
+        handler(...args)
+      })
+    }
+  }
+
   onMessage(data: BridgeRequest) {
     if (data.type === 'event') {
-      this.next(data)
+      this.emitEvent(data.name, ...data.preload)
+      return
     }
 
     if (data.type === 'invoke') {
@@ -83,6 +92,7 @@ export class Bridge extends Subject<BridgeRequest> implements IBridge {
           error: e.message || 'Unknown error',
         })
       })
+      return
     }
 
     if (data.type === 'response') {
@@ -101,16 +111,21 @@ export class Bridge extends Subject<BridgeRequest> implements IBridge {
     }
   }
 
-  on(handler: (data: BridgeRequest) => void) {
-    const subscription = this.subscribe(handler)
-    return () => subscription.unsubscribe()
+  on(name: string, handler: (data: BridgeRequestEvent) => void) {
+    if (!this.events.has(name)) {
+      this.events.set(name, new Set())
+    }
+    const handlers = this.events.get(name)
+    if (handlers) {
+      handlers.add(handler)
+    }
   }
 
   emit(name: string, ...args: any[]) {
     this.send({
       type: 'event',
       name,
-      args,
+      preload: args,
     })
   }
 
@@ -125,8 +140,8 @@ export class Bridge extends Subject<BridgeRequest> implements IBridge {
     this.methods.delete(name)
   }
 
-  invoke(name: string, ...args: any[]) {
-    const promiser = Promise.withResolvers()
+  invoke<T>(name: string, ...args: any[]) {
+    const promiser = Promise.withResolvers<T>()
     const id = this.randomAlphaString(16)
     this.waitResponse.set(id, promiser)
     promiser.promise.finally(() => {
@@ -143,7 +158,7 @@ export class Bridge extends Subject<BridgeRequest> implements IBridge {
     return promiser.promise
   }
 
-  private randomAlphaString(length: number): string {
+  randomAlphaString(length: number): string {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz'
     let result = ''
 

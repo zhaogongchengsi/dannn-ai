@@ -4,13 +4,13 @@ import { Subject } from 'rxjs'
 import { AiEvent } from '~/common/event'
 import { createAIInput } from '~/common/schema'
 import { formatZodError } from '../utils'
-import { BaseClient } from '../client'
+import { Client } from '../client'
 
-const client = BaseClient.getInstance()
+const client = new Client()
 
 const aiCreated$ = new Subject<CreateAIInput>()
 
-client.socket.on(AiEvent.create, (ai: CreateAIInput) => {
+client.on(AiEvent.create, (ai: CreateAIInput) => {
   aiCreated$.next(ai)
 })
 
@@ -23,7 +23,7 @@ export async function registerAI(config: CreateAIInput): Promise<AIData> {
 
   const newAI = await client.trpc.ai.registerAi.mutate(data)
 
-  client.socket.emit(AiEvent.create, newAI)
+  client.emit(AiEvent.create, newAI)
 
   return newAI
 }

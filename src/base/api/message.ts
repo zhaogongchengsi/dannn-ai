@@ -2,7 +2,7 @@ import type { Answer, Question } from '~/common/schema'
 import type { InfoMessage } from '~/common/types'
 import { filter, Subject } from 'rxjs'
 import { ChannelEvent } from '~/common/event'
-import { BaseClient } from '../client'
+import { Client } from '../client'
 
 export interface UserMessageData {
   /**
@@ -31,22 +31,23 @@ export type QuestionMessageMeta = InfoMessage & {
   roomId: number
 }
 
+const client = new Client()
 const questionMessageSubject$ = new Subject<QuestionMessageMeta>()
 const answerMessageSubject$ = new Subject<InfoMessage>()
 const allMessagesSubject$ = new Subject<InfoMessage>()
-const client = BaseClient.getInstance()
 
-client.socket.on(ChannelEvent.question, (message: QuestionMessageMeta) => {
+
+client.on(ChannelEvent.question, (message: QuestionMessageMeta) => {
   allMessagesSubject$.next(message)
   questionMessageSubject$.next(message)
 })
 
-client.socket.on(ChannelEvent.answer, (message: InfoMessage) => {
+client.on(ChannelEvent.answer, (message: InfoMessage) => {
   allMessagesSubject$.next(message)
   answerMessageSubject$.next(message)
 })
 
-client.socket.on(ChannelEvent.all, (message: InfoMessage) => {
+client.on(ChannelEvent.all, (message: InfoMessage) => {
   allMessagesSubject$.next(message)
 })
 
@@ -62,12 +63,12 @@ client.socket.on(ChannelEvent.all, (message: InfoMessage) => {
  */
 export async function sendQuestion(message: Question) {
   const questionMessage: InfoMessage = await client.trpc.message.createQuestion.mutate(message)
-  client.socket.emit(ChannelEvent.question, {
+  client.emit(ChannelEvent.question, {
     ...questionMessage,
     roomParticipants: message.roomParticipants,
     roomId: message.roomId,
   })
-  client.socket.emit(ChannelEvent.all, questionMessage)
+  client.emit(ChannelEvent.all, questionMessage)
   allMessagesSubject$.next(questionMessage)
 }
 
@@ -83,8 +84,8 @@ export async function sendQuestion(message: Question) {
  */
 export async function sendTextAnswer(answer: Answer) {
   const answerMessage: InfoMessage = await client.trpc.message.createAiAnswer.mutate(answer)
-  client.socket.emit(ChannelEvent.answer, answerMessage)
-  client.socket.emit(ChannelEvent.all, answerMessage)
+  client.emit(ChannelEvent.answer, answerMessage)
+  client.emit(ChannelEvent.all, answerMessage)
   allMessagesSubject$.next(answerMessage)
 }
 

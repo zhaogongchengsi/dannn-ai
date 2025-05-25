@@ -1,82 +1,64 @@
 /* eslint-disable node/prefer-global/process */
-import type { TRPCClient } from '@trpc/client'
-import type { Socket } from 'socket.io-client'
+import type { TRPCClient, TRPCLink } from '@trpc/client'
 import type { AppRouter } from '../node/server/router'
-import { createTRPCClient, httpBatchLink } from '@trpc/client'
-import { io } from 'socket.io-client'
+import { createTRPCClient } from '@trpc/client'
 import { isWindows } from 'std-env'
+import { AnyRouter } from '@trpc/server'
+import { observable } from '@trpc/server/observable'
+import { Bridge } from '~/common/bridge'
 
-const host = '127.0.0.1'
-
-let instantiated = false
 /**
  * 基础客户端单例类，负责管理trpc和socket连接
  */
-export class BaseClient {
-  private static instance: BaseClient | null = null
+export class Client {
   private _trpc!: TRPCClient<AppRouter>
-  private _socket!: Socket
-
-  private constructor() {
-    if (instantiated) {
-      return
-    }
-    const { trpc, socket } = createClient()
+  bridge: Bridge
+  constructor(bridge: Bridge) {
+    this.bridge = bridge
+    const trpc = createTRPCClient<AppRouter>({
+      links: [
+        ipcLink(bridge)
+      ],
+    })
     this._trpc = trpc
-    this._socket = socket
-    instantiated = true
   }
 
-  public static getInstance(): BaseClient {
-    if (!BaseClient.instance) {
-      BaseClient.instance = new BaseClient()
-    }
-    return BaseClient.instance
+  emit(event: string, ...args: any[]) {
+    this.bridge.emit(event, ...args)
+  }
+
+  on(event: string, callback: (...args: any[]) => void) {
+    this.bridge.on(event, callback)
   }
 
   get trpc(): TRPCClient<AppRouter> {
     return this._trpc
   }
-
-  get socket(): Socket {
-    return this._socket
-  }
 }
 
-function createClient(): {
-  trpc: TRPCClient<AppRouter>
-  socket: Socket
-} {
-  const process = isWindows ? globalThis.process : window.process
-
-  if (
-    typeof process === 'undefined'
-    || typeof process.env === 'undefined'
-    || typeof process.env.PORT === 'undefined'
-  ) {
-    throw new TypeError('PORT is not defined')
-  }
-
-  const port = process.env.PORT
-
-  const url = `http://${host}:${port}/`
-  const ws = `ws://${host}:${port}/`
-
-  const trpc = createTRPCClient<AppRouter>({
-    links: [
-      httpBatchLink({
-        url,
-      }),
-    ],
-  })
-
-  const socket: Socket = io(ws, {
-    reconnectionDelayMax: 10000,
-    autoConnect: true,
-  })
-
-  return {
-    trpc,
-    socket,
+function ipcLink(bridge: Bridge): TRPCLink<AnyRouter> {
+  return () => {
+    return ({ op }) => {
+      return observable((observer) => {
+        const id = bridge.randomAlphaString(10)
+        bridge.invoke<any>('trpc:response', {
+          id,
+          type: op.type,
+          path: op.path,
+          input: op.input,
+        })
+        .then((data) => {
+          if (data.error) {
+            observer.error(data.error)
+          } else {
+            observer.next(data.result)
+            observer.complete()
+          }
+        })
+        return () => {
+          // 清理逻辑（可选）
+        }
+      })
+    }
   }
 }
