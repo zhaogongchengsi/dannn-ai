@@ -5,10 +5,10 @@ import process from 'node:process'
 import { app, ipcMain } from 'electron'
 import { migrateDb } from '../database/db'
 import { EXTENSIONS_ROOT } from './constant'
+import { ExtensionHub } from './extension/hub'
 import { Config } from './lib/config'
 import { logger } from './lib/logger'
 import { Window } from './lib/window'
-import { ExtensionHub } from './extension/hub'
 
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught exception:', err)
@@ -20,8 +20,8 @@ process.on('unhandledRejection', (reason, promise) => {
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
-const extensionHub = new ExtensionHub()
 const config = new Config()
+const extensionHub = new ExtensionHub()
 const window = new Window()
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
@@ -29,7 +29,6 @@ const gotSingleInstanceLock = app.requestSingleInstanceLock()
 if (!gotSingleInstanceLock) {
   app.quit()
 }
-
 
 async function bootstrap() {
   logger.info('Bootstrap...')
@@ -44,7 +43,8 @@ async function bootstrap() {
 
   const windowConfig = config.get('window')
 
-  extensionHub.loader()
+  // 加载插件并且把窗口传入插件
+  extensionHub.loader(window)
 
   await window.display({
     width: windowConfig?.width,

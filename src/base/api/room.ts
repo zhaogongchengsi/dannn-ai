@@ -111,6 +111,4 @@ export class RoomClient extends Client {
   constructor() {
     super()
   }
-
-
 }

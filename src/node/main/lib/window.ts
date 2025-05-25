@@ -1,9 +1,9 @@
+import type { BridgeRequest } from '~/common/bridge'
 import { resolve } from 'node:path'
 import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
+import { Bridge } from '~/common/bridge'
 import { logger } from './logger'
-import { Bridge, BridgeRequest } from '~/common/bridge'
-
 
 export interface WindowOptions {
   width?: number

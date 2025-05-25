@@ -1,5 +1,22 @@
 export type BridgeHandler = (...data: any[]) => any
 
+export interface BridgeRequestCommon {
+  /**
+   * @description 转发的 Bridge ID
+   */
+  forwardedBy: string[]
+
+  /**
+   * @description 是否是转发的消息
+   */
+  isForwarded?: boolean
+
+  /**
+   * @description 是否需要本体事件响应
+   */
+  forwardedNeedSelfEvent?: boolean
+}
+
 export interface BridgeRequestEvent {
   type: 'event'
   name: string
@@ -32,13 +49,46 @@ export class Bridge implements IBridge {
   methods: Map<string, BridgeHandler> = new Map()
   waitResponse: Map<string, PromiseWithResolvers<any>> = new Map()
   events: Map<string, Set<BridgeHandler>> = new Map()
+  private _bridgeId = this.randomAlphaString(16)
 
   constructor() {}
 
   /**
-   * 
+   * 将本 Bridge 收到的所有消息转发到目标 Bridge 实例
+   * @param target 目标 Bridge 实例
+   * @param filter 可选过滤函数，返回 true 时才转发
+   * @returns 停止转发的函数
+   */
+  forwardTo(target: Bridge, filter?: (data: BridgeRequest) => boolean): () => void {
+    const id = this._bridgeId
+    const handler = (data: BridgeRequest & { __forwardedBy?: string[] }) => {
+      // 检查是否已被本 Bridge 转发过，避免循环
+      if (Array.isArray(data.__forwardedBy) && data.__forwardedBy.includes(id)) {
+        return
+      }
+      if (!filter || filter(data)) {
+        // 标记已转发
+        const forwardedBy = Array.isArray(data.__forwardedBy) ? [...data.__forwardedBy, id] : [id]
+        // 构造新对象，避免污染原消息
+        const newData = { ...data, __forwardedBy: forwardedBy }
+        target.onMessage(newData as BridgeRequest)
+      }
+    }
+    // 包装 onMessage，转发后再执行原逻辑
+    const originalOnMessage = this.onMessage.bind(this)
+    this.onMessage = (data: BridgeRequest) => {
+      handler(data as any)
+      originalOnMessage(data)
+    }
+    // 返回取消转发的方法
+    return () => {
+      this.onMessage = originalOnMessage
+    }
+  }
+
+  /**
+   *
    * @param _ data
-   * @returns void
    * @description This method is used to send data to the other side of the bridge. subclass implementation
    */
   send(_: BridgeRequest) {
@@ -49,13 +99,17 @@ export class Bridge implements IBridge {
     const handlers = this.events.get(name)
     if (handlers) {
       handlers.forEach((handler) => {
-        handler(...args)
+        try {
+          handler(...args)
+        }
+        catch (e) {
+          console.error(`Error in event handler for ${name}:`, e)
+        }
       })
     }
   }
 
   onMessage(data: BridgeRequest) {
-    console.log('onMessage', data)
     if (data.type === 'event') {
       this.emitEvent(data.name, ...data.preload)
       return

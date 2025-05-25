@@ -1,14 +1,14 @@
 import type { PackageJson } from 'pkg-types'
+import type { Window } from '../lib/window'
 import type { BridgeRequest } from '~/common/bridge'
 import { existsSync } from 'node:fs'
-import { readdir, readFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
 import { Worker } from 'node:worker_threads'
 import { app } from 'electron'
 import { join, normalize } from 'pathe'
 import { Bridge } from '~/common/bridge'
-import { EXTENSIONS_ROOT } from '../constant'
 import { logger } from '../lib/logger'
 
 const configName = 'package.json'
@@ -38,16 +38,32 @@ export class ExtensionProcess extends Bridge {
     return ExtensionProcess.all.get(id)
   }
 
+  /**
+   * @description 扩展进程文件夹路径
+   */
   _path: string
+  /**
+   * @description 扩展进程配置
+   */
   _config: IExtensionConfig
+  /**
+   * @description 渲染进程进程窗口
+   */
+  _window: Window
 
-  constructor(path: string, config: IExtensionConfig = { env: {} }) {
+  constructor(path: string, window: Window, config: IExtensionConfig = { env: {} }) {
     super()
     this._path = path
     this._config = config
+    this._window = window
+
+    // 将win的所有的消息转发的扩展进程
+    window.forwardTo(this, data => data.name.startsWith('window.'))
+    // 将扩展进程的消息转发到win
+    this.forwardTo(window, data => data.name.startsWith('extension.'))
   }
 
-  getId (): string {
+  getId(): string {
     return this.id
   }
 
@@ -195,28 +211,4 @@ export class ExtensionProcess extends Bridge {
     }
     ExtensionProcess.all.delete(this.pid)
   }
-}
-
-export async function extensionLoadAll() {
-  const processes = []
-
-  try {
-    const dirs = await readdir(EXTENSIONS_ROOT)
-
-    for (const dir of dirs) {
-      const eProcess = new ExtensionProcess(join(EXTENSIONS_ROOT, dir))
-      try {
-        await eProcess.start()
-        processes.push(eProcess)
-      }
-      catch (err) {
-        console.error(`Failed to load extension ${dir}`, err)
-      }
-    }
-  }
-  catch (err: any) {
-    console.error(`Failed to load extensions`, err)
-  }
-
-  return processes
 }
