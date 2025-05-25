@@ -59,22 +59,24 @@ export function endThink(roomId: number, aiId: number) {
 }
 
 export async function createRoom(opt: CreateRoomOptions): Promise<Omit<RoomData, 'participant'>> {
-  const newRooms = await client.trpc.room.createRoom.mutate(opt)
+  const newRooms = client.invoke<RoomData>('database.room.createRoom', opt)
+  // const newRooms = await client.trpc.room.createRoom.mutate(opt)
   client.emit(RoomEvent.create, newRooms)
   return newRooms
 }
 
 export async function getAllRooms(): Promise<RoomData[]> {
-  const rooms = await client.trpc.room.getAllRooms.query()
-  return rooms
+  return client.invoke<RoomData[]>('database.room.getAllRooms')
 }
 
 export async function getRoomById(id: number): Promise<RoomData | undefined> {
-  return await client.trpc.room.getRoomById.query({ roomId: id })
+  return client.invoke<RoomData | undefined>('database.room.getRoomById', { roomId: id })
+  // return await client.trpc.room.getRoomById.query({ roomId: id })
 }
 
 export async function setAiToRoom(roomId: number, aiId: number): Promise<JoinAIToRoom> {
-  const data = await client.trpc.room.addAiToRoom.mutate({ roomId, aiId })
+  const data = await client.invoke<JoinAIToRoom>('database.room.setAiToRoom', { roomId, aiId })
+  // const data = await client.trpc.room.addAiToRoom.mutate({ roomId, aiId })
   client.emit(RoomEvent.addAi, data)
   return data
 }
@@ -95,13 +97,16 @@ export function onRoomCreated(callback: (room: Omit<RoomData, 'participant'>) =>
 }
 
 export function getRoomContextMessages(roomId: number): Promise<InfoMessage[]> {
-  return client.trpc.room.getRoomContextMessages.query({ roomId })
+  return client.invoke<InfoMessage[]>('database.room.getRoomContextMessages', { roomId })
+  // return client.trpc.room.getRoomContextMessages.query({ roomId })
 }
 
 export function updateAIMessageContextFalse(messageId: string): Promise<InfoMessage> {
-  return client.trpc.room.updateAIMessageContextFalse.mutate({ messageId })
+  return client.invoke<InfoMessage>('database.room.updateAIMessageContextFalse', { messageId })
+  // return client.trpc.room.updateAIMessageContextFalse.mutate({ messageId })
 }
 
 export function updateAIMessageContextTrue(messageId: string): Promise<InfoMessage> {
-  return client.trpc.room.updateAIMessageContextTrue.mutate({ messageId })
+  return client.invoke<InfoMessage>('database.room.updateAIMessageContextTrue', { messageId })
+  // return client.trpc.room.updateAIMessageContextTrue.mutate({ messageId })
 }

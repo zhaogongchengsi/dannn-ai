@@ -13,22 +13,21 @@ client.on(AiEvent.create, (ai: CreateAIInput) => {
 })
 
 export async function registerAI(config: CreateAIInput): Promise<AIData> {
-  const { success, data, error } = createAIInput.safeParse(config)
+  // const { success, data, error } = createAIInput.safeParse(config)
 
-  if (!success) {
-    throw new Error(`Invalid AI config: ${formatZodError(error)}`)
-  }
+  // if (!success) {
+  //   throw new Error(`Invalid AI config: ${formatZodError(error)}`)
+  // }
 
-  const newAI = await client.trpc.ai.registerAi.mutate(data)
+  // const newAI = await client.trpc.ai.registerAi.mutate(data)
 
-  client.emit(AiEvent.create, newAI)
+  // client.emit(AiEvent.create, newAI)
 
-  return newAI
+  // return newAI
 }
 
 export async function getAllAIs() {
-  const ais = await client.trpc.ai.getAllAis.query()
-  return ais
+  return client.invoke<AIData[]>('database.ai.getAllAIs')
 }
 
 export function onAIRegistered(callback: (ai: CreateAIInput) => void) {
