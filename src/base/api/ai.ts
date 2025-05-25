@@ -3,8 +3,8 @@ import type { AIData } from '~/common/types'
 import { Subject } from 'rxjs'
 import { AiEvent } from '~/common/event'
 import { createAIInput } from '~/common/schema'
-import { formatZodError } from '../utils'
 import { Client } from '../client'
+import { formatZodError } from '../utils'
 
 const aiCreated$ = new Subject<CreateAIInput>()
 
@@ -40,5 +40,4 @@ export class AIClient extends Client {
   constructor() {
     super()
   }
-
 }
