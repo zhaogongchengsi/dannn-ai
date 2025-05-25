@@ -57,6 +57,7 @@ export class Bridge implements IBridge {
   }
 
   onMessage(data: BridgeRequest) {
+    console.log('onMessage', data)
     if (data.type === 'event') {
       this.emitEvent(data.name, ...data.preload)
       return
@@ -84,6 +85,7 @@ export class Bridge implements IBridge {
           error: null,
         })
       }).catch((e) => {
+        console.error(e)
         this.send({
           type: 'response',
           name,
@@ -99,6 +101,7 @@ export class Bridge implements IBridge {
       const { id, result, error } = data
       const promiser = this.waitResponse.get(id)
       if (!promiser) {
+        console.warn(`Response for ${id} not found`)
         return
       }
       if (error) {

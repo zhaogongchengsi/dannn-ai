@@ -17,6 +17,7 @@ process.on('uncaughtException', (err) => {
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
+// const ipc = new MainIpc()
 const extensionHub = new ExtensionHub()
 const config = new Config()
 const window = new Window()
@@ -27,6 +28,10 @@ const gotSingleInstanceLock = app.requestSingleInstanceLock()
 if (!gotSingleInstanceLock) {
   app.quit()
 }
+
+// ipcMain.on('trpc:message', (_, args) => {
+//   logger.info('trpc:message', args)
+// })
 
 async function bootstrap() {
   logger.info('Bootstrap...')
