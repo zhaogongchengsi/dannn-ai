@@ -1,13 +1,8 @@
-import { callTRPCProcedure } from '@trpc/server';
 import { resolve } from 'node:path'
 import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
 import { logger } from './logger'
 import { Bridge, BridgeRequest } from '~/common/bridge'
-import { appRouter } from "~/node/server/router";
-import { router } from '~/node/server/trpc';
-// import { callProcedure } from '@trpc/server/unstable-core-do-not-import';
-// import { callProcedure } from '@trpc/server/unstable-core-do-not-import';
 
 
 export interface WindowOptions {
@@ -34,32 +29,11 @@ export class Window extends Bridge {
     this.name = name || this.name
     this.preload = resolve(__dirname, './preload.js')
     this.icon = nativeImage.createFromPath(resolve(__dirname, './public/icon_256X256.png'))
-
-    this.register('trpc:response', this.trpcResponse.bind(this))
-
     ipcMain.on('trpc:message', (_, args) => {
       if (args) {
         this.onMessage(args)
       }
     })
-  }
-
-  async trpcResponse(request: { id: string, type: "mutation" | "query" | "subscription", path: string, input: any }) {
-    console.log('trpcResponse', request)
-
-    const result = await callTRPCProcedure({
-      // @ts-ignore
-      procedures: appRouter._def.procedures,
-      path: request.path,
-      rawInput: request.input,
-      ctx: {}, // 通常这里构建一个上下文（可带用户信息等）
-      type: request.type,
-      router: appRouter,
-    });
-
-    console.log('trpcResponse result', result)
-
-    return result
   }
 
   async createWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {

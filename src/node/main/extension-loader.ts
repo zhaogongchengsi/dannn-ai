@@ -3,7 +3,6 @@ import { join } from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { resolvePackageJSON } from 'pkg-types'
-import { Ipc } from './extension/ipc'
 
 if (!process.env.DANNN_PROCESS_PATH || !process.env.DANNN_PROCESS_PATH) {
   throw new Error('DANNN_PROCESS_PATH is not defined')
@@ -32,18 +31,9 @@ if (!process.env.DANNN_PROCESS_PATH || !process.env.DANNN_PROCESS_PATH) {
 
   import(pathToFileURL(path).href)
     .then((module) => {
-      const ipc = new Ipc()
       if (module || typeof module.activate !== 'function') {
         module.activate()
       }
-
-      ipc.invoke('hello')
-        .then((result) => {
-          console.log('Result from extension:', result)
-        })
-        .catch((err) => {
-          console.error('Error invoking hello:', err)
-        })
     })
     .catch((err) => {
       console.error('Error loading module:', err)

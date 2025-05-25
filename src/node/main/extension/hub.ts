@@ -21,4 +21,15 @@ export class ExtensionHub {
 				logger.error("Error loading extensions:", err)
 			})
 	}
+
+	async unloadAll() {
+		for (const [id, subprocess] of ExtensionHub.hub.entries()) {
+			try {
+				subprocess.close?.();
+			} catch (err) {
+				logger.error(`Error unloading extension ${id}:`, err);
+			}
+		}
+		ExtensionHub.hub.clear();
+	}
 }

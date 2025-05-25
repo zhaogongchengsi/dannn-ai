@@ -33,9 +33,7 @@ export class Bridge implements IBridge {
   waitResponse: Map<string, PromiseWithResolvers<any>> = new Map()
   events: Map<string, Set<BridgeHandler>> = new Map()
 
-  constructor() {
-    
-  }
+  constructor() {}
 
   /**
    * 

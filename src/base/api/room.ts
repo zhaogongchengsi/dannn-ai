@@ -106,3 +106,11 @@ export function updateAIMessageContextFalse(messageId: string): Promise<InfoMess
 export function updateAIMessageContextTrue(messageId: string): Promise<InfoMessage> {
   return client.trpc.room.updateAIMessageContextTrue.mutate({ messageId })
 }
+
+export class RoomClient extends Client {
+  constructor() {
+    super()
+  }
+
+
+}

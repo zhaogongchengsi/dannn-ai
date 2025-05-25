@@ -12,16 +12,17 @@ import { ExtensionHub } from './extension/hub'
 
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught exception:', err)
-  app.quit()
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled rejection:', reason, 'Promise:', promise)
 })
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
-// const ipc = new MainIpc()
 const extensionHub = new ExtensionHub()
 const config = new Config()
 const window = new Window()
-let extensionProcessList: ExtensionProcess[] | null = null
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
 
@@ -29,9 +30,6 @@ if (!gotSingleInstanceLock) {
   app.quit()
 }
 
-// ipcMain.on('trpc:message', (_, args) => {
-//   logger.info('trpc:message', args)
-// })
 
 async function bootstrap() {
   logger.info('Bootstrap...')
@@ -41,10 +39,7 @@ async function bootstrap() {
   await config.init()
 
   app.on('before-quit', () => {
-    // server.stop()
-    extensionProcessList?.forEach((extension) => {
-      extension.close()
-    })
+    extensionHub.unloadAll()
   })
 
   const windowConfig = config.get('window')
