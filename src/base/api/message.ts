@@ -2,7 +2,7 @@ import type { Answer, Question } from '~/common/schema'
 import type { InfoMessage } from '~/common/types'
 import { filter, Subject } from 'rxjs'
 import { ChannelEvent } from '~/common/event'
-import { BaseClient } from './client'
+import { BaseClient } from '../client'
 
 export interface UserMessageData {
   /**

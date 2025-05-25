@@ -4,7 +4,7 @@ import { Subject } from 'rxjs'
 import { AiEvent } from '~/common/event'
 import { createAIInput } from '~/common/schema'
 import { formatZodError } from '../utils'
-import { BaseClient } from './client'
+import { BaseClient } from '../client'
 
 const client = BaseClient.getInstance()
 

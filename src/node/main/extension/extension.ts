@@ -1,14 +1,15 @@
 import type { PackageJson } from 'pkg-types'
+import type { BridgeRequest } from '~/common/bridge'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
-import { pathToFileURL } from 'node:url'
 import { Worker } from 'node:worker_threads'
 import { app } from 'electron'
 import { join, normalize } from 'pathe'
+import { Bridge } from '~/common/bridge'
 import { EXTENSIONS_ROOT } from '../constant'
-import { logger } from './logger'
+import { logger } from '../lib/logger'
 
 const configName = 'package.json'
 
@@ -22,7 +23,7 @@ export interface IExtensionConfig {
   env: Record<string, string>
 }
 
-export class ExtensionProcess {
+export class ExtensionProcess extends Bridge {
   private static ID_COUNTER = 0
   private readonly id = String(++ExtensionProcess.ID_COUNTER)
   private readonly pid = process.pid
@@ -40,9 +41,14 @@ export class ExtensionProcess {
   _path: string
   _config: IExtensionConfig
 
-  constructor(path: string, config: IExtensionConfig) {
+  constructor(path: string, config: IExtensionConfig = { env: {} }) {
+    super()
     this._path = path
     this._config = config
+  }
+
+  getId (): string {
+    return this.id
   }
 
   private async readManifest(): Promise<PackageJson> {
@@ -148,8 +154,17 @@ export class ExtensionProcess {
    * 处理 Worker 的消息事件
    * @param message 消息内容
    */
-  private handleMessage(message: any): void {
-    logger.log(`Message from extension process: ${message}`)
+  private handleMessage(message: BridgeRequest): void {
+    this.onMessage(message)
+  }
+
+  send(data: BridgeRequest): void {
+    if (this.process) {
+      this.process.postMessage(data)
+    }
+    else {
+      logger.error('Extension process is not running')
+    }
   }
 
   /**
@@ -182,18 +197,14 @@ export class ExtensionProcess {
   }
 }
 
-export async function extensionLoadAll(port: number) {
+export async function extensionLoadAll() {
   const processes = []
 
   try {
     const dirs = await readdir(EXTENSIONS_ROOT)
 
     for (const dir of dirs) {
-      const eProcess = new ExtensionProcess(join(EXTENSIONS_ROOT, dir), {
-        env: {
-          PORT: String(port),
-        },
-      })
+      const eProcess = new ExtensionProcess(join(EXTENSIONS_ROOT, dir))
       try {
         await eProcess.start()
         processes.push(eProcess)

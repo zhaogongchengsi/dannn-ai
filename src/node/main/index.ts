@@ -1,16 +1,14 @@
-import type { ExtensionProcess } from './lib/extension'
+import type { ExtensionProcess } from './extension/extension'
 import { existsSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import process from 'node:process'
 import { app, ipcMain } from 'electron'
-import { getPort } from 'get-port-please'
 import { migrateDb } from '../database/db'
-import { createServer } from '../server/server'
 import { EXTENSIONS_ROOT } from './constant'
 import { Config } from './lib/config'
-import { extensionLoadAll } from './lib/extension'
 import { logger } from './lib/logger'
 import { Window } from './lib/window'
+import { ExtensionHub } from './extension/hub'
 
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught exception:', err)
@@ -19,6 +17,7 @@ process.on('uncaughtException', (err) => {
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
+const extensionHub = new ExtensionHub()
 const config = new Config()
 const window = new Window()
 let extensionProcessList: ExtensionProcess[] | null = null
@@ -36,30 +35,16 @@ async function bootstrap() {
 
   await config.init()
 
-  const port = await getPort({
-    port: 52123,
-    portRange: [52123, 52223],
-    random: true,
-  })
-
-  logger.info('Port:', port)
-
-  process.env.PORT = String(port)
-
-  const server = createServer(port)
-
-  await server.start()
-
-  extensionProcessList = await extensionLoadAll(port)
-
   app.on('before-quit', () => {
-    server.stop()
+    // server.stop()
     extensionProcessList?.forEach((extension) => {
       extension.close()
     })
   })
 
   const windowConfig = config.get('window')
+
+  extensionHub.loader()
 
   await window.display({
     width: windowConfig?.width,

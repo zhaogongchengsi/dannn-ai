@@ -1,7 +1,7 @@
 import type { InfoMessage, RoomData } from '~/common/types'
 import { filter, Subject } from 'rxjs'
 import { RoomEvent } from '~/common/event'
-import { BaseClient } from './client'
+import { BaseClient } from '../client'
 
 export interface CreateRoomOptions {
   title: string
