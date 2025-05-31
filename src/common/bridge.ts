@@ -117,7 +117,7 @@ export abstract class Bridge implements IBridge {
     const originalOnMessage = this.onMessage.bind(this)
     this.onMessage = (data: BridgeRequest) => {
       handler(data as any)
-      // originalOnMessage(data)
+      originalOnMessage(data)
     }
     // 返回取消转发的方法
     return () => {

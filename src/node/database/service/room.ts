@@ -1,5 +1,6 @@
+import type { InfoAI } from './ai'
 import type { InfoMessage } from './message'
-// import type { AIData, MakeFieldsOptional, RoomData } from '~/common/types'
+import type { MakeFieldsOptional } from '~/common/types'
 import { eq } from 'drizzle-orm'
 import lodash from 'lodash'
 import { router } from '~/common/router'
@@ -8,8 +9,10 @@ import { ais, chatParticipants, messages, rooms } from '../schema'
 import { getAiMessagesByCount } from './message'
 
 export type InfoRoom = typeof rooms.$inferSelect
-
 export type InsertChat = Pick<InfoRoom, 'title' | 'avatar' | 'description'>
+export type InfoChat = InfoRoom & {
+  participant: InfoAI[]
+}
 
 export async function insertRoom(chat: MakeFieldsOptional<InsertChat, 'description' | 'avatar'>) {
   return await db.insert(rooms).values({
@@ -24,7 +27,7 @@ export async function insertRoom(chat: MakeFieldsOptional<InsertChat, 'descripti
   }).returning().get()
 }
 
-export async function getRoomParticipants(roomId: number): Promise<AIData[]> {
+export async function getRoomParticipants(roomId: number): Promise<InfoAI[]> {
   const participants = await db
     .select({
       ais,
@@ -48,7 +51,7 @@ export async function getRoomMessages(roomId: number) {
   return messageList
 }
 
-export async function getAllRooms(): Promise<RoomData[]> {
+export async function getAllRooms(): Promise<InfoChat[]> {
   const roomsList = await db
     .select()
     .from(rooms)
@@ -67,7 +70,7 @@ export async function getAllRooms(): Promise<RoomData[]> {
   return groupedRooms
 }
 
-export async function getRoomById(id: number): Promise<RoomData | undefined> {
+export async function getRoomById(id: number): Promise<InfoChat | undefined> {
   const room = await db.select().from(rooms).where(eq(rooms.id, id)).get()
   if (!room) {
     return undefined

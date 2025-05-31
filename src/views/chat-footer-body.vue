@@ -1,7 +1,6 @@
 <script setup lang='ts'>
 import { Bot, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
-import { sendQuestion } from '@/base/api/message'
 import Editor from '@/components/editor/editor.vue'
 import { Button } from '@/components/ui/button'
 
@@ -19,12 +18,7 @@ function onSend() {
     return
   }
 
-  sendQuestion({
-    content: message,
-    roomId: chatStore.currentChat.id,
-    roomParticipants: chatStore.currentChat.participant.map(item => item.id),
-    type: 'text',
-  })
+  console.log('发送消息:', message)
 
   value.value = ''
 }

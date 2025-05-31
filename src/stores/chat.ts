@@ -1,12 +1,17 @@
+import type { InfoChat, InsertChat } from '~/node/database/service/room'
 import { defineStore } from 'pinia'
+import { database } from '@/lib/database'
 
 export const useChatStore = defineStore('dannn-chat', () => {
-  const rooms = reactive<any[]>([])
+  const rooms = reactive<InfoChat[]>([])
   const currentChatID = ref<number | null>(null)
-  const aiStore = useAIStore()
   const messages = useMessagesStore()
 
   const findRoomById = (id: number) => rooms.find(room => room.id === id)
+
+  database.room.getAllRooms().then((fetchedRooms) => {
+    rooms.push(...fetchedRooms)
+  })
 
   const currentChat = computed(() => {
     return currentChatID.value ? findRoomById(currentChatID.value) : null
@@ -26,13 +31,13 @@ export const useChatStore = defineStore('dannn-chat', () => {
     return messageConfig.messages
   })
 
-  async function addRoom(room: CreateRoomOptions) {
-    // const newRoom = await createRoom(room)
-    // rooms.push({
-    //   ...newRoom,
-    //   participant: [],
-    // })
-    // return newRoom
+  async function addRoom(room: InsertChat) {
+    const newRoom = await database.room.insertRoom(room)
+    rooms.push({
+      ...newRoom,
+      participant: [], // Initialize with an empty participant array
+    })
+    return newRoom
   }
 
   async function addAiToChat(id: number, aiID: number) {
@@ -41,15 +46,15 @@ export const useChatStore = defineStore('dannn-chat', () => {
       throw new Error('Room not found')
     }
 
-    // await setAiToRoom(id, aiID)
+    // // await setAiToRoom(id, aiID)
 
-    const ai = aiStore.findAiById(aiID)
+    // const ai = aiStore.findAiById(aiID)
 
-    if (!ai) {
-      throw new Error('AI not found')
-    }
+    // if (!ai) {
+    //   throw new Error('AI not found')
+    // }
 
-    room.participant.push(ai)
+    // room.participant.push(ai)
   }
 
   function setCurrentChatID(id: number) {
