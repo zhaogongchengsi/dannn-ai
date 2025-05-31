@@ -22,18 +22,3 @@ class Rpc extends Bridge {
 
 export const rpc = new Rpc()
 export const database = rpc.createProxy<ExtensionDatabaseRouter>('database')
-
-class RendererBridge extends Bridge {
-  constructor() {
-    super()
-    rpc.on('forward:window:message', (data: BridgeRequest) => {
-      this.onMessage(data)
-    })
-  }
-
-  send(data: BridgeRequest): void {
-    rpc.emit('forward:extension:message', data)
-  }
-}
-
-export const windowBridge = new RendererBridge()

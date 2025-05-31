@@ -63,19 +63,17 @@ export class ExtensionProcess extends Bridge {
     // 赋予扩展进程的 操控database 的权限
     registerRouterToBridge(this, extensionRouter, 'database')
 
+    // // 监听渲染进程的消息并转发到扩展进程
+    window.forwardTo(this, (data) => {
+      return data.name.startsWith('extension.')
+    })
+
     // 将扩展进程的消息转发到渲染进程
-    this.on('forward:extension:message', (data: BridgeRequest) => {
-      console.log('Forwarding message to window:', data)
-      window.send(data)
+    this.forwardTo(window, (data) => {
+      return data.name.startsWith('window.')
     })
 
-    // 监听渲染进程的消息并转发到扩展进程
-    window.on('forward:window:message', (data: BridgeRequest) => {
-      console.log('Forwarding message from window:', data)
-      this.onMessage(data)
-    })
-
-    this.on('extension.ready', () => {
+    this.on('_extension.ready', () => {
       this.activate()
         .catch((error) => {
           logger.error(`Failed to activate extension: ${error?.message}`)
@@ -104,11 +102,11 @@ export class ExtensionProcess extends Bridge {
   }
 
   private async activate() {
-    return await this.invoke('extension.activate')
+    return await this.invoke('_extension.activate')
   }
 
   private async deactivate() {
-    return await this.invoke('extension.deactivate')
+    return await this.invoke('_extension.deactivate')
   }
 
   async start(): Promise<void> {

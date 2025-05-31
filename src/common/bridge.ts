@@ -106,19 +106,20 @@ export abstract class Bridge implements IBridge {
       if (Array.isArray(data.__forwardedBy) && data.__forwardedBy.includes(id)) {
         return
       }
+
       if (!filter || filter(data)) {
         // 标记已转发
         const forwardedBy = Array.isArray(data.__forwardedBy) ? [...data.__forwardedBy, id] : [id]
         // 构造新对象，避免污染原消息
         const newData = { ...data, __forwardedBy: forwardedBy }
-        target.onMessage(newData as BridgeRequest)
+        target.send(newData as BridgeRequest)
       }
     }
     // 包装 onMessage，转发后再执行原逻辑
     const originalOnMessage = this.onMessage.bind(this)
     this.onMessage = (data: BridgeRequest) => {
       handler(data as any)
-      originalOnMessage(data)
+      // originalOnMessage(data)
     }
     // 返回取消转发的方法
     return () => {

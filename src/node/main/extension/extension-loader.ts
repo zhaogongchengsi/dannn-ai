@@ -43,8 +43,6 @@ async function init() {
 
   const modulePath = pathToFileURL(path).href
 
-  console.log('Loading extension from:', modulePath)
-
   import(modulePath)
     .then((module: Extension) => {
       bootstrap(module)
