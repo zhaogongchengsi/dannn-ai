@@ -1,5 +1,5 @@
 import type { InfoMessage } from './message'
-import type { AIData, MakeFieldsOptional, RoomData } from '~/common/types'
+// import type { AIData, MakeFieldsOptional, RoomData } from '~/common/types'
 import { eq } from 'drizzle-orm'
 import lodash from 'lodash'
 import { router } from '~/common/router'

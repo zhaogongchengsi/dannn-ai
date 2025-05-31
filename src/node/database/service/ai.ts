@@ -1,4 +1,4 @@
-import type { AiConfig, AIData } from '~/common/types'
+import type { AiConfig } from '~/common/types'
 import { and, eq } from 'drizzle-orm'
 import { router } from '~/common/router'
 import { db } from '../db'
@@ -6,15 +6,15 @@ import { ais } from '../schema'
 
 export type InfoAI = typeof ais.$inferSelect
 
-export function findAiByName(name: string) {
+export async function findAiByName(name: string): Promise<InfoAI | undefined> {
   return db.select().from(ais).where(eq(ais.name, name)).get()
 }
 
-export function findAiById(id: number) {
+export function findAiById(id: number): Promise<InfoAI | undefined> {
   return db.select().from(ais).where(eq(ais.id, id)).get()
 }
 
-export async function findAiByCreateByAndName(createdBy: string, name: string): Promise<AIData | undefined> {
+export async function findAiByCreateByAndName(createdBy: string, name: string): Promise<InfoAI | undefined> {
   return await db
     .select()
     .from(ais)
@@ -22,7 +22,7 @@ export async function findAiByCreateByAndName(createdBy: string, name: string): 
     .get()
 }
 
-export async function insertAi(config: AiConfig): Promise<AIData> {
+export async function insertAi(config: AiConfig): Promise<InfoAI> {
   const info: InfoAI = {
     name: config.name,
     avatar: config.avatar || null,
@@ -48,10 +48,10 @@ export async function insertAi(config: AiConfig): Promise<AIData> {
   return await db.insert(ais).values(info).returning().get()
 }
 
-export async function updateAi(id: number, updates: Partial<AiConfig>): Promise<AIData | null> {
+export async function updateAi(id: number, updates: Partial<AiConfig>): Promise<InfoAI | undefined> {
   const existingAi = await findAiById(id)
   if (!existingAi) {
-    return null
+    return undefined
   }
 
   const versionHistory = (existingAi.versionHistory ?? '').split(',')
@@ -72,7 +72,7 @@ export async function updateAi(id: number, updates: Partial<AiConfig>): Promise<
     .get()
 }
 
-export function getAllAis(): Promise<AIData[]> {
+export function getAllAis(): Promise<InfoAI[]> {
   return db.select().from(ais).all()
 }
 
