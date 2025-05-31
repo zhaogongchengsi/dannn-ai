@@ -1,8 +1,7 @@
-import type { DatabaseRouter } from './node/database/router'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import { Rpc } from '~/lib/rpc'
 import App from './App.vue'
+import { extensionBridge } from './lib/rpc'
 import { initMarkdownIt } from './lib/shiki'
 import { router } from './router'
 import './assets/index.css'
@@ -14,8 +13,16 @@ app.use(pinia)
 app.use(router)
 
 async function bootstrap() {
-  await initMarkdownIt()
+  initMarkdownIt()
   app.mount('#app')
 }
 
 bootstrap()
+
+extensionBridge.on('extension.heartbeat', () => {
+  console.log('Heartbeat received from extension')
+
+  extensionBridge.emit('window.heartbeat', {
+    timestamp: Date.now(),
+  })
+})

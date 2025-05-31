@@ -62,6 +62,25 @@ export class ExtensionProcess extends Bridge {
 
     // 赋予扩展进程的 操控database 的权限
     registerRouterToBridge(this, extensionRouter, 'database')
+
+    // 将扩展进程的消息转发到渲染进程
+    this.on('forward:extension:message', (data: BridgeRequest) => {
+      console.log('Forwarding message to window:', data)
+      window.send(data)
+    })
+
+    // 监听渲染进程的消息并转发到扩展进程
+    window.on('forward:window:message', (data: BridgeRequest) => {
+      console.log('Forwarding message from window:', data)
+      this.onMessage(data)
+    })
+
+    this.on('extension.ready', () => {
+      this.activate()
+        .catch((error) => {
+          logger.error(`Failed to activate extension: ${error?.message}`)
+        })
+    })
   }
 
   getId(): string {
@@ -85,14 +104,15 @@ export class ExtensionProcess extends Bridge {
   }
 
   private async activate() {
-    return await this.invoke('activate')
+    return await this.invoke('extension.activate')
   }
 
   private async deactivate() {
-    return await this.invoke('deactivate')
+    return await this.invoke('extension.deactivate')
   }
 
   async start(): Promise<void> {
+    logger.info('Starting extension process', this.id, this.pid, this._path)
     try {
       performance.mark('start-extension')
       const manifest = await this.readManifest()
@@ -197,10 +217,6 @@ export class ExtensionProcess extends Bridge {
    */
   private handleOnline(): void {
     logger.log('Extension process is online')
-    this.activate()
-      .catch((error) => {
-        logger.error(`Failed to activate extension: ${error?.message}`)
-      })
   }
 
   /**

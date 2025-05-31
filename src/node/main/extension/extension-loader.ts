@@ -41,7 +41,11 @@ async function init() {
     return Promise.reject(new Error('Path to the extension is not defined'))
   }
 
-  import(pathToFileURL(path).href)
+  const modulePath = pathToFileURL(path).href
+
+  console.log('Loading extension from:', modulePath)
+
+  import(modulePath)
     .then((module: Extension) => {
       bootstrap(module)
     })

@@ -32,6 +32,9 @@ async function bootstrap() {
 
   // 加载插件并且把窗口传入插件
   extensionHub.loader(window)
+    .then(() => {
+      extensionHub.startAll()
+    })
 
   await window.display({
     width: windowConfig?.width,

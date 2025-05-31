@@ -10,17 +10,38 @@ export class ExtensionHub {
 
   constructor() { }
 
-  async loader(window: Window) {
-    readdir(EXTENSIONS_ROOT)
-      .then((dirs) => {
-        for (const dir of dirs) {
-          const subprocess = new ExtensionProcess(join(EXTENSIONS_ROOT, dir), window)
-          ExtensionHub.hub.set(subprocess.getId(), subprocess)
-        }
-      })
-      .catch((err) => {
-        logger.error('Error loading extensions:', err)
-      })
+  loader(window: Window) {
+    return new Promise<void>((resolve, reject) => {
+      readdir(EXTENSIONS_ROOT)
+        .then((dirs) => {
+          for (const dir of dirs) {
+            const extensionPath = join(EXTENSIONS_ROOT, dir)
+            logger.info(`Loading extension: ${extensionPath}`)
+            const subprocess = new ExtensionProcess(extensionPath, window)
+            ExtensionHub.hub.set(subprocess.getId(), subprocess)
+          }
+
+          logger.info(`Loaded ${ExtensionHub.hub.size} extensions`)
+          resolve()
+        })
+        .catch((err) => {
+          logger.error('Error loading extensions:', err)
+          reject(err)
+        })
+    })
+  }
+
+  async startAll() {
+    logger.info('Starting all extensions...')
+    for (const subprocess of ExtensionHub.hub.values()) {
+      try {
+        await subprocess.start?.()
+        logger.info(`Started extension: ${subprocess.getId()}`)
+      }
+      catch (err) {
+        logger.error(`Error starting extension ${subprocess.getId()}:`, err)
+      }
+    }
   }
 
   async unloadAll() {

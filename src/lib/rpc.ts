@@ -20,3 +20,20 @@ export class Rpc {
     return Rpc.instance
   }
 }
+
+class ExtensionBridge extends Bridge {
+  rpc: RendererBridge
+  constructor() {
+    super()
+    this.rpc = new Rpc().rpc
+    this.rpc.on('forward:extension:message', (data: BridgeRequest) => {
+      this.onMessage(data)
+    })
+  }
+
+  send(data: BridgeRequest): void {
+    this.rpc.emit('forward:window:message', data)
+  }
+}
+
+export const extensionBridge = new ExtensionBridge()
