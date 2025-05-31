@@ -1,9 +1,9 @@
-import type { Window } from '../lib/window'
+import type { Window } from './window'
 import { readdir } from 'node:fs/promises'
 import { join } from 'pathe'
 import { EXTENSIONS_ROOT } from '../constant'
-import { logger } from '../lib/logger'
 import { ExtensionProcess } from './extension'
+import { logger } from './logger'
 
 export class ExtensionHub {
   static readonly hub: Map<string, ExtensionProcess> = new Map()

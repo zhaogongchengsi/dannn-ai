@@ -1,10 +1,8 @@
 import process from 'node:process'
 import { app } from 'electron'
-import { registerRouterToBridge } from '~/common/router'
 import { migrateDb } from '../database/db'
-import { databaseRouter } from '../database/router'
-import { ExtensionHub } from './extension/hub'
 import { Config } from './lib/config'
+import { ExtensionHub } from './lib/hub'
 import { logger } from './lib/logger'
 import { Window } from './lib/window'
 

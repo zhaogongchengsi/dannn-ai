@@ -47,13 +47,22 @@ export interface IBridge {
   onMessage: (data: BridgeRequest) => void
 }
 
-export class Bridge implements IBridge {
+export abstract class Bridge implements IBridge {
   methods: Map<string, BridgeHandler> = new Map()
   waitResponse: Map<string, PromiseWithResolvers<any>> = new Map()
   events: Map<string, Set<BridgeHandler>> = new Map()
   private _bridgeId = this.randomAlphaString(16)
 
-  constructor() {}
+  constructor() {
+    this.register('this.getAllRegistered', () => this.getAllRegistered())
+  }
+
+  /**
+   * @description 获取当前 Bridge 的唯一 ID
+   */
+  get bridgeId(): string {
+    return this._bridgeId
+  }
 
   /**
    * 将本 Bridge 收到的所有消息转发到目标 Bridge 实例
@@ -93,9 +102,7 @@ export class Bridge implements IBridge {
    * @param _ data
    * @description This method is used to send data to the other side of the bridge. subclass implementation
    */
-  send(_: BridgeRequest) {
-    throw new Error('send method not implemented')
-  }
+  abstract send(_: BridgeRequest): void
 
   private emitEvent(name: string, ...args: any[]) {
     const handlers = this.events.get(name)
@@ -191,6 +198,14 @@ export class Bridge implements IBridge {
       throw new Error(`Method ${name} already registered`)
     }
     this.methods.set(name, handler)
+  }
+
+  isRegistered(name: string): boolean {
+    return this.methods.has(name)
+  }
+
+  getAllRegistered(): string[] {
+    return Array.from(this.methods.keys())
   }
 
   unregister(name: string) {

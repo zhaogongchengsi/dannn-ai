@@ -1,6 +1,4 @@
 import type { InfoMessage } from '@/common/types'
-import { getMessagesByPage, onAllMessages } from '@/base/api/message'
-import { getAllRooms, onAiEndThink, onAiThinking, updateAIMessageContextFalse, updateAIMessageContextTrue } from '@/base/api/room'
 
 export interface ThinkingMessage extends InfoMessage {
   type: 'thinking'
@@ -112,7 +110,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
   async function updateMessageContextTrue(roomId: number, messageId: string) {
     const messageNode = messages.get(roomId)
-    await updateAIMessageContextTrue(messageId)
     if (messageNode) {
       const message = messageNode.messages.find(msg => msg.id === messageId)
       if (message) {
@@ -123,7 +120,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
   async function updateMessageContextFalse(roomId: number, messageId: string) {
     const messageNode = messages.get(roomId)
-    await updateAIMessageContextFalse(messageId)
     if (messageNode) {
       const message = messageNode.messages.find(msg => msg.id === messageId)
       if (message) {
@@ -133,38 +129,23 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   }
 
   async function init() {
-    const rooms = await getAllRooms()
+    // const rooms = await getAllRooms()
 
-    for (const room of rooms) {
-      const { data, total } = await getMessagesByPage(room.id, PAGE, PAGE_SIZE)
-        .catch((err) => {
-          console.error(`Error fetching messages for room ${room.id}:`, err)
-          return {
-            data: [],
-            total: 0,
-          }
-        })
+    // for (const room of rooms) {
+    //   const { data, total } = await getMessagesByPage(room.id, PAGE, PAGE_SIZE)
+    //     .catch((err) => {
+    //       console.error(`Error fetching messages for room ${room.id}:`, err)
+    //       return {
+    //         data: [],
+    //         total: 0,
+    //       }
+    //     })
 
-      addMessagesByRoomId(room.id, data, {
-        total,
-      })
-    }
+    //   addMessagesByRoomId(room.id, data, {
+    //     total,
+    //   })
+    // }
   }
-
-  onAiThinking((data) => {
-    addThinkingMessagesByRoomId(data.roomId, data.aiId)
-  })
-
-  onAiEndThink((data) => {
-    const messageNode = messages.get(data.roomId)
-    if (messageNode) {
-      deleteMessagesByRoomId(data.roomId, `${data.roomId}-${data.aiId}`)
-    }
-  })
-
-  onAllMessages((message: InfoMessage) => {
-    addMessagesByRoomId(message.roomId, [message])
-  })
 
   init()
 

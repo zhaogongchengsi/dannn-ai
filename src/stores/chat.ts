@@ -1,10 +1,7 @@
-import type { CreateRoomOptions } from '@/base/api/room'
-import type { RoomData } from '@/common/types'
 import { defineStore } from 'pinia'
-import { createRoom, getAllRooms, setAiToRoom } from '@/base/api/room'
 
 export const useChatStore = defineStore('dannn-chat', () => {
-  const rooms = reactive<RoomData[]>([])
+  const rooms = reactive<any[]>([])
   const currentChatID = ref<number | null>(null)
   const aiStore = useAIStore()
   const messages = useMessagesStore()
@@ -29,17 +26,13 @@ export const useChatStore = defineStore('dannn-chat', () => {
     return messageConfig.messages
   })
 
-  getAllRooms().then((data) => {
-    rooms.push(...data)
-  })
-
   async function addRoom(room: CreateRoomOptions) {
-    const newRoom = await createRoom(room)
-    rooms.push({
-      ...newRoom,
-      participant: [],
-    })
-    return newRoom
+    // const newRoom = await createRoom(room)
+    // rooms.push({
+    //   ...newRoom,
+    //   participant: [],
+    // })
+    // return newRoom
   }
 
   async function addAiToChat(id: number, aiID: number) {
@@ -48,7 +41,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
       throw new Error('Room not found')
     }
 
-    await setAiToRoom(id, aiID)
+    // await setAiToRoom(id, aiID)
 
     const ai = aiStore.findAiById(aiID)
 

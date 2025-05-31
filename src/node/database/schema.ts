@@ -1,4 +1,3 @@
-import { relations } from 'drizzle-orm'
 import { int, integer, primaryKey, sqliteTable as table, text } from 'drizzle-orm/sqlite-core'
 
 export const ais = table('ais', {

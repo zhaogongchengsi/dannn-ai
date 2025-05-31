@@ -1,17 +1,16 @@
 import type { PackageJson } from 'pkg-types'
-import type { Window } from '../lib/window'
+import type { Window } from './window'
 import type { BridgeRequest } from '~/common/bridge'
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
 import { Worker } from 'node:worker_threads'
+import { withTimeout } from '@zunh/promise-kit'
 import { app } from 'electron'
 import { join, normalize } from 'pathe'
 import { Bridge } from '~/common/bridge'
-import { registerRouterToBridge } from '~/common/router'
-import { databaseRouter } from '~/node/database/router'
-import { logger } from '../lib/logger'
+import { logger } from './logger'
 
 const configName = 'package.json'
 
@@ -58,13 +57,6 @@ export class ExtensionProcess extends Bridge {
     this._path = path
     this._config = config
     this._window = window
-
-    // 赋予扩展进程的 操控database 的权限 并且避免被转发
-    registerRouterToBridge(this, databaseRouter, 'database')
-    // 将win的所有的消息转发的扩展进程
-    window.forwardTo(this, data => data.name.startsWith('window.'))
-    // 将扩展进程的消息转发到win
-    this.forwardTo(window, data => data.name.startsWith('extension.'))
   }
 
   getId(): string {
@@ -85,6 +77,14 @@ export class ExtensionProcess extends Bridge {
     catch (e) {
       throw new Error(`Failed to read config file ${configFile}: ${e}`)
     }
+  }
+
+  private async activate() {
+    return await this.invoke('activate')
+  }
+
+  private async deactivate() {
+    return await this.invoke('deactivate')
   }
 
   async start(): Promise<void> {
@@ -116,7 +116,7 @@ export class ExtensionProcess extends Bridge {
         DANNN_MODULES_PATH: normalize(process.env.DANNN_MODULES_PATH || nodeModulesRoot),
       }
 
-      const iProcess = new Worker(join(__dirname, 'extension-loader.js'), {
+      const iProcess = new Worker(join(__dirname, 'extension', 'extension-loader.js'), {
         env,
         // TODO: 这里希望使用 loader 来加载模块
         // execArgv: ['--loader', pathToFileURL(normalize(resolve(__dirname, 'loader.js'))).href],
@@ -192,6 +192,10 @@ export class ExtensionProcess extends Bridge {
    */
   private handleOnline(): void {
     logger.log('Extension process is online')
+    this.activate()
+      .catch((error) => {
+        logger.error(`Failed to activate extension: ${error?.message}`)
+      })
   }
 
   /**
@@ -208,11 +212,18 @@ export class ExtensionProcess extends Bridge {
     })
   }
 
-  close(): void {
-    if (this.process) {
-      this.process.terminate()
-      this.process = null
-    }
-    ExtensionProcess.all.delete(this.pid)
+  /**
+   * @description 关闭扩展进程
+   */
+  async close(): Promise<void> {
+    // 关闭扩展进程之前先调用 deactivate 方法 最多五秒后执行开始关闭
+    withTimeout(this.deactivate(), 5000)
+      .finally(() => {
+        if (this.process) {
+          this.process.terminate()
+          this.process = null
+        }
+        ExtensionProcess.all.delete(this.pid)
+      })
   }
 }

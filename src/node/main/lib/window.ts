@@ -4,6 +4,7 @@ import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
 import { Bridge } from '~/common/bridge'
 import { registerRouterToBridge } from '~/common/router'
+import { databaseUrl } from '~/node/database/constant'
 import { databaseRouter } from '~/node/database/router'
 import { logger } from './logger'
 

@@ -7,6 +7,9 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const Ipc: typeof import('./src/utils/rpc')['Ipc']
+  const RendererBridge: typeof import('./src/utils/rpc')['RendererBridge']
+  const Rpc: typeof import('./src/utils/rpc')['Rpc']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
@@ -100,6 +103,8 @@ declare global {
   const resolveComponent: typeof import('vue')['resolveComponent']
   const resolveRef: typeof import('@vueuse/core')['resolveRef']
   const resolveUnref: typeof import('@vueuse/core')['resolveUnref']
+  const rpc: typeof import('./src/utils/rpc')['rpc']
+  const rpc2: typeof import('./src/utils/rpc')['rpc2']
   const setActivePinia: typeof import('pinia')['setActivePinia']
   const setMapStoreSuffix: typeof import('pinia')['setMapStoreSuffix']
   const shallowReactive: typeof import('vue')['shallowReactive']
@@ -326,6 +331,9 @@ declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { Rpc } from './src/utils/rpc'
+  import('./src/utils/rpc')
   // @ts-ignore
   export type { ThinkingMessage, MessageNode, RoomID } from './src/stores/messages'
   import('./src/stores/messages')

@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { initMarkdownIt } from './lib/shiki'
 import { router } from './router'
+import { Rpc } from './utils/rpc'
 import './assets/index.css'
 
 const pinia = createPinia()
@@ -17,3 +18,7 @@ async function bootstrap() {
 }
 
 bootstrap()
+
+const rpc = new Rpc()
+
+window._rpc = rpc.rpc

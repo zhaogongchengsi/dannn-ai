@@ -5,7 +5,6 @@
   const process = await import('node:process')
   const fs = await import('node:fs/promises')
   const fsSync = await import('node:fs')
-
   const NAME = (process.argv.find(arg => arg.startsWith('--name='))?.split('=')[1] || '').toLocaleLowerCase()
 
   async function readFile(path: string, encoding: BufferEncoding = 'utf-8') {
