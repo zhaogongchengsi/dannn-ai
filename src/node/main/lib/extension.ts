@@ -10,6 +10,8 @@ import { withTimeout } from '@zunh/promise-kit'
 import { app } from 'electron'
 import { join, normalize } from 'pathe'
 import { Bridge } from '~/common/bridge'
+import { registerRouterToBridge } from '~/common/router'
+import { extensionRouter } from '~/node/database/router'
 import { logger } from './logger'
 
 const configName = 'package.json'
@@ -57,6 +59,9 @@ export class ExtensionProcess extends Bridge {
     this._path = path
     this._config = config
     this._window = window
+
+    // 赋予扩展进程的 操控database 的权限
+    registerRouterToBridge(this, extensionRouter, 'database')
   }
 
   getId(): string {

@@ -1,5 +1,34 @@
 import { withResolvers } from '@zunh/promise-kit'
 
+export type RpcProxy<T> = {
+  [K in keyof T]: T[K] extends (...args: infer A) => infer R
+    ? (...args: A) => Promise<Awaited<R>>
+    : RpcProxy<T[K]>
+}
+
+// 获取 Promise 里的实际类型
+export type UnwrapPromise<T> = T extends Promise<infer U> ? U : T
+
+export type GetRpcReturnType<
+  TRouter extends Record<string, any>,
+  T extends keyof TRouter,
+  M extends keyof TRouter[T] & (string | number | symbol),
+> = TRouter[T][M] extends (...args: any) => any
+  ? UnwrapPromise<ReturnType<TRouter[T][M]>>
+  : never
+
+// 类型工具：只保留函数类型的导出
+export type OnlyFunctions<T> = {
+  [K in keyof T as T[K] extends (...args: any[]) => any ? K : never]: T[K]
+}
+
+// 通用类型工具：只保留函数类型的导出
+export type ExtractRouterFunctions<T> = {
+  [K in keyof T]: {
+    [M in keyof T[K]as T[K][M] extends (...args: any[]) => any ? M : never]: T[K][M]
+  }
+}
+
 export type BridgeHandler = (...data: any[]) => any
 
 export interface BridgeRequestCommon {
@@ -244,5 +273,26 @@ export abstract class Bridge implements IBridge {
     }
 
     return result
+  }
+
+  /**
+   * 生成一个动态代理对象，支持 database.ai.findAiByName() 形式调用
+   * @param namespace 根命名空间（如 'database'）
+   */
+  createProxy<T>(namespace: string): RpcProxy<T> {
+    // eslint-disable-next-line ts/no-this-alias
+    const bridge = this
+    const handler = (path: string[] = []) => {
+      return new Proxy(() => { }, {
+        get(_, prop: string) {
+          return handler([...path, prop])
+        },
+        apply(_, __, args) {
+          const method = [namespace, ...path].join('.')
+          return bridge.invoke(method, ...args)
+        },
+      })
+    }
+    return handler() as unknown as RpcProxy<T>
   }
 }

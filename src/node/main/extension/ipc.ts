@@ -1,8 +1,9 @@
 import type { BridgeRequest } from '~/common/bridge'
+import type { ExtensionDatabaseRouter } from '~/node/database/router'
 import { isMainThread, parentPort } from 'node:worker_threads'
 import { Bridge } from '~/common/bridge'
 
-export class Rpc extends Bridge {
+class Rpc extends Bridge {
   constructor() {
     super()
     if (!isMainThread && parentPort) {
@@ -18,3 +19,6 @@ export class Rpc extends Bridge {
     }
   }
 }
+
+export const rpc = new Rpc()
+export const database = rpc.createProxy<ExtensionDatabaseRouter>('database')

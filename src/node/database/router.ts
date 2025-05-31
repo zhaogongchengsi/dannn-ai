@@ -1,3 +1,4 @@
+import type { ExtractRouterFunctions } from '~/common/bridge'
 import { router } from '~/common/router'
 import { ai } from './service/ai'
 import { message } from './service/message'
@@ -9,13 +10,12 @@ export const databaseRouter = router({
   ai,
 })
 
+export const extensionRouter = router({
+  message,
+  ai,
+})
 
-// 类型工具：只保留函数类型的导出
-type OnlyFunctions<T> = {
-  [K in keyof T as T[K] extends (...args: any[]) => any ? K : never]: T[K]
-}
+export type ExtensionDatabaseRouter = ExtractRouterFunctions<typeof extensionRouter>
 
 // 自动生成 DatabaseRouter 类型
-export type DatabaseRouter = {
-  [K in keyof typeof databaseRouter]: OnlyFunctions<typeof databaseRouter[K]>
-}
+export type DatabaseRouter = ExtractRouterFunctions<typeof databaseRouter>

@@ -1,9 +1,9 @@
-import type { Rpc } from './ipc'
 import type { Extension } from '~/common/extension'
+import { rpc } from './ipc'
 
-export function bootstrap(modules: Extension, rpc: Rpc) {
-  if (!rpc.isRegistered('activate')) {
-    rpc.register('activate', async () => {
+export function bootstrap(modules: Extension) {
+  if (!rpc.isRegistered('extension.activate')) {
+    rpc.register('extension.activate', async () => {
       const activate = module && typeof modules.activate === 'function' ? modules.activate : null
       if (activate) {
         return await activate()
@@ -14,8 +14,8 @@ export function bootstrap(modules: Extension, rpc: Rpc) {
     })
   }
 
-  if (!rpc.isRegistered('deactivate')) {
-    rpc.register('deactivate', async () => {
+  if (!rpc.isRegistered('extension.deactivate')) {
+    rpc.register('extension.deactivate', async () => {
       const deactivate = module && typeof modules.deactivate === 'function' ? modules.deactivate : null
       if (deactivate) {
         return await deactivate()

@@ -6,13 +6,11 @@ import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { resolvePackageJSON } from 'pkg-types'
 import { bootstrap } from './bootstrap'
-import { Rpc } from './ipc'
+import { rpc } from './ipc'
 
 if (!process.env.DANNN_PROCESS_PATH || !process.env.DANNN_PROCESS_PATH) {
   throw new Error('DANNN_PROCESS_PATH is not defined')
 }
-
-const rpc = new Rpc()
 
 async function init() {
   const pkgPath = await resolvePackageJSON(process.env.DANNN_PROCESS_PATH)
@@ -45,7 +43,7 @@ async function init() {
 
   import(pathToFileURL(path).href)
     .then((module: Extension) => {
-      bootstrap(module, rpc)
+      bootstrap(module)
     })
     .catch((err: any) => {
       console.error('Error loading extension:', err)
