@@ -5,7 +5,6 @@ class RendererBridge extends Bridge {
   constructor() {
     super()
     window.dannn.ipc.on('trpc:message', (_, data: BridgeRequest) => {
-      console.log('Received message in RendererBridge:', data)
       this.onMessage(data)
     })
   }
@@ -15,9 +14,4 @@ class RendererBridge extends Bridge {
   }
 }
 
-export class Rpc {
-  private static readonly instance = new RendererBridge()
-  get rpc(): RendererBridge {
-    return Rpc.instance
-  }
-}
+export const rendererBridge = new RendererBridge()

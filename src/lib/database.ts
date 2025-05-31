@@ -1,5 +1,4 @@
 import type { DatabaseRouter } from '~/node/database/router'
+import { rendererBridge } from './rpc'
 
-const rpc = new Rpc()
-
-export const database = rpc.rpc.createProxy<DatabaseRouter>('database')
+export const database = rendererBridge.createProxy<DatabaseRouter>('database')

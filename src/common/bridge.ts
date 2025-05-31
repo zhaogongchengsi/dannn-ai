@@ -9,6 +9,10 @@ export type RpcProxy<T> = {
 // 获取 Promise 里的实际类型
 export type UnwrapPromise<T> = T extends Promise<infer U> ? U : T
 
+/**
+ * @description 获取 RPC 方法的返回值类型
+ * @template TRouter - 路由类型
+ */
 export type GetRpcReturnType<
   TRouter extends Record<string, any>,
   T extends keyof TRouter,
@@ -17,12 +21,16 @@ export type GetRpcReturnType<
   ? UnwrapPromise<ReturnType<TRouter[T][M]>>
   : never
 
-// 类型工具：只保留函数类型的导出
+/**
+ * @description 获取 RPC 方法的参数类型
+ */
 export type OnlyFunctions<T> = {
   [K in keyof T as T[K] extends (...args: any[]) => any ? K : never]: T[K]
 }
 
-// 通用类型工具：只保留函数类型的导出
+/**
+ * @description 提取路由器中所有函数的类型
+ */
 export type ExtractRouterFunctions<T> = {
   [K in keyof T]: {
     [M in keyof T[K]as T[K][M] extends (...args: any[]) => any ? M : never]: T[K][M]
@@ -35,17 +43,7 @@ export interface BridgeRequestCommon {
   /**
    * @description 转发的 Bridge ID
    */
-  forwardedBy: string[]
-
-  /**
-   * @description 是否是转发的消息
-   */
-  isForwarded?: boolean
-
-  /**
-   * @description 是否需要本体事件响应
-   */
-  forwardedNeedSelfEvent?: boolean
+  _forwardedBy?: string[]
 }
 
 export interface BridgeRequestEvent {
