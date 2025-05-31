@@ -208,11 +208,15 @@ export abstract class Bridge implements IBridge {
     return Array.from(this.methods.keys())
   }
 
+  async getAllInvokeMethods(): Promise<string[]> {
+    return await this.invoke<string[]>('this.getAllRegistered')
+  }
+
   unregister(name: string) {
     this.methods.delete(name)
   }
 
-  invoke<T>(name: string, ...args: any[]) {
+  async invoke<T>(name: string, ...args: any[]) {
     const promiser = withResolvers<T>()
     const id = this.randomAlphaString(16)
     this.waitResponse.set(id, promiser)
@@ -227,7 +231,7 @@ export abstract class Bridge implements IBridge {
       args,
     })
 
-    return promiser.promise
+    return await promiser.promise
   }
 
   randomAlphaString(length: number): string {
