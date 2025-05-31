@@ -1,15 +1,15 @@
-import type { Extension } from '~/common/extension'
+import type { Extension } from './type'
+import { ExtensionContext } from './context'
 import { rpc } from './ipc'
 
 export function bootstrap(modules: Extension) {
+  const context = new ExtensionContext()
+
   if (!rpc.isRegistered('_extension.activate')) {
     rpc.register('_extension.activate', async () => {
       const activate = modules && typeof modules.activate === 'function' ? modules.activate : null
       if (activate) {
-        return await activate()
-      }
-      else {
-        return Promise.reject(new Error('extension.activate is not defined in the module'))
+        return await activate(context)
       }
     })
   }
@@ -19,9 +19,6 @@ export function bootstrap(modules: Extension) {
       const deactivate = modules && typeof modules.deactivate === 'function' ? modules.deactivate : null
       if (deactivate) {
         return await deactivate()
-      }
-      else {
-        return Promise.reject(new Error('extension.deactivate is not defined in the module'))
       }
     })
   }

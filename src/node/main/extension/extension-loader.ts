@@ -1,4 +1,4 @@
-import type { Extension } from '~/common/extension'
+import type { Extension } from './type'
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'

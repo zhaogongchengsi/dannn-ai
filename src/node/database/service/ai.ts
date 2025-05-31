@@ -1,3 +1,4 @@
+import type { CreateAIInput } from '~/common/schema'
 import type { AiConfig } from '~/common/types'
 import { and, eq } from 'drizzle-orm'
 import { router } from '~/common/router'
@@ -76,6 +77,49 @@ export function getAllAis(): Promise<InfoAI[]> {
   return db.select().from(ais).all()
 }
 
+export async function registerAi(config: CreateAIInput & { createdBy: string }) {
+  if (!config.createdBy) {
+    throw new Error('createdBy is required')
+  }
+
+  const exi = await findAiByCreateByAndName(config.createdBy, config.name)
+
+  if (exi) {
+    if (isVersionUpgraded(exi.version, config.version)) {
+      // 版本升级，处理逻辑
+      return (await updateAi(exi.id, config))!
+    }
+    return exi
+  }
+
+  return await insertAi({
+    ...config,
+    type: config.type || 'chat',
+  })
+}
+
+/**
+ * 检查版本号是否升级
+ * @param oldVersion 旧版本号
+ * @param newVersion 新版本号
+ * @returns 如果新版本号比旧版本号高，返回 true；否则返回 false
+ */
+function isVersionUpgraded(oldVersion: string, newVersion: string): boolean {
+  const parseVersion = (version: string) => version.split('.').map(Number)
+
+  const [oldMajor, oldMinor, oldPatch] = parseVersion(oldVersion)
+  const [newMajor, newMinor, newPatch] = parseVersion(newVersion)
+
+  if (newMajor > oldMajor)
+    return true
+  if (newMajor === oldMajor && newMinor > oldMinor)
+    return true
+  if (newMajor === oldMajor && newMinor === oldMinor && newPatch > oldPatch)
+    return true
+
+  return false
+}
+
 export const ai = router({
   findAiByCreateByAndName,
   findAiByName,
@@ -83,4 +127,5 @@ export const ai = router({
   insertAi,
   updateAi,
   getAllAis,
+  registerAi,
 })

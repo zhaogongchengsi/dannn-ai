@@ -2,9 +2,7 @@ import type { CreateAIInput } from '~/common/schema'
 import type { AIData } from '~/common/types'
 import { Subject } from 'rxjs'
 import { AiEvent } from '~/common/event'
-import { createAIInput } from '~/common/schema'
 import { client } from '../client'
-import { formatZodError } from '../utils'
 
 const aiCreated$ = new Subject<CreateAIInput>()
 
