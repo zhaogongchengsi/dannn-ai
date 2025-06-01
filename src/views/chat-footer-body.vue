@@ -3,6 +3,7 @@ import { Bot, Plus } from 'lucide-vue-next'
 import { ref } from 'vue'
 import Editor from '@/components/editor/editor.vue'
 import { Button } from '@/components/ui/button'
+import { broadcast } from '@/lib/extension'
 
 const value = ref('')
 const chatStore = useChatStore()
@@ -18,7 +19,13 @@ function onSend() {
     return
   }
 
-  console.log('发送消息:', message)
+  broadcast({
+    content: message,
+    type: 'text',
+    roomId: chatStore.currentChat.id,
+    aiIds: chatStore.currentChat.participant.map(p => p.id),
+    context: [],
+  })
 
   value.value = ''
 }

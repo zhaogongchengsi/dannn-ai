@@ -28,7 +28,7 @@ export const question = z.object({
    * @default "text"
    */
 
-  type: z.enum(['text', 'image', 'audio', 'video', 'file']).default('text'),
+  type: z.enum(['text', 'image', 'audio', 'video', 'file']).optional().default('text'),
   /**
    * @description 这个问题是从哪个房间发出来的
    * @example 123
@@ -49,7 +49,7 @@ export const question = z.object({
   context: z.array(z.object({
     role: z.enum(['user', 'assistant', 'system']),
     content: z.string(),
-  })).default([]),
+  })).optional().default([]),
 })
 
 export const answer = z.object({

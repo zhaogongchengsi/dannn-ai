@@ -1,19 +1,39 @@
 import type { ClientOptions } from 'openai'
-import type { CreateAIInput } from '~/common/schema'
+import type { CreateAIInput, Question } from '~/common/schema'
 import { EventEmitter } from 'node:events'
 import process from 'node:process'
-import OpenAI from 'openai'
+import { question } from '~/common/schema'
 import { AI } from './ai'
-import { database } from './ipc'
+import { database, rpc } from './ipc'
 
 export interface ExtensionContextEvents {
-  question: [string, any]
+  /**
+   * Emitted when a new question is received that matches the AI instances registered.
+   * @param question - The question data.
+   */
+  'question': [Question]
+  /**
+   * Emitted when a message is received from the window.
+   * This is typically used for communication between the extension and the renderer process.
+   */
+  'window.message': [Question]
 }
 
 export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
-  OpenAI: typeof OpenAI = OpenAI
+  private readonly aiHub: Map<number, AI> = new Map()
+
   constructor() {
     super()
+    rpc.on('extension.question', (preload: Question) => {
+      const { success, data } = question.safeParse(preload)
+      if (!success) {
+        console.error('Invalid question data received:', data)
+        return
+      }
+      if (data.aiIds.some((id: number) => this.aiHub.has(id))) {
+        this.emit('question', data)
+      }
+    })
   }
 
   /**
@@ -31,6 +51,11 @@ export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
       ...config,
       createdBy: process.env.DANNN_PROCESS_PATH,
     })
-    return new AI(aiMeta, clientOpt)
+
+    const ai = new AI(aiMeta, clientOpt)
+
+    this.aiHub.set(aiMeta.id, ai)
+
+    return ai
   }
 }
