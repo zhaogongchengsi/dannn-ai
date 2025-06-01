@@ -6,6 +6,7 @@ import { db } from '../db'
 import { messages, rooms } from '../schema'
 
 export type InfoMessage = typeof messages.$inferSelect
+export type MessageStatus = 'pending' | 'success' | 'error'
 
 export async function getLastMessageForRoom(roomId: number): Promise<number | null> {
   const lastMessage = await db
@@ -235,6 +236,18 @@ export async function updateAIMessageContextFalse(
   return updatedMessages
 }
 
+export function updateMessageStatus(
+  messageId: string,
+  status: MessageStatus,
+): Promise<InfoMessage> {
+  return db
+    .update(messages)
+    .set({ status, updatedAt: new Date().toISOString() })
+    .where(eq(messages.id, messageId))
+    .returning()
+    .get()
+}
+
 export const message = router({
   updateAIMessageContextFalse,
   updateAIMessageContextTrue,
@@ -245,4 +258,5 @@ export const message = router({
   createQuestion,
   createAiAnswer,
   getLastMessageForRoom,
+  updateMessageStatus,
 })

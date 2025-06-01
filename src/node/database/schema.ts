@@ -84,7 +84,7 @@ export const messages = table('messages', {
   }).notNull(),
   senderId: integer('sender_id'), // ai 用 ai id，human 固定写死为 0 就行
   parentId: text('parent_id'), // 上下文关联 ✅
-  status: text('status'), // 消息状态：pending/success/error
+  status: text('status'), // 消息状态：pending/success/error/canceled/thinking
   meta: text('meta'), // AI 生成详情、tokens 等
 
   isStreaming: int('is_streaming').notNull().default(0),

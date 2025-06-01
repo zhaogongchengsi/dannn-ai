@@ -1,5 +1,6 @@
 import type OpenAI from 'openai'
 import type { Answer, Question } from '~/common/schema'
+import type { MessageStatus } from '~/node/database/service/message'
 import { database, rpc } from './ipc'
 
 export class QuestionEvent {
@@ -43,6 +44,15 @@ export class QuestionEvent {
   async #sendTextAnswer(answer: Answer) {
     const answerMessage = await database.message.createAiAnswer(answer)
     rpc.emit('window.answer', answerMessage)
+    return answerMessage
+  }
+
+  async #updateMessageStatus(messageId: string, status: MessageStatus) {
+    database.message.updateMessageStatus(messageId, status)
+    rpc.emit('window.answer-status-update', {
+      messageId,
+      status,
+    })
   }
 
   async thinking(aiId: number) {
@@ -77,13 +87,14 @@ export class QuestionEvent {
       }
       ; (async () => {
         let index = 0
+        let messageId: string = ''
         for await (const chunk of contentStream) {
           const content = chunk.choices?.[0]?.delta?.content
           if (!content) {
             continue // Skip empty chunks
           }
           try {
-            await this.#sendTextAnswer({
+            const message = await this.#sendTextAnswer({
               content,
               roomId,
               type: 'text',
@@ -92,12 +103,20 @@ export class QuestionEvent {
               streamGroupId,
               streamIndex: index++,
             })
+
+            messageId = message.id
+
+            if (index === 0) {
+              await this.#updateMessageStatus(messageId, 'pending')
+            }
           }
           catch (innerErr) {
             console.error('Failed to send one chunk:', innerErr)
             // 如果需要终止也可以直接 throw
           }
         }
+
+        await this.#updateMessageStatus(messageId, 'success')
       })().then(resolve).catch(reject)
     })
   }

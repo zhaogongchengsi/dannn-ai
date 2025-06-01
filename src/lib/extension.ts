@@ -1,5 +1,5 @@
 import type { Question } from '@/common/schema'
-import type { InfoMessage } from '@/node/database/service/message'
+import type { InfoMessage, MessageStatus } from '@/node/database/service/message'
 import { rendererBridge } from './rpc'
 
 export function broadcast(data: Question) {
@@ -22,4 +22,10 @@ export function onAiEndThink(
   callback: (data: { roomId: number, aiId: number, questionId: string }) => void,
 ) {
   rendererBridge.on('window.ai-endThink', callback)
+}
+
+export function onAnswerStatusUpdate(
+  callback: (data: { messageId: string, status: MessageStatus }) => void,
+) {
+  rendererBridge.on('window.answer-status-update', callback)
 }

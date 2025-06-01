@@ -1,6 +1,6 @@
-import type { InfoMessage } from '@/node/database/service/message'
+import type { InfoMessage, MessageStatus } from '@/node/database/service/message'
 import { database } from '@/lib/database'
-import { onAiEndThink, onAiThinking, onQuestion } from '@/lib/extension'
+import { onAiEndThink, onAiThinking, onAnswerStatusUpdate, onQuestion } from '@/lib/extension'
 
 export interface ThinkingMessage extends InfoMessage {
   type: 'thinking'
@@ -133,8 +133,28 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
+  async function updateMessageStatue(messageId: string, status: MessageStatus) {
+    await database.message.updateMessageStatus(messageId, status)
+    const rooms = Array.from(messages.keys())
+    for (const roomId of rooms) {
+      const messageNode = messages.get(roomId)
+      if (messageNode) {
+        const message = messageNode.messages.find(msg => msg.id === messageId)
+        if (message) {
+          message.status = status
+        }
+      }
+    }
+  }
+
   onQuestion((message) => {
+    console.log('Received question message:', message)
     addMessagesByRoomId(message.roomId, [message])
+  })
+
+  onAnswerStatusUpdate((data) => {
+    console.log('Received answer status update:', data)
+    updateMessageStatue(data.messageId, data.status)
   })
 
   onAiThinking((data) => {

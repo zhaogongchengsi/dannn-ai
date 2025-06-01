@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { useElementSize, watchOnce } from '@vueuse/core'
+import { debounceFilter, useElementSize, watchOnce } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 import { VirtList } from 'vue-virt-list'
 import { useChatStore } from '@/stores/chat'
@@ -29,6 +29,17 @@ async function updateMessageInContext(id: number, messageId: string, value: bool
     await messageStore.updateMessageContextFalse(id, messageId)
   }
 }
+
+watchWithFilter(
+  () => chatStore.currentChatMessage,
+  () => {
+    console.log('message list changed!')
+    virtEl.value?.$forceUpdate()
+  }, // callback will be called in 500ms debounced manner
+  {
+    eventFilter: debounceFilter(70),
+  },
+)
 </script>
 
 <template>
