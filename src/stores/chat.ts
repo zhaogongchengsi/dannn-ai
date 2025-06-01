@@ -103,14 +103,13 @@ export const useChatStore = defineStore('dannn-chat', () => {
       })
     }
 
-    console.log(context)
-
     broadcast({
       content: question,
       type: 'text',
       roomId: currentChatID.value,
       aiIds,
       context,
+      id: message.id,
     })
   }
 

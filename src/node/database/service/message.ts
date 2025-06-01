@@ -23,7 +23,7 @@ export async function getLastMessageForRoom(roomId: number): Promise<number | nu
   return Number(lastMessage.lastMessage)
 }
 
-export async function createQuestion(question: Omit<Question, 'context'>): Promise<InfoMessage> {
+export async function createQuestion(question: Omit<Question, 'context' | 'id'>): Promise<InfoMessage> {
   return db.transaction(async (tx) => {
     const lastMessage = await tx
       .select({

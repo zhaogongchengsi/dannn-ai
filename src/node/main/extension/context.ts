@@ -5,13 +5,14 @@ import process from 'node:process'
 import { question } from '~/common/schema'
 import { AI } from './ai'
 import { database, rpc } from './ipc'
+import { QuestionEvent } from './question-event'
 
 export interface ExtensionContextEvents {
   /**
    * Emitted when a new question is received that matches the AI instances registered.
    * @param question - The question data.
    */
-  question: [Question]
+  question: [QuestionEvent]
 }
 
 export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
@@ -26,7 +27,7 @@ export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
         return
       }
       if (data.aiIds.some((id: number) => this.aiHub.has(id))) {
-        this.emit('question', data)
+        this.emit('question', new QuestionEvent(data))
       }
     })
   }

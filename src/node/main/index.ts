@@ -7,6 +7,9 @@ import { logger } from './lib/logger'
 import { Window } from './lib/window'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
+process.env.ELECTRON_ENABLE_LOGGING = 'true'
+process.env.ELECTRON_DEBUG_NOTIFICATIONS = 'true'
+
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
 
 if (!gotSingleInstanceLock) {

@@ -21,6 +21,7 @@ export const questionContext = z.object({
 })
 
 export const question = z.object({
+  id: z.string(),
   /**
    * @description 这个问题的内容
    * @example "What is the capital of France?"

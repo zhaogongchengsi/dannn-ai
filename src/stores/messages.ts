@@ -1,5 +1,6 @@
 import type { InfoMessage } from '@/node/database/service/message'
 import { database } from '@/lib/database'
+import { onAiEndThink, onAiThinking, onQuestion } from '@/lib/extension'
 
 export interface ThinkingMessage extends InfoMessage {
   type: 'thinking'
@@ -77,7 +78,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
-  function addThinkingMessagesByRoomId(roomId: RoomID, aiId: number) {
+  function addThinkingMessagesByRoomId(roomId: RoomID, aiId: number, questionId: string) {
     const messageNode = messages.get(roomId)
 
     if (messageNode) {
@@ -85,7 +86,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
       const message: ThinkingMessage = {
         type: 'thinking',
         status: null,
-        id: `${roomId}-${aiId}`,
+        id: `${roomId}-${aiId}-${questionId}`,
         content: '思考中...',
         messageType: 'text',
         sortBy: lastMessage?.sortBy ? lastMessage.sortBy + 1 : 0,
@@ -132,6 +133,20 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
+  onQuestion((message) => {
+    addMessagesByRoomId(message.roomId, [message])
+  })
+
+  onAiThinking((data) => {
+    const { roomId, aiId, questionId } = data
+    addThinkingMessagesByRoomId(roomId, aiId, questionId)
+  })
+
+  onAiEndThink((data) => {
+    const id = `${data.roomId}-${data.aiId}-${data.questionId}`
+    deleteMessagesByRoomId(data.roomId, id)
+  })
+
   async function init() {
     const rooms = await database.room.getAllRooms()
 
@@ -147,6 +162,8 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
       addMessagesByRoomId(room.id, data, {
         total,
+        page: PAGE,
+        pageSize: PAGE_SIZE,
       })
     }
   }
