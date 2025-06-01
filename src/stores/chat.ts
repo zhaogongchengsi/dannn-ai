@@ -1,6 +1,8 @@
+import type { QuestionContext } from '@/common/schema'
 import type { InfoChat, InsertChat } from '~/node/database/service/room'
 import { defineStore } from 'pinia'
 import { database } from '@/lib/database'
+import { broadcast } from '@/lib/extension'
 
 export const useChatStore = defineStore('dannn-chat', () => {
   const rooms = reactive<InfoChat[]>([])
@@ -62,6 +64,47 @@ export const useChatStore = defineStore('dannn-chat', () => {
     currentChatID.value = id
   }
 
+  async function sendQuestionToChat(question: string) {
+    if (!currentChatID.value) {
+      throw new Error('No chat selected')
+    }
+
+    const room = findRoomById(currentChatID.value)
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const aiIds = room.participant.map(participant => participant.id)
+
+    const message = await database.message.createQuestion({
+      type: 'text',
+      content: question,
+      roomId: room.id,
+      aiIds,
+    })
+
+    messages.addMessagesByRoomId(room.id, [message])
+
+    const contextMessages = await database.room.getRoomContextMessages(room.id)
+
+    const context = contextMessages.map((msg): QuestionContext => {
+      return {
+        role: msg.senderType === 'human' ? 'user' : 'assistant',
+        content: msg.content,
+      }
+    })
+
+    const needJoinPr = await database.room.updateRoomMemoryInterval(room.id)
+
+    broadcast({
+      content: question,
+      type: 'text',
+      roomId: currentChatID.value,
+      aiIds,
+      context: [...context],
+    })
+  }
+
   return {
     rooms,
     currentChatID,
@@ -70,5 +113,6 @@ export const useChatStore = defineStore('dannn-chat', () => {
     currentChatMessage,
     addRoom,
     addAiToChat,
+    sendQuestionToChat,
   }
 })

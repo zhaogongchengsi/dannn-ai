@@ -11,12 +11,7 @@ export interface ExtensionContextEvents {
    * Emitted when a new question is received that matches the AI instances registered.
    * @param question - The question data.
    */
-  'question': [Question]
-  /**
-   * Emitted when a message is received from the window.
-   * This is typically used for communication between the extension and the renderer process.
-   */
-  'window.message': [Question]
+  question: [Question]
 }
 
 export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {

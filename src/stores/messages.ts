@@ -90,6 +90,8 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
         messageType: 'text',
         sortBy: lastMessage?.sortBy ? lastMessage.sortBy + 1 : 0,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        deletedAt: null,
         functionResponse: null,
         roomId,
         reference: null,
@@ -97,12 +99,11 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
         senderId: aiId,
         parentId: null,
         meta: null,
-        isAIAutoChat: 0,
         isStreaming: 0,
         streamGroupId: null,
         streamIndex: null,
         functionCall: null,
-        isInContext: null,
+        isInContext: 0,
       }
 
       addMessagesByRoomId(roomId, [message])
@@ -155,5 +156,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     findMessagesByRoomId,
     updateMessageContextTrue,
     updateMessageContextFalse,
+    addMessagesByRoomId,
   }
 })

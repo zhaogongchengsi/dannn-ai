@@ -1,11 +1,12 @@
 import type { CreateAIInput } from '~/common/schema'
-import type { AiConfig } from '~/common/types'
 import { and, eq } from 'drizzle-orm'
 import { router } from '~/common/router'
 import { db } from '../db'
 import { ais } from '../schema'
 
 export type InfoAI = typeof ais.$inferSelect
+
+export type AIConfig = Omit<InfoAI, 'id' | 'createdAt' | 'updatedAt' | 'lastUsedAt' | 'versionHistory' | 'deletedAt'>
 
 export async function findAiByName(name: string): Promise<InfoAI | undefined> {
   return db.select().from(ais).where(eq(ais.name, name)).get()
@@ -19,37 +20,32 @@ export async function findAiByCreateByAndName(createdBy: string, name: string): 
   return await db
     .select()
     .from(ais)
-    .where(and(eq(ais.createdBy, createdBy), eq(ais.name, name)))
+    .where(and(eq(ais.author, createdBy), eq(ais.name, name)))
     .get()
 }
 
-export async function insertAi(config: AiConfig): Promise<InfoAI> {
-  const info: InfoAI = {
+export async function insertAi(config: AIConfig): Promise<InfoAI> {
+  const info: Omit<InfoAI, 'id'> = {
     name: config.name,
     avatar: config.avatar || null,
     title: config.title,
     version: config.version,
     description: config.description ?? '',
-    role: config.role ?? '',
-    prompt: config.prompt ?? '',
     type: config.type || 'chat',
     models: config.models || '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
     isActive: 1,
     lastUsedAt: null,
     versionHistory: [config.version].join(','),
-    tags: config.tags ? config.tags.join(',') : null,
-    configuration: config.configuration ? JSON.stringify(config.configuration) : null,
-    createdBy: config.createdBy || null,
-    id: 0,
+    tags: config.tags,
     author: config.author || null,
     deletedAt: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }
   return await db.insert(ais).values(info).returning().get()
 }
 
-export async function updateAi(id: number, updates: Partial<AiConfig>): Promise<InfoAI | undefined> {
+export async function updateAi(id: number, updates: Partial<InfoAI>): Promise<InfoAI | undefined> {
   const existingAi = await findAiById(id)
   if (!existingAi) {
     return undefined
@@ -60,8 +56,7 @@ export async function updateAi(id: number, updates: Partial<AiConfig>): Promise<
   const updatedInfo: Partial<InfoAI> = {
     ...updates,
     updatedAt: new Date().toISOString(),
-    tags: updates.tags ? updates.tags.join(',') : existingAi.tags,
-    configuration: updates.configuration ? JSON.stringify(updates.configuration) : existingAi.configuration,
+    tags: updates.tags ? updates.tags : existingAi.tags,
     versionHistory: [...versionHistory, updates.version].filter(Boolean).join(','),
   }
 
@@ -87,14 +82,25 @@ export async function registerAi(config: CreateAIInput & { createdBy: string }) 
   if (exi) {
     if (isVersionUpgraded(exi.version, config.version)) {
       // 版本升级，处理逻辑
-      return (await updateAi(exi.id, config))!
+      return (await updateAi(exi.id, {
+        ...config,
+        tags: config.tags ? config.tags.join(',') : exi.tags,
+      }))!
     }
     return exi
   }
 
   return await insertAi({
-    ...config,
+    author: config.createdBy,
+    avatar: config.avatar || null,
+    description: config.description || null,
     type: config.type || 'chat',
+    models: config.models || '',
+    isActive: 1,
+    tags: config.tags ? config.tags.join(',') : null,
+    name: config.name,
+    title: config.title,
+    version: config.version,
   })
 }
 

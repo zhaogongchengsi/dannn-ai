@@ -14,7 +14,7 @@
     "build": "vite build",
     "build:ext": "tsdown -c ./tsdown.ext.config.ts",
     "dev": "vite",
-    "dev:app": "tsdown -c ./tsdown.app.config.ts --on-success \"electron .\"",
+    "dev:app": "tsdown -c ./tsdown.ext.config.ts && tsdown -c ./tsdown.app.config.ts --on-success \"electron .\"",
     "test": "vitest",
     "gen:db": "drizzle-kit generate",
     "studio": "drizzle-kit studio",

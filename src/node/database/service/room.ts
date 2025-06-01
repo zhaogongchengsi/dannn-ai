@@ -131,6 +131,45 @@ export async function getRoomContextMessages(roomId: number): Promise<InfoMessag
   return getAiMessagesByCount(roomId, room.maxContextMessages)
 }
 
+/**
+ *
+ * @param roomId 房间id
+ * @description memoryInterval 调用一次会 MemoryInterval 会减少 1, 当为 零 时表示次数到了 需要将提示词加入上下文 然后将 memoryInterval 重置为初始值
+ * @returns boolean 是否需要将提示词加入上下文
+ */
+export async function updateRoomMemoryInterval(roomId: number) {
+  return db.transaction(async (ctx): Promise<boolean> => {
+    const findRoom = async () => await ctx.select().from(rooms).where(eq(rooms.id, roomId)).get()
+    const room = await findRoom()
+
+    if (!room) {
+      throw new Error(`Room with id ${roomId} does not exist`)
+    }
+
+    if (room.memoryInterval === 1) {
+      // 重置 memoryInterval
+      await ctx
+        .update(rooms)
+        .set({
+          memoryInterval: room.memoryIntervalInitialValue || 15, // 重置为最大上下文消息数
+        })
+        .where(eq(rooms.id, roomId))
+
+      return true // 需要将提示词加入上下文
+    }
+
+    // 减少 memoryInterval
+    await ctx
+      .update(rooms)
+      .set({
+        memoryInterval: room.memoryInterval - 1,
+      })
+      .where(eq(rooms.id, roomId))
+
+    return false // 不需要将提示词加入上下文
+  })
+}
+
 export const room = router({
   getAllRooms,
   insertRoom,
@@ -141,4 +180,5 @@ export const room = router({
   deleteRoomById,
   addAiToRoom,
   getRoomContextMessages,
+  updateRoomMemoryInterval,
 })

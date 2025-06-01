@@ -23,7 +23,7 @@ export async function getLastMessageForRoom(roomId: number): Promise<number | nu
   return Number(lastMessage.lastMessage)
 }
 
-export async function createQuestion(question: Question): Promise<InfoMessage> {
+export async function createQuestion(question: Omit<Question, 'context'>): Promise<InfoMessage> {
   return db.transaction(async (tx) => {
     const lastMessage = await tx
       .select({
@@ -56,7 +56,6 @@ export async function createQuestion(question: Question): Promise<InfoMessage> {
       parentId: null,
       status: null,
       meta: null,
-      isAIAutoChat: 0,
       isStreaming: 0,
       streamGroupId: null,
       streamIndex: null,
@@ -121,7 +120,6 @@ export async function createAiAnswer(answer: Answer): Promise<InfoMessage> {
       parentId: null,
       status: null,
       meta: null,
-      isAIAutoChat: 0,
       isStreaming: answer.isStreaming ? 1 : 0,
       streamGroupId: answer.streamGroupId || null,
       streamIndex: answer.streamIndex || null,

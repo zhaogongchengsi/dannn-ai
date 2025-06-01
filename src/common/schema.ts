@@ -15,6 +15,11 @@ export const createAIInput = z.object({
 
 export type CreateAIInput = z.infer<typeof createAIInput>
 
+export const questionContext = z.object({
+  role: z.enum(['user', 'assistant', 'system']),
+  content: z.string(),
+})
+
 export const question = z.object({
   /**
    * @description 这个问题的内容
@@ -46,10 +51,7 @@ export const question = z.object({
    */
   aiIds: z.array(z.number()).default([]),
 
-  context: z.array(z.object({
-    role: z.enum(['user', 'assistant', 'system']),
-    content: z.string(),
-  })).optional().default([]),
+  context: z.array(questionContext).optional().default([]),
 })
 
 export const answer = z.object({
@@ -64,5 +66,6 @@ export const answer = z.object({
   streamIndex: z.number().optional(),
 })
 
+export type QuestionContext = z.infer<typeof questionContext>
 export type Question = z.infer<typeof question>
 export type Answer = z.infer<typeof answer>
