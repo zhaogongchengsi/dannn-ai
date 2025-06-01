@@ -1,4 +1,5 @@
-import type { InfoMessage } from '@/common/types'
+import type { InfoMessage } from '@/node/database/service/message'
+import { database } from '@/lib/database'
 
 export interface ThinkingMessage extends InfoMessage {
   type: 'thinking'
@@ -129,22 +130,22 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   }
 
   async function init() {
-    // const rooms = await getAllRooms()
+    const rooms = await database.room.getAllRooms()
 
-    // for (const room of rooms) {
-    //   const { data, total } = await getMessagesByPage(room.id, PAGE, PAGE_SIZE)
-    //     .catch((err) => {
-    //       console.error(`Error fetching messages for room ${room.id}:`, err)
-    //       return {
-    //         data: [],
-    //         total: 0,
-    //       }
-    //     })
+    for (const room of rooms) {
+      const { data, total } = await database.message.getMessagesByPageDesc(room.id, PAGE, PAGE_SIZE)
+        .catch((err) => {
+          console.error(`Error fetching messages for room ${room.id}:`, err)
+          return {
+            data: [],
+            total: 0,
+          }
+        })
 
-    //   addMessagesByRoomId(room.id, data, {
-    //     total,
-    //   })
-    // }
+      addMessagesByRoomId(room.id, data, {
+        total,
+      })
+    }
   }
 
   init()

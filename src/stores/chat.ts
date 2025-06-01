@@ -6,6 +6,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
   const rooms = reactive<InfoChat[]>([])
   const currentChatID = ref<number | null>(null)
   const messages = useMessagesStore()
+  const aiStore = useAIStore()
 
   const findRoomById = (id: number) => rooms.find(room => room.id === id)
 
@@ -46,15 +47,15 @@ export const useChatStore = defineStore('dannn-chat', () => {
       throw new Error('Room not found')
     }
 
-    // // await setAiToRoom(id, aiID)
+    await database.room.addAiToRoom(id, aiID)
 
-    // const ai = aiStore.findAiById(aiID)
+    const ai = aiStore.findAiById(aiID)
 
-    // if (!ai) {
-    //   throw new Error('AI not found')
-    // }
+    if (!ai) {
+      throw new Error('AI not found')
+    }
 
-    // room.participant.push(ai)
+    room.participant.push(ai)
   }
 
   function setCurrentChatID(id: number) {
