@@ -15,5 +15,6 @@ export default [
     },
     external: ['electron'],
     outDir: './extensions/chat/dist',
+    clean: false,
   }),
 ]

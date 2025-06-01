@@ -30,6 +30,15 @@ export default {
         '**/*',
       ],
     }))),
+    {
+      from: './extensions',
+      to: 'resources/extensions',
+      filter: [
+        '**/*.js',
+        '**/*.json',
+        '**/*.md',
+      ],
+    },
   ],
   asar: true,
   appId: 'com.zhaozunhong.app',

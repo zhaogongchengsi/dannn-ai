@@ -9,10 +9,11 @@
   },
   "main": "./app_dist/index.js",
   "scripts": {
-    "package": "vite build && npm run build:app && electron-builder -w -c ./electron-builder.js",
+    "package": "electron-builder -w -c ./electron-builder.js",
     "build:app": "tsdown -c ./tsdown.app.config.ts",
-    "build": "vite build",
+    "build:web": "vite build",
     "build:ext": "tsdown -c ./tsdown.ext.config.ts",
+    "build": "npm run build:web && npm run build:ext && npm run build:app",
     "dev": "vite",
     "dev:app": "tsdown -c ./tsdown.ext.config.ts && tsdown -c ./tsdown.app.config.ts --on-success \"electron .\"",
     "test": "vitest",
