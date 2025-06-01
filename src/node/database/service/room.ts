@@ -9,7 +9,7 @@ import { ais, chatParticipants, messages, rooms } from '../schema'
 import { getAiMessagesByCount } from './message'
 
 export type InfoRoom = typeof rooms.$inferSelect
-export type InsertChat = Pick<InfoRoom, 'title' | 'avatar' | 'description'>
+export type InsertChat = Pick<InfoRoom, 'title' | 'avatar' | 'description' | 'prompt'>
 export type InfoChat = InfoRoom & {
   participant: InfoAI[]
 }

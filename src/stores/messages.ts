@@ -113,6 +113,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   async function updateMessageContextTrue(roomId: number, messageId: string) {
     const messageNode = messages.get(roomId)
     if (messageNode) {
+      await database.message.updateAIMessageContextTrue(messageId)
       const message = messageNode.messages.find(msg => msg.id === messageId)
       if (message) {
         message.isInContext = 1
@@ -123,6 +124,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   async function updateMessageContextFalse(roomId: number, messageId: string) {
     const messageNode = messages.get(roomId)
     if (messageNode) {
+      await database.message.updateAIMessageContextFalse(messageId)
       const message = messageNode.messages.find(msg => msg.id === messageId)
       if (message) {
         message.isInContext = 0

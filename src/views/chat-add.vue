@@ -28,6 +28,7 @@ async function onFormSubmit(values: Record<string, any>) {
     title: values.title,
     avatar: null,
     description: values.description,
+    prompt: values.systemPrompt,
   })
     .finally(() => {
       isOpen.value = false

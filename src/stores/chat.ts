@@ -94,14 +94,23 @@ export const useChatStore = defineStore('dannn-chat', () => {
       }
     })
 
-    const needJoinPr = await database.room.updateRoomMemoryInterval(room.id)
+    const needJoinPrompt = await database.room.updateRoomMemoryInterval(room.id)
+
+    if (needJoinPrompt && room.prompt) {
+      context.unshift({
+        role: 'system',
+        content: room.prompt,
+      })
+    }
+
+    console.log(context)
 
     broadcast({
       content: question,
       type: 'text',
       roomId: currentChatID.value,
       aiIds,
-      context: [...context],
+      context,
     })
   }
 
