@@ -9,7 +9,7 @@
   },
   "main": "./app_dist/index.js",
   "scripts": {
-    "package": "electron-builder -w -c ./electron-builder.js",
+    "package": "electron-builder -w -c ./electron-builder.config.json",
     "build:app": "tsdown -c ./tsdown.app.config.ts",
     "build:web": "vite build",
     "build:ext": "tsdown -c ./tsdown.ext.config.ts",
