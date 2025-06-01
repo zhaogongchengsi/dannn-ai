@@ -148,12 +148,10 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   }
 
   onQuestion((message) => {
-    console.log('Received question message:', message)
     addMessagesByRoomId(message.roomId, [message])
   })
 
   onAnswerStatusUpdate((data) => {
-    console.log('Received answer status update:', data)
     updateMessageStatue(data.messageId, data.status)
   })
 

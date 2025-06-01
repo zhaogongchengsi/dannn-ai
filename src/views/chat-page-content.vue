@@ -10,6 +10,7 @@ const virtEl = useTemplateRef('virtEl')
 const chatStore = useChatStore()
 const messageStore = useMessagesStore()
 const { height } = useElementSize(el)
+const shouldAutoScroll = ref(true)
 
 const route = useRoute<'/chat/[id]/'>()
 
@@ -33,18 +34,26 @@ async function updateMessageInContext(id: number, messageId: string, value: bool
 watchWithFilter(
   () => chatStore.currentChatMessage,
   () => {
-    console.log('message list changed!')
-    virtEl.value?.$forceUpdate()
-  }, // callback will be called in 500ms debounced manner
+    virtEl.value?.forceUpdate()
+    if (shouldAutoScroll.value) {
+      virtEl.value?.scrollToBottom()
+    }
+  },
   {
     eventFilter: debounceFilter(70),
   },
 )
+
+function onVirtListScroll(e: Event) {
+  const target = e.target as HTMLElement
+  // 判断是否在底部（允许 2px 误差）
+  shouldAutoScroll.value = target.scrollHeight - target.scrollTop - target.clientHeight < 2
+}
 </script>
 
 <template>
   <div ref="el" class="h-full w-full">
-    <VirtList ref="virtEl" class="custom-scrollbar" item-key="id" :list="chatStore.currentChatMessage" :style="{ height: `${height}px` }" :min-size="20">
+    <VirtList ref="virtEl" class="custom-scrollbar" item-key="id" :list="chatStore.currentChatMessage" :style="{ height: `${height}px` }" :min-size="20" @scroll="onVirtListScroll">
       <template #default="{ itemData, index }">
         <ChatMessageRow :message="itemData" :index="index" @update-in-context="updateMessageInContext" />
       </template>
