@@ -1,5 +1,5 @@
-import type { CreateAIInput } from '@/common/schema'
-import type { AIData, RoomData } from '@/common/types'
+import type { CreateAIInput } from '~/common/schema'
+import type { AIData, RoomData } from '~/common/types'
 import type { AI } from './ai'
 import type { CreateRoomOptions } from './api/room'
 

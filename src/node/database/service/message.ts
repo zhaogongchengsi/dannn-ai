@@ -1,10 +1,12 @@
-import type { Answer, Question } from '@/common/schema'
+import type { Answer, Question } from '~/common/schema'
 import { randomUUID } from 'node:crypto'
 import { and, count, desc, eq } from 'drizzle-orm'
+import { router } from '~/common/router'
 import { db } from '../db'
 import { messages, rooms } from '../schema'
 
 export type InfoMessage = typeof messages.$inferSelect
+export type MessageStatus = 'pending' | 'success' | 'error'
 
 export async function getLastMessageForRoom(roomId: number): Promise<number | null> {
   const lastMessage = await db
@@ -22,7 +24,7 @@ export async function getLastMessageForRoom(roomId: number): Promise<number | nu
   return Number(lastMessage.lastMessage)
 }
 
-export async function createQuestion(question: Question): Promise<InfoMessage> {
+export async function createQuestion(question: Omit<Question, 'context' | 'id'>): Promise<InfoMessage> {
   return db.transaction(async (tx) => {
     const lastMessage = await tx
       .select({
@@ -55,7 +57,6 @@ export async function createQuestion(question: Question): Promise<InfoMessage> {
       parentId: null,
       status: null,
       meta: null,
-      isAIAutoChat: 0,
       isStreaming: 0,
       streamGroupId: null,
       streamIndex: null,
@@ -120,7 +121,6 @@ export async function createAiAnswer(answer: Answer): Promise<InfoMessage> {
       parentId: null,
       status: null,
       meta: null,
-      isAIAutoChat: 0,
       isStreaming: answer.isStreaming ? 1 : 0,
       streamGroupId: answer.streamGroupId || null,
       streamIndex: answer.streamIndex || null,
@@ -235,3 +235,28 @@ export async function updateAIMessageContextFalse(
 
   return updatedMessages
 }
+
+export function updateMessageStatus(
+  messageId: string,
+  status: MessageStatus,
+): Promise<InfoMessage> {
+  return db
+    .update(messages)
+    .set({ status, updatedAt: new Date().toISOString() })
+    .where(eq(messages.id, messageId))
+    .returning()
+    .get()
+}
+
+export const message = router({
+  updateAIMessageContextFalse,
+  updateAIMessageContextTrue,
+  getAiMessagesByCount,
+  clearAllMessages,
+  getMessagesByPageDesc,
+  getMessagesByPage,
+  createQuestion,
+  createAiAnswer,
+  getLastMessageForRoom,
+  updateMessageStatus,
+})

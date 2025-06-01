@@ -11,18 +11,48 @@ export const createAIInput = z.object({
   type: z.string().optional(),
   models: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  configuration: z.record(z.any()).optional(),
-  createdBy: z.string(),
 })
 
 export type CreateAIInput = z.infer<typeof createAIInput>
 
-export const question = z.object({
+export const questionContext = z.object({
+  role: z.enum(['user', 'assistant', 'system']),
   content: z.string(),
-  type: z.enum(['text', 'image', 'audio', 'video', 'file']),
+})
+
+export const question = z.object({
+  id: z.string(),
+  /**
+   * @description 这个问题的内容
+   * @example "What is the capital of France?"
+   */
+  content: z.string(),
+
+  /**
+   * @description 这个问题的类型，可以是文本、图片、音频、视频或文件
+   * @example "text"
+   * @default "text"
+   */
+
+  type: z.enum(['text', 'image', 'audio', 'video', 'file']).optional().default('text'),
+  /**
+   * @description 这个问题是从哪个房间发出来的
+   * @example 123
+   */
   roomId: z.number(),
+
+  /**
+   * @description 这个问题的引用，可以是另一个问题的 ID 或其他相关信息
+   */
   reference: z.string().optional(),
-  roomParticipants: z.array(z.number()),
+
+  /**
+   * @description 需要哪些 AI 回答这个问题，AI 的 ID 列表
+   * @example [1, 2, 3]
+   */
+  aiIds: z.array(z.number()).default([]),
+
+  context: z.array(questionContext).optional().default([]),
 })
 
 export const answer = z.object({
@@ -37,5 +67,6 @@ export const answer = z.object({
   streamIndex: z.number().optional(),
 })
 
+export type QuestionContext = z.infer<typeof questionContext>
 export type Question = z.infer<typeof question>
 export type Answer = z.infer<typeof answer>

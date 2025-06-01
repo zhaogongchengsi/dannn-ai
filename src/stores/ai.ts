@@ -1,13 +1,13 @@
-import type { AIData } from '@/common/types'
+import type { InfoAI } from '~/node/database/service/ai'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
-import { getAllAIs } from '@/base/api/ai'
+import { database } from '@/lib/database'
 
 export const useAIStore = defineStore('dannn-ai', () => {
-  const ais = reactive<AIData[]>([])
+  const ais = reactive<InfoAI[]>([])
 
-  getAllAIs().then((data) => {
-    ais.push(...data)
+  database.ai.getAllAis().then((fetchedAis) => {
+    ais.push(...fetchedAis)
   })
 
   function findAiById(id: number) {

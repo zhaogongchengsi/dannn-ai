@@ -24,12 +24,11 @@
     "./auto-imports.d.ts",
     "vite.config.ts",
     "./types.ts",
+    "src/node/main/preload.ts",
     "./typed-router.d.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "src/node/main/**/*.ts",
-    "src/node/**/*.ts"
   ]
 }

@@ -1,15 +1,18 @@
 import type { PackageJson } from 'pkg-types'
+import type { Window } from './window'
 import type { BridgeRequest } from '~/common/bridge'
 import { existsSync } from 'node:fs'
-import { readdir, readFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
 import { Worker } from 'node:worker_threads'
+import { withTimeout } from '@zunh/promise-kit'
 import { app } from 'electron'
 import { join, normalize } from 'pathe'
 import { Bridge } from '~/common/bridge'
-import { EXTENSIONS_ROOT } from '../constant'
-import { logger } from '../lib/logger'
+import { registerRouterToBridge } from '~/common/router'
+import { extensionRouter } from '~/node/database/router'
+import { logger } from './logger'
 
 const configName = 'package.json'
 
@@ -38,16 +41,47 @@ export class ExtensionProcess extends Bridge {
     return ExtensionProcess.all.get(id)
   }
 
+  /**
+   * @description 扩展进程文件夹路径
+   */
   _path: string
+  /**
+   * @description 扩展进程配置
+   */
   _config: IExtensionConfig
+  /**
+   * @description 渲染进程进程窗口
+   */
+  _window: Window
 
-  constructor(path: string, config: IExtensionConfig = { env: {} }) {
+  constructor(path: string, window: Window, config: IExtensionConfig = { env: {} }) {
     super()
     this._path = path
     this._config = config
+    this._window = window
+
+    // 赋予扩展进程的 操控database 的权限
+    registerRouterToBridge(this, extensionRouter, 'database')
+
+    // // 监听渲染进程的消息并转发到扩展进程
+    window.forwardTo(this, (data) => {
+      return data.name.startsWith('extension.')
+    })
+
+    // 将扩展进程的消息转发到渲染进程
+    this.forwardTo(window, (data) => {
+      return data.name.startsWith('window.')
+    })
+
+    this.on('_extension.ready', () => {
+      this.activate()
+        .catch((error) => {
+          logger.error(`Failed to activate extension: ${error?.message}`)
+        })
+    })
   }
 
-  getId (): string {
+  getId(): string {
     return this.id
   }
 
@@ -67,7 +101,16 @@ export class ExtensionProcess extends Bridge {
     }
   }
 
+  private async activate() {
+    return await this.invoke('_extension.activate')
+  }
+
+  private async deactivate() {
+    return await this.invoke('_extension.deactivate')
+  }
+
   async start(): Promise<void> {
+    logger.info('Starting extension process', this.id, this.pid, this._path)
     try {
       performance.mark('start-extension')
       const manifest = await this.readManifest()
@@ -96,7 +139,7 @@ export class ExtensionProcess extends Bridge {
         DANNN_MODULES_PATH: normalize(process.env.DANNN_MODULES_PATH || nodeModulesRoot),
       }
 
-      const iProcess = new Worker(join(__dirname, 'extension-loader.js'), {
+      const iProcess = new Worker(join(__dirname, 'extension', 'extension-loader.js'), {
         env,
         // TODO: 这里希望使用 loader 来加载模块
         // execArgv: ['--loader', pathToFileURL(normalize(resolve(__dirname, 'loader.js'))).href],
@@ -188,35 +231,18 @@ export class ExtensionProcess extends Bridge {
     })
   }
 
-  close(): void {
-    if (this.process) {
-      this.process.terminate()
-      this.process = null
-    }
-    ExtensionProcess.all.delete(this.pid)
+  /**
+   * @description 关闭扩展进程
+   */
+  async close(): Promise<void> {
+    // 关闭扩展进程之前先调用 deactivate 方法 最多五秒后执行开始关闭
+    withTimeout(this.deactivate(), 5000)
+      .finally(() => {
+        if (this.process) {
+          this.process.terminate()
+          this.process = null
+        }
+        ExtensionProcess.all.delete(this.pid)
+      })
   }
-}
-
-export async function extensionLoadAll() {
-  const processes = []
-
-  try {
-    const dirs = await readdir(EXTENSIONS_ROOT)
-
-    for (const dir of dirs) {
-      const eProcess = new ExtensionProcess(join(EXTENSIONS_ROOT, dir))
-      try {
-        await eProcess.start()
-        processes.push(eProcess)
-      }
-      catch (err) {
-        console.error(`Failed to load extension ${dir}`, err)
-      }
-    }
-  }
-  catch (err: any) {
-    console.error(`Failed to load extensions`, err)
-  }
-
-  return processes
 }

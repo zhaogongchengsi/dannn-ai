@@ -1,6 +1,6 @@
-import type { InfoMessage } from '@/common/types'
-import { getMessagesByPage, onAllMessages } from '@/base/api/message'
-import { getAllRooms, onAiEndThink, onAiThinking, updateAIMessageContextFalse, updateAIMessageContextTrue } from '@/base/api/room'
+import type { InfoMessage, MessageStatus } from '@/node/database/service/message'
+import { database } from '@/lib/database'
+import { onAiEndThink, onAiThinking, onAnswerStatusUpdate, onQuestion } from '@/lib/extension'
 
 export interface ThinkingMessage extends InfoMessage {
   type: 'thinking'
@@ -78,7 +78,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
-  function addThinkingMessagesByRoomId(roomId: RoomID, aiId: number) {
+  function addThinkingMessagesByRoomId(roomId: RoomID, aiId: number, questionId: string) {
     const messageNode = messages.get(roomId)
 
     if (messageNode) {
@@ -86,11 +86,13 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
       const message: ThinkingMessage = {
         type: 'thinking',
         status: null,
-        id: `${roomId}-${aiId}`,
+        id: `${roomId}-${aiId}-${questionId}`,
         content: '思考中...',
         messageType: 'text',
         sortBy: lastMessage?.sortBy ? lastMessage.sortBy + 1 : 0,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        deletedAt: null,
         functionResponse: null,
         roomId,
         reference: null,
@@ -98,12 +100,11 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
         senderId: aiId,
         parentId: null,
         meta: null,
-        isAIAutoChat: 0,
         isStreaming: 0,
         streamGroupId: null,
         streamIndex: null,
         functionCall: null,
-        isInContext: null,
+        isInContext: 0,
       }
 
       addMessagesByRoomId(roomId, [message])
@@ -112,8 +113,8 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
   async function updateMessageContextTrue(roomId: number, messageId: string) {
     const messageNode = messages.get(roomId)
-    await updateAIMessageContextTrue(messageId)
     if (messageNode) {
+      await database.message.updateAIMessageContextTrue(messageId)
       const message = messageNode.messages.find(msg => msg.id === messageId)
       if (message) {
         message.isInContext = 1
@@ -123,8 +124,8 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
   async function updateMessageContextFalse(roomId: number, messageId: string) {
     const messageNode = messages.get(roomId)
-    await updateAIMessageContextFalse(messageId)
     if (messageNode) {
+      await database.message.updateAIMessageContextFalse(messageId)
       const message = messageNode.messages.find(msg => msg.id === messageId)
       if (message) {
         message.isInContext = 0
@@ -132,11 +133,43 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
+  async function updateMessageStatue(messageId: string, status: MessageStatus) {
+    await database.message.updateMessageStatus(messageId, status)
+    const rooms = Array.from(messages.keys())
+    for (const roomId of rooms) {
+      const messageNode = messages.get(roomId)
+      if (messageNode) {
+        const message = messageNode.messages.find(msg => msg.id === messageId)
+        if (message) {
+          message.status = status
+        }
+      }
+    }
+  }
+
+  onQuestion((message) => {
+    addMessagesByRoomId(message.roomId, [message])
+  })
+
+  onAnswerStatusUpdate((data) => {
+    updateMessageStatue(data.messageId, data.status)
+  })
+
+  onAiThinking((data) => {
+    const { roomId, aiId, questionId } = data
+    addThinkingMessagesByRoomId(roomId, aiId, questionId)
+  })
+
+  onAiEndThink((data) => {
+    const id = `${data.roomId}-${data.aiId}-${data.questionId}`
+    deleteMessagesByRoomId(data.roomId, id)
+  })
+
   async function init() {
-    const rooms = await getAllRooms()
+    const rooms = await database.room.getAllRooms()
 
     for (const room of rooms) {
-      const { data, total } = await getMessagesByPage(room.id, PAGE, PAGE_SIZE)
+      const { data, total } = await database.message.getMessagesByPageDesc(room.id, PAGE, PAGE_SIZE)
         .catch((err) => {
           console.error(`Error fetching messages for room ${room.id}:`, err)
           return {
@@ -147,24 +180,11 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
 
       addMessagesByRoomId(room.id, data, {
         total,
+        page: PAGE,
+        pageSize: PAGE_SIZE,
       })
     }
   }
-
-  onAiThinking((data) => {
-    addThinkingMessagesByRoomId(data.roomId, data.aiId)
-  })
-
-  onAiEndThink((data) => {
-    const messageNode = messages.get(data.roomId)
-    if (messageNode) {
-      deleteMessagesByRoomId(data.roomId, `${data.roomId}-${data.aiId}`)
-    }
-  })
-
-  onAllMessages((message: InfoMessage) => {
-    addMessagesByRoomId(message.roomId, [message])
-  })
 
   init()
 
@@ -173,5 +193,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     findMessagesByRoomId,
     updateMessageContextTrue,
     updateMessageContextFalse,
+    addMessagesByRoomId,
   }
 })

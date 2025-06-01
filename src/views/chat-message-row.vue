@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import type { InfoMessage } from '@/common/types'
+import type { InfoMessage } from '@/node/database/service/message'
 import { useDateFormat } from '@vueuse/core'
 import { CheckCheck, Loader } from 'lucide-vue-next'
 import { computed } from 'vue'

@@ -1,19 +1,24 @@
-import { Bridge, BridgeRequest } from "~/common/bridge"
-import { parentPort } from 'worker_threads';
+import type { BridgeRequest } from '~/common/bridge'
+import type { ExtensionDatabaseRouter } from '~/node/database/router'
+import { isMainThread, parentPort } from 'node:worker_threads'
+import { Bridge } from '~/common/bridge'
 
-export class Ipc extends Bridge {
+class Rpc extends Bridge {
   constructor() {
-	super()
-	parentPort?.on('message', (data: BridgeRequest) => {
-		this.onMessage(data)
-	})
-
-	this.register('ping', () => {
-	  return 'pong'
-	})
+    super()
+    if (!isMainThread && parentPort) {
+      parentPort.on('message', (data: BridgeRequest) => {
+        this.onMessage(data)
+      })
+    }
   }
 
   send(data: BridgeRequest): void {
-	parentPort?.postMessage?.(data)
+    if (!isMainThread && parentPort) {
+      parentPort.postMessage(data)
+    }
   }
 }
+
+export const rpc = new Rpc()
+export const database = rpc.createProxy<ExtensionDatabaseRouter>('database')

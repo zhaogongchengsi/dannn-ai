@@ -26,7 +26,9 @@ const createChatSchemas = z.object({
 async function onFormSubmit(values: Record<string, any>) {
   await chatStore.addRoom({
     title: values.title,
+    avatar: null,
     description: values.description,
+    prompt: values.systemPrompt,
   })
     .finally(() => {
       isOpen.value = false

@@ -12,7 +12,7 @@ app.use(pinia)
 app.use(router)
 
 async function bootstrap() {
-  await initMarkdownIt()
+  initMarkdownIt()
   app.mount('#app')
 }
 

@@ -5,7 +5,6 @@
   const process = await import('node:process')
   const fs = await import('node:fs/promises')
   const fsSync = await import('node:fs')
-
   const NAME = (process.argv.find(arg => arg.startsWith('--name='))?.split('=')[1] || '').toLocaleLowerCase()
 
   async function readFile(path: string, encoding: BufferEncoding = 'utf-8') {
@@ -55,10 +54,6 @@
     return ipcRenderer.invoke(`${NAME}.isMaximized`)
   }
 
-  async function getEnv(keys: string[]): Promise<Record<string, string | undefined>> {
-    return ipcRenderer.invoke('env.get', keys)
-  }
-
   const is = {
     mac: process.platform === 'darwin',
     win: process.platform === 'win32',
@@ -78,7 +73,6 @@
     readFile,
     readDir,
     exists,
-    getEnv,
     window: {
       name: NAME,
       close,

@@ -7,6 +7,9 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const Ipc: typeof import('./src/lib/rpc')['Ipc']
+  const RendererBridge: typeof import('./src/lib/rpc')['RendererBridge']
+  const Rpc: typeof import('./src/lib/rpc')['Rpc']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
@@ -100,6 +103,8 @@ declare global {
   const resolveComponent: typeof import('vue')['resolveComponent']
   const resolveRef: typeof import('@vueuse/core')['resolveRef']
   const resolveUnref: typeof import('@vueuse/core')['resolveUnref']
+  const rpc: typeof import('./src/lib/rpc')['rpc']
+  const rpc2: typeof import('./src/lib/rpc')['rpc2']
   const setActivePinia: typeof import('pinia')['setActivePinia']
   const setMapStoreSuffix: typeof import('pinia')['setMapStoreSuffix']
   const shallowReactive: typeof import('vue')['shallowReactive']
@@ -189,7 +194,7 @@ declare global {
   const useEventListener: typeof import('@vueuse/core')['useEventListener']
   const useEventSource: typeof import('@vueuse/core')['useEventSource']
   const useExtension: typeof import('./src/composables/extension')['useExtension']
-  const useExtensions: typeof import('./src/composables/extension')['useExtensions']
+  const useExtensions: typeof import('./src/lib/extension')['useExtensions']
   const useEyeDropper: typeof import('@vueuse/core')['useEyeDropper']
   const useFavicon: typeof import('@vueuse/core')['useFavicon']
   const useFetch: typeof import('@vueuse/core')['useFetch']

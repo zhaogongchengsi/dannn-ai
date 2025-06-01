@@ -3,7 +3,7 @@ import { defineConfig } from 'tsdown'
 export default [
   defineConfig({
     entry: [
-      './extensions/deepseek/src/index.ts',
+      './extensions/chat/src/index.ts',
     ],
     alias: {
       '~': './src',
@@ -14,6 +14,7 @@ export default [
       '.svg': 'dataurl',
     },
     external: ['electron'],
-    outDir: './extensions/deepseek/dist',
+    outDir: './extensions/chat/dist',
+    clean: false,
   }),
 ]

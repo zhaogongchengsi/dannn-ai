@@ -1,4 +1,3 @@
-import { relations } from 'drizzle-orm'
 import { int, integer, primaryKey, sqliteTable as table, text } from 'drizzle-orm/sqlite-core'
 
 export const ais = table('ais', {
@@ -10,8 +9,6 @@ export const ais = table('ais', {
   author: text('author'),
   avatar: text('avatar'),
   description: text('description'),
-  role: text('role'),
-  prompt: text('prompt'),
 
   type: text('type').notNull(),
   models: text('models').notNull(),
@@ -27,8 +24,6 @@ export const ais = table('ais', {
   versionHistory: text('version_history'),
 
   tags: text('tags'),
-  configuration: text('configuration'),
-  createdBy: text('created_by'),
 })
 
 export const rooms = table('rooms', {
@@ -44,11 +39,16 @@ export const rooms = table('rooms', {
   isLocked: int('is_locked').notNull(),
   isPinned: int('is_pinned').notNull(),
   isArchived: int('is_archived').notNull(),
+  // 最后消息
   lastMessage: integer('last_message_at').default(0), // 最后消息 id
   // 最大设置的上下文消息数量
   maxContextMessages: int('max_context_messages').notNull().default(3),
   // 多少轮聊天后提示词会被重新加入到上下文中
   memoryInterval: int('memory_interval').notNull().default(15), // 每隔多少轮将提示词加入对话，0 表示不自动加入
+  // 本房间提示词
+  prompt: text('prompt'), // 这个房间的提示词
+  // 本房间 memoryInterval 初始值
+  memoryIntervalInitialValue: int('memory_interval_initial_value').notNull().default(15), // 初始值，0 表示不自动加入
 })
 
 // // 在 chat_participants 中建立 AI 和 chat 的关联
@@ -78,14 +78,14 @@ export const messages = table('messages', {
   deletedAt: text('deleted_at'),
 
   reference: text('reference'),
+
   senderType: text('sender_type', {
     enum: ['ai', 'human'], // 类型约束（不是强约束，仅提供类型提示）
   }).notNull(),
   senderId: integer('sender_id'), // ai 用 ai id，human 固定写死为 0 就行
   parentId: text('parent_id'), // 上下文关联 ✅
-  status: text('status'), // 消息状态：pending/success/error
+  status: text('status'), // 消息状态：pending/success/error/canceled/thinking
   meta: text('meta'), // AI 生成详情、tokens 等
-  isAIAutoChat: int('is_ai_auto_chat').notNull().default(0),
 
   isStreaming: int('is_streaming').notNull().default(0),
   streamGroupId: text('stream_group_id'),
@@ -96,4 +96,20 @@ export const messages = table('messages', {
   functionResponse: text('function_response'),
 
   isInContext: integer('is_in_context').notNull().default(0), // 是否在上下文中
+})
+
+export const kv = table('kv', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+  deletedAt: text('deleted_at'),
+})
+
+export const envs = table('envs', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+  deletedAt: text('deleted_at'),
 })
