@@ -20,7 +20,7 @@ import { isMacOS } from '@/composables/platform'
         <WindowCloseButton v-if="!isMacOS" />
       </div>
     </div>
-    <section class="h-[calc(100vh - var(--app-header-height))] overflow-auto">
+    <section style="height: calc(100vh - var(--app-header-height))" class="overflow-auto">
       <RouterView />
     </section>
   </main>

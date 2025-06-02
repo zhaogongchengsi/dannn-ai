@@ -48,8 +48,8 @@ const toasterTheme = computed(() => {
 </script>
 
 <template>
-  <SidebarProvider class="h-[calc(100vh_-_var(--app-header-height))]">
-    <Sidebar collapsible="icon" class="h-[calc(100vh_-_var(--app-header-height))]">
+  <SidebarProvider style="height: calc(100vh - var(--app-header-height))">
+    <Sidebar collapsible="icon" style="height: calc(100vh - var(--app-header-height))">
       <SidebarHeader>
         <div class="w-full flex items-center justify-between gap-2 group-data-[state=collapsed]:flex-col">
           <div class="flex items-center justify-center gap-2">
@@ -78,9 +78,8 @@ const toasterTheme = computed(() => {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
-      <SidebarRail />
     </Sidebar>
-    <section class="flex-1 h-full relative">
+    <section class="relative">
       <ChatHeader />
       <ScrollArea
         class="w-full overflow-auto"
