@@ -51,7 +51,7 @@
     "shortcutName": "Dannn AI"
   },
   "appImage": {
-    "artifactName": "dannn-ai-Setup.${version}.exe"
+    "artifactName": "dannn-ai-setup.${version}.exe"
   },
   "npmRebuild": false,
   "publish": [

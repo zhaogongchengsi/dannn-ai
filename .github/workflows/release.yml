@@ -22,10 +22,20 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
       - name: Install pnpm
         run: npm install -g pnpm
+              
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      
+      - name: List output files
+        run: |
+          echo "查看当前目录"
+          ls -R
+          echo "查看 node_modules 是否存在"
+          ls -l node_modules
+          echo "查看打包配置文件"
+          cat package.json | jq '.build'
 
       - name: build-win
         if: matrix.os == 'windows-latest'
@@ -33,6 +43,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GIT_HUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run build && npm run package
+
+      - name: Show dist content
+        run: ls -R dist/
 
       - name: release
         uses: softprops/action-gh-release@v1
