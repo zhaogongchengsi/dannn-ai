@@ -332,6 +332,9 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
+  export type { ChatItem } from './src/stores/chat'
+  import('./src/stores/chat')
+  // @ts-ignore
   export type { ThinkingMessage, MessageNode, RoomID } from './src/stores/messages'
   import('./src/stores/messages')
 }
