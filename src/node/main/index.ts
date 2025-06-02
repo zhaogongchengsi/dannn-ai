@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { app } from 'electron'
+import { app, screen } from 'electron'
 import { migrateDb } from '../database/db'
 import { Config } from './lib/config'
 import { ExtensionHub } from './lib/hub'
@@ -41,9 +41,15 @@ async function bootstrap() {
 
   const currentChatId = config.get('currentChatId')
 
+  // 获取屏幕的工作区域
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const scaleFactor = primaryDisplay.scaleFactor
+  const baseWidth = 1280
+  const baseHeight = 800
+
   await window.display({
-    width: windowConfig?.width,
-    height: windowConfig?.height,
+    width: windowConfig?.width ?? Math.round(baseWidth * scaleFactor),
+    height: windowConfig?.height ?? Math.round(baseHeight * scaleFactor),
     currentUrl: currentChatId !== undefined ? `#/chat/${currentChatId}` : '',
   })
 

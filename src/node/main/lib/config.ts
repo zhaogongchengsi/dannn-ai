@@ -15,8 +15,8 @@ export class Config extends Store<ConfigData> {
       name: 'config',
       defaultData: {
         window: {
-          width: 900,
-          height: 670,
+          width: 1280,
+          height: 800,
         },
         theme: 'auto',
       },

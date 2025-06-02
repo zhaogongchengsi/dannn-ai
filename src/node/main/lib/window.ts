@@ -44,11 +44,16 @@ export class Window extends Bridge {
     this.isShow = false
     await app.whenReady()
 
+    const minWidth = 800
+    const minHeight = 540
+
     this.window = new BrowserWindow({
       width: width ?? 800,
       height: height ?? 600,
       show: false,
       icon: this.icon,
+      minWidth,
+      minHeight,
       frame: isMacOS ? true : !app.isPackaged,
       titleBarStyle: isMacOS ? 'hidden' : undefined,
       titleBarOverlay: isMacOS,

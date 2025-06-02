@@ -18,9 +18,9 @@ import ChatAvatar from '@/views/chat-avatar.vue'
 import ChatHeader from '@/views/chat-header.vue'
 
 const config = useConfig()
-
 const chatStore = useChatStore()
 const route = useRoute<'/chat/[id]/'>()
+const isOpen = useStorage('sidebar-open', true, localStorage)
 
 watchEffect(() => {
   const id = route.params.id
@@ -44,7 +44,7 @@ const toasterTheme = computed(() => {
 </script>
 
 <template>
-  <SidebarProvider style="height: calc(100vh - var(--app-header-height))">
+  <SidebarProvider v-model:open="isOpen" style="height: calc(100vh - var(--app-header-height))">
     <Sidebar collapsible="icon" style="height: calc(100vh - var(--app-header-height))">
       <SidebarHeader>
         <div class="w-full flex items-center justify-between gap-2 group-data-[state=collapsed]:flex-col">
@@ -82,7 +82,7 @@ const toasterTheme = computed(() => {
         </SidebarMenu>
       </SidebarContent>
     </Sidebar>
-    <section class="relative">
+    <section class="relative ml-auto flex-1 min-w-0" :style="{ width: isOpen ? 'calc(100vw - var(--sidebar-width))' : 'calc(100vw - var(--sidebar-width-icon))' }">
       <ChatHeader />
       <ScrollArea
         class="w-full overflow-auto"
