@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 useConfig()
-useChatStore()
+useAIStore()
 useMessagesStore()
+useChatStore()
 </script>
 
 <template>

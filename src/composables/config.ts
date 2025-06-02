@@ -46,6 +46,17 @@ export const useConfig = createGlobalState(
       return config.value[key]
     }
 
+    function setCurrentChatId(id: number) {
+      if (!config.value) {
+        return
+      }
+      config.value = {
+        ...config.value,
+        currentChatId: id,
+      }
+      window.dannn.ipc.invoke('config.set', 'currentChatId', id)
+    }
+
     return {
       config,
       set,
@@ -53,6 +64,7 @@ export const useConfig = createGlobalState(
       loading,
       init,
       mode,
+      setCurrentChatId,
     }
   },
 )

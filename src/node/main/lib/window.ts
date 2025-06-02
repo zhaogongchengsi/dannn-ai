@@ -4,18 +4,17 @@ import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
 import { isMacOS } from 'std-env'
 import { Bridge } from '~/common/bridge'
 import { registerRouterToBridge } from '~/common/router'
-import { databaseUrl } from '~/node/database/constant'
 import { databaseRouter } from '~/node/database/router'
 import { logger } from './logger'
 
 export interface WindowOptions {
   width?: number
   height?: number
+  currentUrl?: string
 }
 
 export interface WindowEvents {
-  'window.resized': []
-  'setting.resized': []
+  resized: []
 }
 
 export class Window extends Bridge {
@@ -41,7 +40,7 @@ export class Window extends Bridge {
     registerRouterToBridge(this, databaseRouter, 'database')
   }
 
-  async createWindow({ width, height }: WindowOptions = { width: 800, height: 600 }) {
+  async createWindow({ width, height, currentUrl }: WindowOptions = { width: 800, height: 600 }) {
     this.isShow = false
     await app.whenReady()
 
@@ -63,11 +62,11 @@ export class Window extends Bridge {
     })
 
     if (!app.isPackaged) {
-      this.window.loadURL('http://localhost:3001')
+      this.window.loadURL(`http://localhost:3001${currentUrl || ''}`)
       this.window.webContents.openDevTools()
     }
     else {
-      this.window.loadFile(resolve(__dirname, './index.html'))
+      this.window.loadFile(resolve(__dirname, `./index.html${currentUrl || ''}`))
     }
 
     app.on('activate', () => {
@@ -81,7 +80,7 @@ export class Window extends Bridge {
 
     this.initEvent('window', this.window)
 
-    this.window.on('resized', () => this.emit('window.resized'))
+    this.window.on('resized', () => this.emit('resized'))
   }
 
   private initEvent(name: string, window: BrowserWindow) {

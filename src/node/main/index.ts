@@ -39,15 +39,18 @@ async function bootstrap() {
       extensionHub.startAll()
     })
 
+  const currentChatId = config.get('currentChatId')
+
   await window.display({
     width: windowConfig?.width,
     height: windowConfig?.height,
+    currentUrl: currentChatId !== undefined ? `#/chat/${currentChatId}` : '',
   })
 
   await window.show()
 }
 
-window.on('window.resized', async () => {
+window.on('resized', async () => {
   const { width, height } = window.getSize()
   await config.set('window', {
     width,

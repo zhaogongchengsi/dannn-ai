@@ -71,8 +71,15 @@ const toasterTheme = computed(() => {
                 :to="`/chat/${chat.id}/`" class="flex items-center gap-2 size-full"
                 active-class="bg-sidebar-accent text-sidebar-accent-foreground"
               >
-                <ChatAvatar :chat="chat" />
-                <span class="group-data-[state=collapsed]:hidden">{{ chat.title }}</span>
+                <ChatAvatar class="shrink-1" :chat="chat" />
+                <div class="group-data-[state=collapsed]:hidden flex-1 min-w-0">
+                  <span class="text-lg font-600 truncate block min-w-0">{{ chat.title }}</span>
+                  <div v-if="chat.lastEntityMessage">
+                    <p class="line-clamp-2 min-w-0 text-zinc-500 dark:text-zinc-400 text-sm">
+                      {{ chat.lastEntityMessage.content }}
+                    </p>
+                  </div>
+                </div>
               </RouterLink>
             </SidebarMenuButton>
           </SidebarMenuItem>

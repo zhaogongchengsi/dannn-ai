@@ -77,6 +77,7 @@ interface ConfigData {
     height: number
   }
   theme: 'light' | 'dark' | 'auto'
+  currentChatId?: number
 }
 
 interface Window {

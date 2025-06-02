@@ -22,16 +22,48 @@ const PAGE_SIZE = 20
 export const useMessagesStore = defineStore('dannn-messages', () => {
   const messages = reactive<Map<RoomID, MessageNode>>(new Map())
 
+  /**
+   * @description 查找指定房间的消息
+   * @param roomId 房间ID
+   * @returns 返回房间的消息列表
+   */
   function findMessagesByRoomId(roomId: RoomID) {
     return messages.get(roomId)
   }
 
+  /**
+   * @description 查找指定房间的最后一条消息
+   * @param roomId 房间ID
+   * @returns 返回房间的最后一条消息，如果没有消息则返回null
+   */
+  function findChatLastMessage(roomId: RoomID): (InfoMessage | ThinkingMessage) | undefined {
+    const messageNode = messages.get(roomId)
+    if (messageNode && messageNode.messages.length > 0) {
+      const messageConfig = messageNode.messages.at(-1)
+      if (messageConfig) {
+        return messageConfig
+      }
+    }
+    return undefined
+  }
+
+  /**
+   * @description 对消息列表进行排序
+   * @param messageList 消息列表
+   * @returns 返回排序后的消息列表
+   */
   const sortMessages = (messageList: InfoMessage[]) => {
     return messageList.sort((a, b) => {
       return a.sortBy - b.sortBy
     })
   }
 
+  /**
+   * @description 添加或更新指定房间的消息
+   * @param roomId 房间ID
+   * @param messageList 消息列表
+   * @param options 分页选项
+   */
   function addMessagesByRoomId(roomId: RoomID, messageList: (InfoMessage | ThinkingMessage)[], options: { page?: number, pageSize?: number, total?: number } = {}) {
     const messageNode = messages.get(roomId)
     const sortMessagesList = sortMessages(messageList)
@@ -147,19 +179,21 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
+  // 监听扩展进程发过来的回答
   onQuestion((message) => {
     addMessagesByRoomId(message.roomId, [message])
   })
 
+  // 监听回答状态更新事件
   onAnswerStatusUpdate((data) => {
     updateMessageStatue(data.messageId, data.status)
   })
 
+  // 监听AI思考开始和结束事件
   onAiThinking((data) => {
     const { roomId, aiId, questionId } = data
     addThinkingMessagesByRoomId(roomId, aiId, questionId)
   })
-
   onAiEndThink((data) => {
     const id = `${data.roomId}-${data.aiId}-${data.questionId}`
     deleteMessagesByRoomId(data.roomId, id)
@@ -194,5 +228,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     updateMessageContextTrue,
     updateMessageContextFalse,
     addMessagesByRoomId,
+    findChatLastMessage,
   }
 })

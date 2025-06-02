@@ -6,6 +6,7 @@ interface ConfigData {
     height: number
   }
   theme: string
+  currentChatId?: number
 }
 
 export class Config extends Store<ConfigData> {
