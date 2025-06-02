@@ -24,6 +24,8 @@ jobs:
 
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: build-win
         if: matrix.os == 'windows-latest'
