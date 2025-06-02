@@ -91,6 +91,10 @@
   --app-chat-footer-header-height: 50px;
 }
 
+.main-container-height {
+  height: calc(100vh - var(--app-header-height));
+}
+
 .dragging {
   -webkit-app-region: drag;
 }

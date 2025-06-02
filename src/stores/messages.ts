@@ -1,6 +1,6 @@
 import type { InfoMessage, MessageStatus } from '@/node/database/service/message'
 import { database } from '@/lib/database'
-import { onAiEndThink, onAiThinking, onAnswerStatusUpdate, onQuestion } from '@/lib/extension'
+import { onAiEndThink, onAiThinking, onAnswer, onAnswerStatusUpdate } from '@/lib/extension'
 
 export interface ThinkingMessage extends InfoMessage {
   type: 'thinking'
@@ -180,7 +180,7 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   }
 
   // 监听扩展进程发过来的回答
-  onQuestion((message) => {
+  onAnswer((message) => {
     addMessagesByRoomId(message.roomId, [message])
   })
 

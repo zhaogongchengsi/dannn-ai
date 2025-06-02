@@ -12,6 +12,7 @@ import { join, normalize } from 'pathe'
 import { Bridge } from '~/common/bridge'
 import { registerRouterToBridge } from '~/common/router'
 import { extensionRouter } from '~/node/database/router'
+import { getEnv } from '~/node/database/service/kv'
 import { logger } from './logger'
 
 const configName = 'package.json'
@@ -22,8 +23,10 @@ export interface IExtensionProcessInfo {
   readonly manifest: PackageJson
 }
 
-export interface IExtensionConfig {
-  env: Record<string, string>
+export interface IExtensionConfig extends PackageJson {
+  permissions?: {
+    env?: Record<string, string>
+  }
 }
 
 export class ExtensionProcess extends Bridge {
@@ -33,6 +36,7 @@ export class ExtensionProcess extends Bridge {
   private static readonly all = new Map<number, IExtensionProcessInfo>()
   process: Worker | null = null
   manifest: PackageJson | null = null
+  readme: string | null = null
   static getAll(): IExtensionProcessInfo[] {
     return Array.from(ExtensionProcess.all.values())
   }
@@ -86,11 +90,19 @@ export class ExtensionProcess extends Bridge {
     })
   }
 
+  async getMetafile() {
+    return {
+      path: this._path,
+      packageJson: this.manifest,
+      readme: (await this.readReadme()) || undefined,
+    }
+  }
+
   getId(): string {
     return this.id
   }
 
-  private async readManifest(): Promise<PackageJson> {
+  private async readManifest(): Promise<IExtensionConfig> {
     const configFile = resolve(this._path, configName)
     if (!configFile.endsWith('.json') || !existsSync(configFile)) {
       throw new Error(`Config file ${configFile} does not exist or is not a JSON file`)
@@ -98,11 +110,53 @@ export class ExtensionProcess extends Bridge {
 
     try {
       const value = await readFile(configFile, 'utf-8')
-      this.manifest = JSON.parse(value) as PackageJson
-      return this.manifest
+      const manifestValue = JSON.parse(value) as PackageJson
+      const resolvedManifest = JSON.parse(value) as IExtensionConfig
+
+      if (manifestValue.permissions && manifestValue.permissions.env && Array.isArray(manifestValue.permissions.env)) {
+        Object.assign(resolvedManifest, {
+          permissions: {
+            env: {},
+          },
+        })
+        for (const key of manifestValue.permissions.env) {
+          const envValue = process.env[key] || (await getEnv(key)
+            .catch(() => undefined))
+          resolvedManifest.permissions!.env![key] = envValue as string
+        }
+      }
+
+      this.manifest = resolvedManifest as IExtensionConfig
+
+      return resolvedManifest
     }
     catch (e) {
       throw new Error(`Failed to read config file ${configFile}: ${e}`)
+    }
+  }
+
+  private async readReadme(): Promise<string | null> {
+    if (this.readme) {
+      return this.readme
+    }
+
+    const readme = ['README.md', 'README.txt'].find((file) => {
+      return existsSync(resolve(this._path, file))
+    })
+
+    if (!readme) {
+      logger.warn('No README file found in the extension directory')
+      return null
+    }
+
+    try {
+      const content = await readFile(resolve(this._path, readme), 'utf-8')
+      this.readme = content
+      return content
+    }
+    catch (e) {
+      logger.error(`Failed to read README file: ${e}`)
+      return null
     }
   }
 
@@ -119,6 +173,7 @@ export class ExtensionProcess extends Bridge {
     try {
       performance.mark('start-extension')
       const manifest = await this.readManifest()
+
       if (!manifest || !manifest.main) {
         return
       }
@@ -127,7 +182,7 @@ export class ExtensionProcess extends Bridge {
         throw new Error(`Main file ${mainFile} does not exist`)
       }
 
-      const extensionNeedEnv = manifest?.permissions?.env ? Object.fromEntries(manifest.permissions.env.map((key: string) => [key, process.env[key]])) : {}
+      const extensionNeedEnv = (manifest.permissions && manifest.permissions.env) ? manifest.permissions.env : {}
 
       if (!this.manifest) {
         throw new Error('Manifest is not defined')

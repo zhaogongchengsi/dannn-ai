@@ -1,14 +1,33 @@
+import type { IExtensionConfig } from './extension'
 import type { Window } from './window'
 import { readdir } from 'node:fs/promises'
+import { ipcMain } from 'electron'
 import { join } from 'pathe'
+import { setEnv } from '~/node/database/service/kv'
 import { EXTENSIONS_ROOT } from '../constant'
 import { ExtensionProcess } from './extension'
 import { logger } from './logger'
 
+export interface ExtensionMetafile {
+  packageJson: IExtensionConfig
+  readme?: string
+  path: string
+}
+
 export class ExtensionHub {
   static readonly hub: Map<string, ExtensionProcess> = new Map()
 
-  constructor() { }
+  constructor() {
+    ipcMain.handle('extension.get-all-metafiles', async () => {
+      return await this.getAllExtensionMetafiles()
+    })
+
+    ipcMain.handle('extension.set-env-value', async (_, item: { name: string, key: string, value: string }) => {
+      await setEnv(item.key, item.value)
+      // TODO: 这里需要重新加载扩展
+      // const subprocess = ExtensionHub.hub.get(item.name)
+    })
+  }
 
   loader(window: Window) {
     return new Promise<void>((resolve, reject) => {
@@ -29,6 +48,14 @@ export class ExtensionHub {
           reject(err)
         })
     })
+  }
+
+  async getAllExtensionMetafiles(): Promise<ExtensionMetafile[]> {
+    return await Promise.all(
+      ExtensionHub.hub.values().map(async (subprocess: ExtensionProcess) => {
+        return await subprocess.getMetafile() as ExtensionMetafile
+      }),
+    )
   }
 
   async startAll() {

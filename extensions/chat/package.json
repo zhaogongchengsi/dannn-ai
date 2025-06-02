@@ -1,15 +1,15 @@
 {
-	"name": "dannn-chat-extension",
-	"type": "module",
-	"version": "1.0.0",
-	"icon": "https://chat.deepseek.com/favicon.svg",
-	"description": "ChatGPT Extension for DeepSeek",
-	"author": "zhaozunhong",
-	"homepage": "zhaozunhong.me",
-	"main": "./dist/index.js",
-	"permissions": {
-		"env": [
-			"DEEPSEEK_API_KEY"
-		]
-	}
+  "name": "dannn-chat-extension",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "ChatGPT Extension for DeepSeek",
+  "author": "zhaozunhong",
+  "homepage": "zhaozunhong.me",
+  "main": "./dist/index.js",
+  "icon": "https://chat.deepseek.com/favicon.svg",
+  "permissions": {
+    "env": [
+      "DEEPSEEK_API_KEY"
+    ]
+  }
 }

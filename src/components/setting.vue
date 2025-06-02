@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import { Settings } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -16,7 +17,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Settings } from 'lucide-vue-next'
 
 const config = useConfig()
 
@@ -60,9 +60,11 @@ useEventListener('keydown', onKeyDown)
           <span>Billing</span>
           <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span>Settings</span>
-          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+        <DropdownMenuItem as-child>
+          <router-link to="/settings">
+            <span>Settings</span>
+            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+          </router-link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <span>Keyboard shortcuts</span>
