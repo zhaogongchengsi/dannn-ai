@@ -18,27 +18,6 @@
       ]
     },
     {
-      "from": "node_modules/openai",
-      "to": "node_modules/openai",
-      "filter": [
-        "**/*"
-      ]
-    },
-    {
-      "from": "node_modules/socket.io-client",
-      "to": "node_modules/socket.io-client",
-      "filter": [
-        "**/*"
-      ]
-    },
-    {
-      "from": "node_modules/std-env",
-      "to": "node_modules/std-env",
-      "filter": [
-        "**/*"
-      ]
-    },
-    {
       "from": "./extensions",
       "to": "resources/extensions",
       "filter": [

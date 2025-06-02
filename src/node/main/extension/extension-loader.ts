@@ -57,6 +57,6 @@ async function init() {
 init()
   .catch((err: any) => {
     console.error('Error in extension loader:', err)
-    rpc.emit('extension.error', err?.message)
+    rpc.emit('_extension.error', err?.message)
     process.exit(1)
   })

@@ -79,6 +79,11 @@ export class ExtensionProcess extends Bridge {
           logger.error(`Failed to activate extension: ${error?.message}`)
         })
     })
+
+    this.on('_extension.error', (error: string) => {
+      logger.error(`Extension error: ${error}`)
+      this._window.emit('extension.error', { id: this.id, error })
+    })
   }
 
   getId(): string {
