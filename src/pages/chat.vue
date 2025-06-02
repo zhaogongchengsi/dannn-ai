@@ -5,7 +5,6 @@ import { useConfig } from '@/composables/config'
 import ChatAdd from '@/views/chat-add.vue'
 import ChatAvatar from '@/views/chat-avatar.vue'
 import ChatHeader from '@/views/chat-header.vue'
-import { computed } from 'vue'
 
 const config = useConfig()
 
@@ -34,7 +33,7 @@ const toasterTheme = computed(() => {
 </script>
 
 <template>
-  <div class="flex h-screen" aria-hidden>
+  <div class="flex" aria-hidden>
     <div class="w-64 border-r">
       <div class="flex items-center gap-2 justify-end h-14 px-2 border-b">
         <ChatAdd />
@@ -53,9 +52,9 @@ const toasterTheme = computed(() => {
       </ul>
     </div>
 
-    <section class="flex-1 h-screen relative">
+    <section class="flex-1 relative">
       <ChatHeader />
-      <ScrollArea class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-chat-header-height))' }">
+      <ScrollArea class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-chat-header-height) - var(--app-header-height))' }">
         <router-view />
       </ScrollArea>
     </section>

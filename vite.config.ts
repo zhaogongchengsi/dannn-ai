@@ -6,6 +6,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import VueRouter from 'unplugin-vue-router/vite'
 import { defineConfig } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import Layouts from 'vite-plugin-vue-layouts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -13,6 +14,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VueRouter({}),
+    Layouts(),
     AutoImport({
       imports: [
         'vue',

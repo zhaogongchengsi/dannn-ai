@@ -9,6 +9,12 @@ declare module '*.vue' {
   export default component
 }
 
+declare module 'virtual:generated-layouts' {
+  import type { RouteRecordRaw } from 'vue-router'
+
+  export function setupLayouts(routes: RouteRecordRaw[]): RouteRecordRaw[]
+}
+
 // 递归构造对象的路径
 type Path<T, K extends keyof T = keyof T> =
   K extends string
