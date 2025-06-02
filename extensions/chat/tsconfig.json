@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "module": "preserve",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": [
+      "es2020",
+      "webworker"
+    ],
+    "paths": {
+      "~/*": [
+        "../../src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "./module.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

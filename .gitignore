@@ -9,7 +9,6 @@ node_modules
 *.log
 dist
 dist-ssr
-extensions
 .dannn
 drizzle
 dist_client
@@ -17,5 +16,3 @@ client_dist
 sqlite.db
 app_dist
 dannn_dist
-resources/drizzle
-electron-builder.json
