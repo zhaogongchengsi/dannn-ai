@@ -1,14 +1,14 @@
 <script setup lang='ts'>
 import { Check, ChevronLeft } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import Button from '@/components/ui/button/Button.vue'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue'
 import Separator from '@/components/ui/separator/Separator.vue'
+import { Toaster } from '@/components/ui/sonner'
 import Switch from '@/components/ui/switch/Switch.vue'
 import { getAllMetafiles, setEnvValue } from '@/lib/extension'
-import { Toaster } from '@/components/ui/sonner'
-import { toast } from 'vue-sonner'
 
 const config = useConfig()
 
@@ -17,7 +17,6 @@ const envFrom = ref<{
   name: string
   env: Record<string, string>
 }[]>([])
-
 
 const toasterTheme = computed(() => {
   const mode = config.mode.value
@@ -39,10 +38,8 @@ onMounted(async () => {
 })
 
 function onSaveEnv(item: { name: string, key: string, value: string }) {
-  console.log('Saving environment variable:', item)
   setEnvValue(item.name, item.key, item.value)
     .then(() => {
-      console.log('Environment variable saved successfully')
       toast.success(`环境变量 ${item.key} 保存成功`, {
         description: `值: ${item.value}`,
       })
@@ -108,6 +105,6 @@ function onSaveEnv(item: { name: string, key: string, value: string }) {
         </ul>
       </div>
     </ScrollArea>
-    <Toaster :theme="toasterTheme" />
+    <Toaster position="top-right" :theme="toasterTheme" />
   </div>
 </template>
