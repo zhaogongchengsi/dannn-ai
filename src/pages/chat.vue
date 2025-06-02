@@ -1,5 +1,20 @@
 <script setup lang='ts'>
 import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import { useConfig } from '@/composables/config'
 import ChatAdd from '@/views/chat-add.vue'
@@ -33,31 +48,47 @@ const toasterTheme = computed(() => {
 </script>
 
 <template>
-  <div class="flex" aria-hidden>
-    <div class="w-64 border-r">
-      <div class="flex items-center gap-2 justify-end h-14 px-2 border-b">
+  <SidebarProvider class="h-[calc(100vh_-_var(--app-header-height))]">
+    <Sidebar collapsible="icon" class="h-[calc(100vh_-_var(--app-header-height))]">
+      <SidebarHeader>
+        <div class="w-full flex items-center justify-between gap-2 group-data-[state=collapsed]:flex-col">
+          <div class="flex items-center justify-center gap-2">
+            <img src="/icon_128x128.png" alt="logo" class="size-8 block">
+            <h1 class="group-data-[state=collapsed]:hidden">
+              Dannn AI
+            </h1>
+          </div>
+          <SidebarTrigger />
+        </div>
         <ChatAdd />
-      </div>
-      <ul class="py-3">
-        <li v-for="chat in chatStore.rooms" :key="chat.id" class="w-full">
-          <RouterLink
-            :to="`/chat/${chat.id}/`"
-            class="flex p-1 items-center gap-2 size-full"
-            active-class="bg-sidebar-accent text-sidebar-accent-foreground"
-          >
-            <ChatAvatar :chat="chat" />
-            <span>{{ chat.title }}</span>
-          </RouterLink>
-        </li>
-      </ul>
-    </div>
-
-    <section class="flex-1 relative">
+      </SidebarHeader>
+      <SidebarSeparator />
+      <SidebarContent>
+        <SidebarMenu class="py-4 px-2">
+          <SidebarMenuItem v-for="chat in chatStore.rooms" :key="chat.id">
+            <SidebarMenuButton size="auto" class="group-data-[state=collapsed]:p-0!" as-child>
+              <RouterLink
+                :to="`/chat/${chat.id}/`" class="flex items-center gap-2 size-full"
+                active-class="bg-sidebar-accent text-sidebar-accent-foreground"
+              >
+                <ChatAvatar :chat="chat" />
+                <span class="group-data-[state=collapsed]:hidden">{{ chat.title }}</span>
+              </RouterLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
+    <section class="flex-1 h-full relative">
       <ChatHeader />
-      <ScrollArea class="w-full overflow-auto" :style="{ height: 'calc(100vh - var(--app-chat-header-height) - var(--app-header-height))' }">
+      <ScrollArea
+        class="w-full overflow-auto"
+        :style="{ height: 'calc(100vh - var(--app-chat-header-height) - var(--app-header-height))' }"
+      >
         <router-view />
       </ScrollArea>
     </section>
-  </div>
-  <Toaster :theme="toasterTheme" />
+    <Toaster :theme="toasterTheme" />
+  </SidebarProvider>
 </template>

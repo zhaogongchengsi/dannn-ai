@@ -1,10 +1,10 @@
 <script setup lang='ts'>
-import type { RoomData } from '@/common/types'
+import type { InfoChat } from '@/node/database/service/room'
 import defaultAvatar from '@/assets/default-avatar.png'
 import AvatarGroup from '@/components/avatar/avatar-group.vue'
 
 const props = defineProps<{
-  chat?: RoomData
+  chat?: InfoChat
 }>()
 
 const src = computed(() => {
@@ -16,7 +16,5 @@ const src = computed(() => {
 </script>
 
 <template>
-  <div>
-    <AvatarGroup :src="src" />
-  </div>
+  <AvatarGroup :src="src" avatar-class="max-w-12" />
 </template>

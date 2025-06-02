@@ -53,6 +53,7 @@ export class Window extends Bridge {
       frame: isMacOS ? true : !app.isPackaged,
       titleBarStyle: isMacOS ? 'hidden' : undefined,
       titleBarOverlay: isMacOS,
+      trafficLightPosition: { x: 10, y: 10 },
       webPreferences: {
         additionalArguments: [`--name=${this.name}`],
         nodeIntegration: true,

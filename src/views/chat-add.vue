@@ -41,7 +41,7 @@ async function onFormSubmit(values: Record<string, any>) {
     <DialogTrigger class="w-full">
       <Button class="w-full">
         <Plus class="size-5" />
-        <span>添加聊天</span>
+        <span class="group-data-[state=collapsed]:hidden">添加聊天</span>
       </Button>
     </DialogTrigger>
     <DialogContent>

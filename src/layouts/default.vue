@@ -13,9 +13,6 @@ import { isMacOS } from '@/composables/platform'
 
       class="h-[--app-header-height] flex justify-between items-center border-b dragging"
     >
-      <div>
-        header
-      </div>
       <div class="ml-auto flex items-center h-full px-4 gap-4">
         <Setting />
         <WindowMinusButton v-if="!isMacOS" />
