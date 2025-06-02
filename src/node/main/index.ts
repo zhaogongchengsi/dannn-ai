@@ -1,6 +1,7 @@
 import process from 'node:process'
 import { app, screen } from 'electron'
 import { migrateDb } from '../database/db'
+import { initAutoUpdater } from './autoupdater'
 import { Config } from './lib/config'
 import { ExtensionHub } from './lib/hub'
 import { logger } from './lib/logger'
@@ -15,6 +16,8 @@ const gotSingleInstanceLock = app.requestSingleInstanceLock()
 if (!gotSingleInstanceLock) {
   app.quit()
 }
+
+app.whenReady().then(initAutoUpdater)
 
 const config = new Config()
 const extensionHub = new ExtensionHub()
@@ -74,8 +77,13 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled rejection:', reason, 'Promise:', promise)
 })
 
+app.on('quit', () => {
+  logger.info('App is quitting...')
+})
+
 ;['SIGTERM', 'SIGINT'].forEach((signal) => {
   process.on(signal, () => {
+    logger.info(`Received ${signal}. Exiting...`)
     app.quit()
   })
 })

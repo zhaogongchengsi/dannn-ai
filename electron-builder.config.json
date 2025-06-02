@@ -1,4 +1,5 @@
 {
+  "appId": "me.zhaozunhong.dannn",
   "files": [
     "app_dist/**/*",
     "node_modules/**/*",
@@ -6,6 +7,7 @@
     "package.json",
     "!.dannn"
   ],
+  "artifactName": "dannn-ai-Setup.${version}.exe",
   "directories": {
     "buildResources": "./public"
   },
@@ -29,7 +31,6 @@
     }
   ],
   "asar": true,
-  "appId": "com.zhaozunhong.app",
   "productName": "Dannn AI",
   "mac": {
     "target": "dmg"
@@ -50,7 +51,15 @@
     "shortcutName": "Dannn AI"
   },
   "appImage": {
-    "artifactName": "${name}-setup.${ext}"
+    "artifactName": "dannn-ai-Setup.${version}.exe"
   },
-  "npmRebuild": false
+  "npmRebuild": false,
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "zhaogongchengsi",
+      "repo": "dannn-ai",
+      "private": false
+    }
+  ]
 }
