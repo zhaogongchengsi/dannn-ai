@@ -245,4 +245,31 @@ export class Window extends Bridge {
       throw new Error('Window is not created')
     }
   }
+
+  isMinimized() {
+    if (this.window) {
+      return this.window.isMinimized()
+    }
+    else {
+      throw new Error('Window is not created')
+    }
+  }
+
+  restore() {
+    if (this.window) {
+      this.window.restore()
+    }
+    else {
+      throw new Error('Window is not created')
+    }
+  }
+
+  focus() {
+    if (this.window) {
+      this.window.focus()
+    }
+    else {
+      throw new Error('Window is not created')
+    }
+  }
 }

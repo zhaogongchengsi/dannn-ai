@@ -103,6 +103,11 @@ useEventListener('keydown', onKeyDown)
       <DropdownMenuItem as-child>
         <a href="https://github.com/zhaogongchengsi/dannn-ai/issues">Help</a>
       </DropdownMenuItem>
+      <DropdownMenuItem as-child>
+        <RouterLink to="/">
+          Login out
+        </RouterLink>
+      </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem @click="onToggleDevtools">
         <span>Open Devtools</span>

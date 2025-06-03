@@ -7,7 +7,7 @@
     "package.json",
     "!.dannn"
   ],
-  "artifactName": "dannn-ai-Setup.${version}.exe",
+  "artifactName": "dannn-ai-setup.${version}.exe",
   "directories": {
     "buildResources": "./public"
   },

@@ -84,6 +84,11 @@ export async function getRoomById(id: number): Promise<InfoChat | undefined> {
   }
 }
 
+export async function roomExists(roomId: number): Promise<boolean> {
+  const room = await db.select().from(rooms).where(eq(rooms.id, roomId)).get()
+  return !!room
+}
+
 export async function updateRoomById(
   id: number,
   updates: Partial<InsertChat>,

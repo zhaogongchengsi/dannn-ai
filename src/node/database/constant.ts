@@ -1,5 +1,5 @@
 import process from 'node:process'
 import { app } from 'electron'
-import { dirname, normalize, resolve } from 'pathe'
+import { join, normalize, resolve } from 'pathe'
 
-export const databaseUrl = `file:///${normalize(resolve(app.isPackaged ? dirname(app.getPath('exe')) : process.cwd(), './sqlite.db'))}`
+export const databaseUrl = `file:///${normalize(resolve(app.isPackaged ? join(app.getPath('home'), '.dannn') : process.cwd(), './sqlite.db'))}`

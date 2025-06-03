@@ -1,6 +1,7 @@
 import process from 'node:process'
 import { app, screen } from 'electron'
 import { migrateDb } from '../database/db'
+import { roomExists } from '../database/service/room'
 import { initAutoUpdater } from './autoupdater'
 import { Config } from './lib/config'
 import { ExtensionHub } from './lib/hub'
@@ -8,8 +9,6 @@ import { logger } from './lib/logger'
 import { Window } from './lib/window'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
-// process.env.ELECTRON_ENABLE_LOGGING = 'true'
-// process.env.ELECTRON_DEBUG_NOTIFICATIONS = 'true'
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock()
 
@@ -26,37 +25,50 @@ const window = new Window()
 async function bootstrap() {
   logger.info('Bootstrap...')
 
-  await migrateDb()
-
   await config.init()
 
   app.on('before-quit', () => {
     extensionHub.unloadAll()
   })
 
-  const windowConfig = config.get('window')
-
-  // 加载插件并且把窗口传入插件
-  extensionHub.loader(window)
-    .then(() => {
-      extensionHub.startAll()
-    })
-
-  const currentChatId = config.get('currentChatId')
-
-  // 获取屏幕的工作区域
-  const primaryDisplay = screen.getPrimaryDisplay()
-  const scaleFactor = primaryDisplay.scaleFactor
-  const baseWidth = 1280
-  const baseHeight = 800
-
-  await window.display({
-    width: windowConfig?.width ?? Math.round(baseWidth * scaleFactor),
-    height: windowConfig?.height ?? Math.round(baseHeight * scaleFactor),
-    currentUrl: currentChatId !== undefined ? `#/chat/${currentChatId}` : '',
+  app.on('second-instance', () => {
+    logger.info('Second instance detected. Bringing the main window to the front.')
+    if (window.isMinimized()) {
+      window.restore()
+    }
+    window.focus()
   })
 
-  await window.show()
+  const windowConfig = config.get('window')
+
+  migrateDb()
+    .then(async () => {
+      // 加载插件并且把窗口传入插件
+      extensionHub.loader(window)
+        .then(() => {
+          extensionHub.startAll()
+        })
+
+      // 获取屏幕的工作区域
+      const { width, height } = getDisplayRatioWithSize()
+
+      await window.display({
+        width: windowConfig?.width ?? width,
+        height: windowConfig?.height ?? height,
+        currentUrl: await getDefaultRoute()
+          .catch((err) => {
+            logger.error('Failed to get default route:', err)
+            return ''
+          }),
+      })
+
+      await window.show()
+    })
+    .catch((err) => {
+      logger.error('Database migration failed:', err)
+      // 如果迁移失败，可能是数据库损坏或不兼容，直接退出应用
+      app.quit()
+    })
 }
 
 window.on('resized', async () => {
@@ -87,3 +99,30 @@ app.on('quit', () => {
     app.quit()
   })
 })
+
+function getDisplayRatioWithSize() {
+  // 获取屏幕的工作区域
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const scaleFactor = primaryDisplay.scaleFactor || 1 // 默认值为 1
+  const { width, height } = primaryDisplay.workAreaSize
+  const displayRatio = {
+    width: Math.round(width / scaleFactor),
+    height: Math.round(height / scaleFactor),
+  }
+  return displayRatio
+}
+
+async function getDefaultRoute() {
+  const currentChatId = Number(config.get('currentChatId'))
+
+  if (!currentChatId === undefined || currentChatId === null || currentChatId === 0 || Number.isNaN(currentChatId)) {
+    return ''
+  }
+
+  // 检查当前聊天 ID 是否存在对应的房间 防止路由错误
+  if (await roomExists(currentChatId)) {
+    return `#/chat/${currentChatId}`
+  }
+
+  return '#/chat' // 如果没有找到对应的房间，则返回空字符串
+}
