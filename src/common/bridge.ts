@@ -1,4 +1,5 @@
 import { withResolvers } from '@zunh/promise-kit'
+import { Subject } from 'rxjs/internal/Subject'
 
 export type RpcProxy<T> = {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R
@@ -74,13 +75,14 @@ export interface IBridge {
   onMessage: (data: BridgeRequest) => void
 }
 
-export abstract class Bridge implements IBridge {
+export abstract class Bridge extends Subject<BridgeRequest> implements IBridge {
   methods: Map<string, BridgeHandler> = new Map()
   waitResponse: Map<string, PromiseWithResolvers<any>> = new Map()
   events: Map<string, Set<BridgeHandler>> = new Map()
   private _bridgeId = this.randomAlphaString(16)
 
   constructor() {
+    super()
     this.register('this.getAllRegistered', () => this.getAllRegistered())
   }
 
@@ -92,6 +94,7 @@ export abstract class Bridge implements IBridge {
   }
 
   /**
+   * TODO: 重写转发逻辑以使用多个插件的通信 预计将转发消息的逻辑抽离出来
    * 将本 Bridge 收到的所有消息转发到目标 Bridge 实例
    * @param target 目标 Bridge 实例
    * @param filter 可选过滤函数，返回 true 时才转发
@@ -100,18 +103,20 @@ export abstract class Bridge implements IBridge {
   forwardTo(target: Bridge, filter?: (data: BridgeRequest) => boolean): () => void {
     const id = this._bridgeId
     const handler = (data: BridgeRequest & { __forwardedBy?: string[] }) => {
-      // 检查是否已被本 Bridge 转发过，避免循环
-      if (Array.isArray(data.__forwardedBy) && data.__forwardedBy.includes(id)) {
-        return
-      }
-
       if (!filter || filter(data)) {
+        // 检查是否已被本 Bridge 转发过，避免循环
+        if (Array.isArray(data.__forwardedBy) && data.__forwardedBy.includes(id)) {
+          return
+        }
         // 标记已转发
         const forwardedBy = Array.isArray(data.__forwardedBy) ? [...data.__forwardedBy, id] : [id]
         // 构造新对象，避免污染原消息
         const newData = { ...data, __forwardedBy: forwardedBy }
         target.send(newData as BridgeRequest)
+        return true
       }
+
+      return false
     }
     // 包装 onMessage，转发后再执行原逻辑
     const originalOnMessage = this.onMessage.bind(this)
@@ -174,7 +179,6 @@ export abstract class Bridge implements IBridge {
           error: null,
         })
       }).catch((e) => {
-        console.error(e)
         this.send({
           type: 'response',
           name,
