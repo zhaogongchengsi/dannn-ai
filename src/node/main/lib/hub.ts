@@ -4,7 +4,7 @@ import { readdir } from 'node:fs/promises'
 import { ipcMain } from 'electron'
 import { join } from 'pathe'
 import { setEnv } from '~/node/database/service/kv'
-import { EXTENSIONS_ROOT } from '../constant'
+import { EXTENSIONS_ROOT } from '../../constant'
 import { ExtensionProcess } from './extension'
 import { logger } from './logger'
 

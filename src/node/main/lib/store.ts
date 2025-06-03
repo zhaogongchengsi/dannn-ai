@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { ipcMain } from 'electron'
 import { JSONFilePreset } from 'lowdb/node'
 import { dirname, join } from 'pathe'
-import { APP_DATA_PATH } from '../constant'
+import { APP_DATA_PATH } from '../../constant'
 
 export interface StoreOptions<T = any> {
   name: string

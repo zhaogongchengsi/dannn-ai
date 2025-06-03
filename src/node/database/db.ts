@@ -3,7 +3,7 @@ import { migrate } from 'drizzle-orm/libsql/migrator'
 import { drizzle } from 'drizzle-orm/libsql/sqlite3'
 import { app } from 'electron'
 import { resolve } from 'pathe'
-import { databaseUrl } from './constant'
+import { databaseUrl } from '../constant'
 
 export const db = drizzle({
   connection: databaseUrl,
