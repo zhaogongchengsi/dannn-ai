@@ -6,6 +6,7 @@ import { initAutoUpdater } from './autoupdater'
 import { Config } from './lib/config'
 import { ExtensionHub } from './lib/hub'
 import { logger } from './lib/logger'
+import { AppTray } from './lib/tray'
 import { Window } from './lib/window'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
@@ -21,6 +22,11 @@ app.whenReady().then(initAutoUpdater)
 const config = new Config()
 const extensionHub = new ExtensionHub()
 const window = new Window()
+let tray: AppTray | null = null
+app.whenReady().then(() => {
+  logger.info('App is ready. Initializing main window and tray...')
+  tray = new AppTray('Dannn AI')
+})
 
 async function bootstrap() {
   logger.info('Bootstrap...')
@@ -28,6 +34,7 @@ async function bootstrap() {
   await config.init()
 
   app.on('before-quit', () => {
+    tray?.destroy()
     extensionHub.unloadAll()
   })
 
