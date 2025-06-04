@@ -81,6 +81,8 @@ export abstract class Bridge extends Subject<BridgeRequest> implements IBridge {
   events: Map<string, Set<BridgeHandler>> = new Map()
   private _bridgeId = this.randomAlphaString(16)
 
+  onMessagePipe: Set<((data: BridgeRequest) => (BridgeRequest | undefined))> = new Set()
+
   constructor() {
     super()
     this.register('this.getAllRegistered', () => this.getAllRegistered())
@@ -91,43 +93,6 @@ export abstract class Bridge extends Subject<BridgeRequest> implements IBridge {
    */
   get bridgeId(): string {
     return this._bridgeId
-  }
-
-  /**
-   * TODO: 重写转发逻辑以使用多个插件的通信 预计将转发消息的逻辑抽离出来
-   * 将本 Bridge 收到的所有消息转发到目标 Bridge 实例
-   * @param target 目标 Bridge 实例
-   * @param filter 可选过滤函数，返回 true 时才转发
-   * @returns 停止转发的函数
-   */
-  forwardTo(target: Bridge, filter?: (data: BridgeRequest) => boolean): () => void {
-    const id = this._bridgeId
-    const handler = (data: BridgeRequest & { __forwardedBy?: string[] }) => {
-      if (!filter || filter(data)) {
-        // 检查是否已被本 Bridge 转发过，避免循环
-        if (Array.isArray(data.__forwardedBy) && data.__forwardedBy.includes(id)) {
-          return
-        }
-        // 标记已转发
-        const forwardedBy = Array.isArray(data.__forwardedBy) ? [...data.__forwardedBy, id] : [id]
-        // 构造新对象，避免污染原消息
-        const newData = { ...data, __forwardedBy: forwardedBy }
-        target.send(newData as BridgeRequest)
-        return true
-      }
-
-      return false
-    }
-    // 包装 onMessage，转发后再执行原逻辑
-    const originalOnMessage = this.onMessage.bind(this)
-    this.onMessage = (data: BridgeRequest) => {
-      handler(data as any)
-      originalOnMessage(data)
-    }
-    // 返回取消转发的方法
-    return () => {
-      this.onMessage = originalOnMessage
-    }
   }
 
   /**
@@ -151,7 +116,29 @@ export abstract class Bridge extends Subject<BridgeRequest> implements IBridge {
     }
   }
 
+  use(fn: (data: BridgeRequest) => (BridgeRequest | undefined)) {
+    if (!fn || typeof fn !== 'function') {
+      throw new Error('Pipe function must be a valid function')
+    }
+
+    this.onMessagePipe.add(fn)
+    return () => {
+      this.onMessagePipe.delete(fn)
+    }
+  }
+
   onMessage(data: BridgeRequest) {
+    // 处理转发的消息 不需要自身处理的
+    let _data: BridgeRequest | undefined = data
+    this.onMessagePipe.forEach((pipe) => {
+      _data = pipe(data)
+    })
+
+    // 如果管道处理后返回 undefined，表示不需要继续处理
+    if (!_data) {
+      return
+    }
+
     if (data.type === 'event') {
       this.emitEvent(data.name, ...data.preload)
       return
