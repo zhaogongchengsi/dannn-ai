@@ -100,49 +100,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
     }
   }
 
-  function deleteMessagesByRoomId(roomId: RoomID, messageId: string) {
-    const messageNode = messages.get(roomId)
-    if (messageNode) {
-      messageNode.messages = messageNode.messages.filter(
-        msg => !(msg.id === messageId),
-      )
-      messageNode.total = messageNode.messages.length
-    }
-  }
-
-  function addThinkingMessagesByRoomId(roomId: RoomID, aiId: number, questionId: string) {
-    const messageNode = messages.get(roomId)
-
-    if (messageNode) {
-      const lastMessage = messageNode.messages.at(-1)
-      const message: ThinkingMessage = {
-        type: 'thinking',
-        status: null,
-        id: `${roomId}-${aiId}-${questionId}`,
-        content: '思考中...',
-        messageType: 'text',
-        sortBy: lastMessage?.sortBy ? lastMessage.sortBy + 1 : 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        deletedAt: null,
-        functionResponse: null,
-        roomId,
-        reference: null,
-        senderType: 'ai',
-        senderId: aiId,
-        parentId: null,
-        meta: null,
-        isStreaming: 0,
-        streamGroupId: null,
-        streamIndex: null,
-        functionCall: null,
-        isInContext: 0,
-      }
-
-      addMessagesByRoomId(roomId, [message])
-    }
-  }
-
   async function updateMessageContextTrue(roomId: number, messageId: string) {
     const messageNode = messages.get(roomId)
     if (messageNode) {
@@ -187,16 +144,6 @@ export const useMessagesStore = defineStore('dannn-messages', () => {
   // 监听回答状态更新事件
   onAnswerStatusUpdate((data) => {
     updateMessageStatue(data.messageId, data.status)
-  })
-
-  // 监听AI思考开始和结束事件
-  onAiThinking((data) => {
-    const { roomId, aiId, questionId } = data
-    addThinkingMessagesByRoomId(roomId, aiId, questionId)
-  })
-  onAiEndThink((data) => {
-    const id = `${data.roomId}-${data.aiId}-${data.questionId}`
-    deleteMessagesByRoomId(data.roomId, id)
   })
 
   async function init() {

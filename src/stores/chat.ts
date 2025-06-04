@@ -1,13 +1,15 @@
 import type { QuestionContext } from '@/common/schema'
+import type { InfoAI } from '@/node/database/service/ai'
 import type { InfoMessage } from '@/node/database/service/message'
 import type { ThinkingMessage } from '@/stores/messages'
 import type { InfoChat, InsertChat } from '~/node/database/service/room'
 import { defineStore } from 'pinia'
 import { database } from '@/lib/database'
-import { broadcast } from '@/lib/extension'
+import { broadcast, onAiEndThink, onAiThinking } from '@/lib/extension'
 
 export interface ChatItem extends InfoChat {
   lastEntityMessage?: (InfoMessage | ThinkingMessage)
+  thinkingAI: InfoAI[]
 }
 
 export const useChatStore = defineStore('dannn-chat', () => {
@@ -25,6 +27,7 @@ export const useChatStore = defineStore('dannn-chat', () => {
         ...room,
         participant: room.participant || [], // Ensure participant is initialized
         lastEntityMessage: messages.findChatLastMessage(room.id),
+        thinkingAI: [],
       })
     })
   }
@@ -143,6 +146,33 @@ export const useChatStore = defineStore('dannn-chat', () => {
       id: message.id,
     })
   }
+
+  // 监听AI思考开始和结束事件
+  onAiThinking((data) => {
+    const room = findRoomById(data.roomId)
+    if (!room) {
+      console.warn(`Room with ID ${data.roomId} not found for AI thinking event.`)
+      return
+    }
+
+    const ai = aiStore.findAiById(data.aiId)
+    if (!ai) {
+      console.warn(`AI with ID ${data.aiId} not found for AI thinking event.`)
+      return
+    }
+
+    room.thinkingAI.push(ai)
+  })
+
+  onAiEndThink((data) => {
+    const room = findRoomById(data.roomId)
+    if (!room) {
+      console.warn(`Room with ID ${data.roomId} not found for AI end thinking event.`)
+      return
+    }
+
+    room.thinkingAI = room.thinkingAI.filter(ai => ai.id !== data.aiId)
+  })
 
   return {
     rooms,

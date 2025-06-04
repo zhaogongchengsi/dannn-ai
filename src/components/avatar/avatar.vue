@@ -15,6 +15,6 @@ const isSvgHtml = computed(() => {
 <template>
   <div :class="props.class">
     <div v-if="isSvgHtml" class="w-full h-full rounded-full flex justify-center items-center" v-html="src" />
-    <img v-else :src="src" :alt="alt" class="w-full h-full rounded-full object-cover" />
+    <img v-else :src="src" :alt="alt" class="w-full h-full rounded-full object-cover">
   </div>
 </template>
