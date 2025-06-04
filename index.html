@@ -5,46 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dannn AI</title>
     <style>
+      body,
+      #app {
+        min-width: 100vw;
+        min-height: max-content;
+      }
+
       ._loading_container {
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        gap: 3rem;
         height: 100vh;
-        background: linear-gradient(to right, #7fa5f8, #fa8583);
+        width: 100vw;
+        overflow: hidden;
       }
-      ._image {
-        width: 5rem /* 80px */;
-        height: 5rem /* 80px */;
-      }
-      @keyframes pulse {
-        50% {
-          opacity: 0.5;
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
       }
+
       .animate-pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
-      ._title {
-        font-size: 3rem /* 48px */;
-        line-height: 1;
-        font-weight: bold;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: spin 1s linear infinite;
       }
     </style>
   </head>
   <body>
     <div id="app">
       <div class="_loading_container">
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-        </style>
-        <img class="_image" src="/icon_256x256.png" alt="Dannn AI" />
-        <h1 class="_title animate-pulse">Dannn AI</h1>
+        <div class="animate-pulse">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-loader-circle-icon lucide-loader-circle"
+          >
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+        </div>
       </div>
     </div>
     <script type="module" src="./src/index.ts"></script>
