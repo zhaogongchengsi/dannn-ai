@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module'
-import { dialog } from 'electron'
+import { app, dialog } from 'electron'
 import { logger } from './lib/logger'
 
 const requireLogger = createRequire(import.meta.url)
@@ -19,6 +19,8 @@ export function initAutoUpdater() {
     releaseType: 'release',
     vPrefixedTagName: true,
   })
+
+  autoUpdater.autoDownload = app.isPackaged
 
   autoUpdater.on('error', (error) => {
     logger.error('Auto updater error:', error)
@@ -59,6 +61,20 @@ export function initAutoUpdater() {
       }
     })
   })
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    const log_message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent
+    }% (${progressObj.transferred}/${progressObj.total})`
+    logger.info(log_message)
+
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'Downloading Update',
+      message: log_message,
+    })
+  })
+
+  autoUpdater.forceDevUpdateConfig = true
 
   autoUpdater.checkForUpdates()
 

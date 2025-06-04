@@ -1316,6 +1316,7 @@ packages:
 
   '@libsql/win32-x64-msvc@0.5.11':
     resolution: {integrity: sha512-NES0P2pyx5XjveTYotTG03eoJwx0haJBYWXfqmcPLmbQ5u03Qmd7rxhLfWDdIRj4PrdhVProwdB0FA82ryLcKQ==}
+    cpu: [x64]
     os: [win32]
 
   '@malept/cross-spawn-promise@2.0.0':
@@ -3792,6 +3793,7 @@ packages:
 
   libsql@0.5.11:
     resolution: {integrity: sha512-P2xY1nL2Jl7oM75LcguAEYqouVcevWhLWT8RU/p9ldaqQx5s/chF9t5ZFXPWP0x9myQQ4SguRqPO+FqdnCzKQg==}
+    cpu: [x64, arm64, wasm32, arm]
     os: [darwin, linux, win32]
 
   lilconfig@3.1.3:
