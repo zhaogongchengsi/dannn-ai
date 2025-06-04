@@ -72,7 +72,7 @@ const toasterTheme = computed(() => {
                   <span class="text-lg font-600 truncate block min-w-0">{{ chat.title }}</span>
                   <div v-if="chat.lastEntityMessage">
                     <p class="line-clamp-2 min-w-0 text-zinc-500 dark:text-zinc-400 text-sm">
-                      {{ chat.lastEntityMessage.content }}
+                      {{ chat.lastEntityMessage.content.substring(0, 30) }}
                     </p>
                   </div>
                 </div>
