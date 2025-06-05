@@ -89,11 +89,6 @@ export class ExtensionProcess extends Bridge {
       return data
     })
 
-    // // 将扩展进程的消息转发到渲染进程
-    // this.forwardTo(window, (data) => {
-    //   return data.name.startsWith('window.')
-    // })
-
     this.on('_extension.ready', () => {
       this.activate()
         .catch((error) => {

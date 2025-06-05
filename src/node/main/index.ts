@@ -17,8 +17,6 @@ if (!gotSingleInstanceLock) {
   app.quit()
 }
 
-app.whenReady().then(initAutoUpdater)
-
 const config = new Config()
 const extensionHub = new ExtensionHub()
 const window = new Window()
@@ -26,6 +24,8 @@ let tray: AppTray | null = null
 app.whenReady().then(() => {
   logger.info('App is ready. Initializing main window and tray...')
   tray = new AppTray('Dannn AI')
+
+  initAutoUpdater(window)
 })
 
 async function bootstrap() {

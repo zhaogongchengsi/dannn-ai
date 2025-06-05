@@ -1,9 +1,12 @@
 import type { BridgeRequest } from '~/common/bridge'
+import type { ToastConfig } from '~/common/schema'
 import { resolve } from 'node:path'
 import { app, BrowserWindow, ipcMain, nativeImage, shell } from 'electron'
+import { BehaviorSubject } from 'rxjs'
 import { isMacOS } from 'std-env'
 import { Bridge } from '~/common/bridge'
 import { registerRouterToBridge } from '~/common/router'
+import { toastConfig } from '~/common/schema'
 import { databaseRouter } from '~/node/database/router'
 import { logger } from './logger'
 
@@ -26,6 +29,11 @@ export class Window extends Bridge {
   waitReadyPromise: PromiseWithResolvers<void> | null = null
   preload: string
   icon?: Electron.NativeImage
+
+  notificationReady = false
+  waitNotificationReady = new BehaviorSubject<boolean>(false)
+  waitNotificationLoop: ToastConfig[] = []
+
   constructor(name?: string) {
     super()
     this.name = name || this.name
@@ -36,6 +44,17 @@ export class Window extends Bridge {
         this.onMessage(args)
       }
     })
+
+    // 监听通知准备就绪事件
+    ipcMain.once('notification.ready', () => {
+      this.notificationReady = true
+      this.waitNotificationReady.next(true)
+      // 如果通知已经准备好，立即发送等待中的通知
+      this.waitNotificationLoop.forEach((config) => {
+        this.toast(config)
+      })
+    })
+
     // 赋予扩展进程的 操控database 的权限 并且避免被转发
     registerRouterToBridge(this, databaseRouter, 'database')
   }
@@ -271,5 +290,49 @@ export class Window extends Bridge {
     else {
       throw new Error('Window is not created')
     }
+  }
+
+  toast(config: ToastConfig) {
+    const toast = (config: ToastConfig) => {
+      const { success, data } = toastConfig.safeParse(config)
+      if (!success) {
+        logger.error('Invalid toast config', data)
+        return
+      }
+
+      const action = data.action
+
+      const newData = {
+        ...data,
+        action: action
+          ? {
+              label: action.label,
+              onClick: ('onClick' in action && typeof action.onClick === 'function'),
+            }
+          : undefined,
+      }
+
+      this.invoke<boolean>('notification', newData)
+        .then(() => {
+          action && 'onClick' in action && typeof action.onClick === 'function' && action.onClick()
+        })
+        .catch((error) => {
+          logger.error('Failed to show toast notification', error)
+        })
+    }
+
+    if (this.notificationReady) {
+      toast(config)
+      return
+    }
+
+    this.waitNotificationReady.subscribe((ready) => {
+      if (ready) {
+        toast(config)
+      }
+      else {
+        this.waitNotificationLoop.push(config)
+      }
+    })
   }
 }

@@ -70,3 +70,20 @@ export const answer = z.object({
 export type QuestionContext = z.infer<typeof questionContext>
 export type Question = z.infer<typeof question>
 export type Answer = z.infer<typeof answer>
+
+export const toastConfig = z.object({
+  title: z.string(),
+  message: z.string(),
+  type: z.enum(['success', 'error', 'info', 'warning']).optional().default('info'),
+  duration: z.number().default(3000).optional(),
+  action: z.object({
+    label: z.string(),
+    onClick:
+      z.union([
+        z.boolean(),
+        z.function().args().returns(z.void()).optional(),
+      ]),
+  }).optional(),
+})
+
+export type ToastConfig = z.infer<typeof toastConfig>

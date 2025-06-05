@@ -11,13 +11,10 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Toaster } from '@/components/ui/sonner'
-import { useConfig } from '@/composables/config'
 import ChatAdd from '@/views/chat-add.vue'
 import ChatAvatar from '@/views/chat-avatar.vue'
 import ChatHeader from '@/views/chat-header.vue'
 
-const config = useConfig()
 const chatStore = useChatStore()
 const route = useRoute<'/chat/[id]/'>()
 const isOpen = useStorage('sidebar-open', true, localStorage)
@@ -33,14 +30,6 @@ watchEffect(() => {
 })
 
 useMessagesStore()
-
-const toasterTheme = computed(() => {
-  const mode = config.mode.value
-  if (mode === 'auto') {
-    return 'system'
-  }
-  return mode === 'dark' ? 'dark' : 'light'
-})
 </script>
 
 <template>
@@ -91,6 +80,5 @@ const toasterTheme = computed(() => {
         <router-view />
       </ScrollArea>
     </section>
-    <Toaster :theme="toasterTheme" />
   </SidebarProvider>
 </template>

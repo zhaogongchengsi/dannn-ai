@@ -1,3 +1,4 @@
+import type { Window } from './lib/window'
 import { createRequire } from 'node:module'
 import { app, dialog } from 'electron'
 import { logger } from './lib/logger'
@@ -8,7 +9,7 @@ export const { autoUpdater }: typeof import('electron-updater') = requireLogger(
 // const server = 'https://update.electronjs.org'
 // const feed = `${server}/zhaogongchengsi/dannn-ai/${app.getVersion()}`
 
-export function initAutoUpdater() {
+export function initAutoUpdater(window: Window) {
   logger.info('Initializing auto updater...')
 
   autoUpdater.setFeedURL({
@@ -39,12 +40,17 @@ export function initAutoUpdater() {
     logger.info('No updates available.')
   })
 
-  autoUpdater.on('update-available', () => {
-    logger.info('Update available. Downloading now...')
-    dialog.showMessageBox({
+  autoUpdater.on('update-available', (info) => {
+    window.toast({
       type: 'info',
-      title: 'Update Available',
-      message: 'A new version is available. Downloading now...',
+      title: '更新通知',
+      message: `发现新版本: ${info.version}`,
+      action: {
+        label: '现在更新',
+        onClick: () => {
+          console.log('User clicked to update now.')
+        },
+      },
     })
   })
 
