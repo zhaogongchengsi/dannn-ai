@@ -18,7 +18,9 @@
     "src/node/**/*.ts",
     "src/common/**/*.ts",
     "src/base/**/*.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "mcp/**/*.ts",
+    "mcp/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

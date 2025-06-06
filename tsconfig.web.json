@@ -21,6 +21,8 @@
     "src/base/**/*.ts",
     "src/common/**/*.ts",
     "src/**/*.vue",
+    "mcp/**/*.ts",
+    "mcp/**/*.d.ts",
     "./auto-imports.d.ts",
     "vite.config.ts",
     "./types.ts",
@@ -29,6 +31,6 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
+    "dist"
   ]
 }

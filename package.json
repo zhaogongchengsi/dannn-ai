@@ -62,6 +62,8 @@
     "reka-ui": "^2.1.1",
     "rxjs": "^7.8.2",
     "shiki": "^3.2.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "std-env": "^3.8.1",
     "tailwind-merge": "^3.0.2",
     "vaul-vue": "^0.4.1",

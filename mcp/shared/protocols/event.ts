@@ -1,0 +1,28 @@
+import type { BaseMessage } from './base'
+
+/**
+ * 事件通知消息
+ */
+export interface Event extends BaseMessage {
+  type: 'event'
+
+  /**
+   * 事件名，例如 "userJoined"、"pluginRegistered"
+   */
+  event: string
+
+  /**
+   * 事件负载数据，具体结构依事件而定
+   */
+  payload?: unknown
+
+  /**
+   * 作用域，比如全局、某个房间或某个用户
+   */
+  scope?: 'global' | 'room' | 'user'
+
+  /**
+   * 目标标识，依据 scope 的含义可能是房间ID或用户ID
+   */
+  target?: string
+}
