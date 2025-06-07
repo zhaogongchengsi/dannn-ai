@@ -53,6 +53,8 @@ describe.todo('mcpClient Events 集成测试', () => {
       })
     })
 
+    client2.emitEvent(eventName, eventData)
+
     // 等待接收事件
     const receivedData = await eventPromise
 
