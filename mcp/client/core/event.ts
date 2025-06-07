@@ -69,7 +69,7 @@ export class Events {
    * 处理收到的事件消息
    */
   private handleEventMessage(message: EventMessage) {
-    const { event, payload } = message
+    const { payload, event } = message
 
     this.logger.debug?.(`[MCP Events] Received event: ${event}`, message)
 
