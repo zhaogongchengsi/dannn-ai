@@ -1,5 +1,14 @@
+import type { McpMessage } from 'mcp/shared/protocols'
 import type { Socket } from 'socket.io-client'
 import type { Logger } from '../shared/logger' // 你自己定义的 Logger 接口
+import type {
+  RegisterServiceMessage,
+  ServiceListRequest,
+  ServiceListResponse,
+  ServiceRegistrationResponse,
+} from '../shared/protocols/discovery'
+import { withResolvers, withTimeout } from '@zunh/promise-kit'
+import { nanoid } from 'nanoid'
 import { io } from 'socket.io-client'
 
 export interface ClientConfig {
@@ -11,6 +20,7 @@ export class McpClient {
   private socket: Socket
   private logger: Logger
   private connected: boolean = false
+  funcMap: Map<string, PromiseWithResolvers<any>> = new Map()
 
   constructor(private config: ClientConfig) {
     this.logger = config.logger ?? console
@@ -35,6 +45,9 @@ export class McpClient {
     this.socket.on('connect_error', (err) => {
       this.logger.error('[MCP Client] Connection error:', err)
     })
+
+    this.socket.on('system-get-services-response', this.onSystemServiceListResponse.bind(this))
+    this.socket.on('system-registered-response', this.systemRegisteredResponse.bind(this))
   }
 
   public async connect(): Promise<void> {
@@ -97,5 +110,78 @@ export class McpClient {
 
   public isConnected() {
     return this.connected
+  }
+
+  /**
+   * 注册一个服务
+   */
+  public async registerService(serviceId: string, methods: string[], metadata?: Record<string, any>) {
+    const promiser = withResolvers<ServiceListResponse['services']>()
+    const id = nanoid()
+    const message: RegisterServiceMessage = {
+      id,
+      type: 'system',
+      action: 'register',
+      version: '1.0',
+      timestamp: Date.now(),
+      serviceId,
+      methods,
+      metadata,
+    }
+
+    this.funcMap.set(id, promiser)
+
+    // 发送注册消息
+    this.emitEvent('system-register', message)
+
+    return await withTimeout(promiser.promise, 5000)
+  }
+
+  /**
+   * 请求服务列表
+   */
+  public async requestServiceList(): Promise<ServiceListResponse['services']> {
+    const promiser = withResolvers<ServiceListResponse['services']>()
+    const id = nanoid()
+    const request: ServiceListRequest = {
+      id,
+      type: 'system',
+      action: 'getServices',
+      version: '1.0',
+      timestamp: Date.now(),
+    }
+
+    this.funcMap.set(id, promiser)
+
+    // 发出请求
+    this.socket.emit('system-get-services', request)
+
+    return await withTimeout(promiser.promise, 5000)
+  }
+
+  private onSystemServiceListResponse(response: ServiceListResponse) {
+    this.logger.info('[MCP Client] Received service list response:', response)
+
+    const resolvers = this.funcMap.get(response.id)
+    if (resolvers) {
+      resolvers.resolve(response.services)
+      this.funcMap.delete(response.id)
+    }
+    else {
+      this.logger.warn(`[MCP Client] No resolver found for service list response with id ${response.id}`)
+    }
+  }
+
+  private systemRegisteredResponse(response: ServiceRegistrationResponse) {
+    this.logger.info('[MCP Client] Received service registration response:', response)
+
+    const resolvers = this.funcMap.get(response.id)
+    if (resolvers) {
+      resolvers.resolve(response)
+      this.funcMap.delete(response.id)
+    }
+    else {
+      this.logger.warn(`[MCP Client] No resolver found for service registration response with id ${response.id}`)
+    }
   }
 }

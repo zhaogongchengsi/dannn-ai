@@ -1,13 +1,8 @@
 import type { Server as HTTPServer } from 'node:http'
+import type { Logger } from '../shared/logger'
 import { createServer as createHTTPServer } from 'node:http'
 import { Server as IOServer } from 'socket.io'
-
-export interface Logger {
-  info: (...args: any[]) => void
-  warn: (...args: any[]) => void
-  error: (...args: any[]) => void
-  debug?: (...args: any[]) => void
-}
+import { ServiceRegistry } from './modules/service-registry'
 
 export interface ServerConfig {
   port: number
@@ -27,6 +22,8 @@ export class McpServer implements Server {
   private isStarted: boolean = false
   private logger: Logger
 
+  private registry: ServiceRegistry
+
   constructor(config: ServerConfig) {
     this.config = config
     this.logger = config.logger ?? console
@@ -36,6 +33,16 @@ export class McpServer implements Server {
         origin: '*',
       },
     })
+
+    this.registry = new ServiceRegistry(this)
+  }
+
+  getLogger(): Logger {
+    return this.logger
+  }
+
+  getSocket(): IOServer {
+    return this.io
   }
 
   public async start(): Promise<void> {

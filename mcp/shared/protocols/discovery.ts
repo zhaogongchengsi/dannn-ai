@@ -64,3 +64,20 @@ export interface ServiceListResponse extends BaseMessage {
     metadata?: Record<string, any>
   }[]
 }
+
+export interface ServiceRegistrationResponse extends BaseMessage {
+  /** 消息类型，固定为 'system' */
+  type: 'system'
+
+  /** 系统动作类型，表示服务注册响应 */
+  action: 'registerResponse'
+
+  /** 是否注册成功 */
+  success: boolean
+
+  /** 注册的服务 ID */
+  serviceId: string
+
+  /** 可选的错误信息，如果注册失败 */
+  error?: string
+}
