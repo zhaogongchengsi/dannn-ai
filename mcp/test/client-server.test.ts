@@ -55,7 +55,6 @@ describe('mCP 客户端与服务端联测', () => {
 
     // client2 请求服务列表
     const services = await client2.requestServiceList()
-
     // 断言服务发现成功
     expect(services).toContainEqual({
       serviceId: 'mathService',
@@ -79,6 +78,7 @@ describe('mCP 客户端与服务端联测', () => {
 
     // 通过 client2 获取服务列表
     const services = await client2.requestServiceList()
+
     // 应该没有 tempService
     expect(services.find(s => s.serviceId === 'tempService')).toBeUndefined()
   })

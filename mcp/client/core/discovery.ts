@@ -72,10 +72,10 @@ export class Discovery {
     }
 
     this.logger.info('[MCP Discovery] Requesting service list')
-    const response = await this.messageHandler.sendRequest<ServiceListResponse>(
+    const response = await this.messageHandler.sendRequest<ServiceListResponse['services']>(
       'system-get-services',
       request,
     )
-    return response.services
+    return response
   }
 }
