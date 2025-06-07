@@ -25,7 +25,7 @@ export class McpClient {
 
     this._connection = new Connection(config)
     this._message = new MessageHandler(this._connection, logger)
-    this._events = new Events(this._connection, logger)
+    this._events = new Events(this._connection, this._message, logger)
     // 初始化功能模块
     this._discovery = new Discovery(
       this._connection,

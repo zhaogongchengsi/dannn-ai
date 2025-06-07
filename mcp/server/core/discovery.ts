@@ -2,7 +2,6 @@ import type { Observable } from 'rxjs'
 import type { Server as IOServer, Socket } from 'socket.io'
 import type { Logger } from '../../shared/logger'
 import type { RegisterServiceMessage, ServiceListRequest, ServiceListResponse, ServiceRegistrationResponse } from '../../shared/protocols/discovery'
-import type { McpServer } from '../server'
 import type { ConnectionServer } from './connection'
 import { Subject } from 'rxjs'
 
@@ -13,7 +12,7 @@ export interface ServiceInfo {
   socket?: Socket
 }
 
-export class ServiceRegistry {
+export class Discovery {
   private services = new Map<string, ServiceInfo>()
   private change$ = new Subject<void>()
   logger: Logger
