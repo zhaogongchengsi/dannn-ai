@@ -79,13 +79,24 @@ export class Events {
       return
     }
 
+    const emitList: EventHandler<any>[] = []
     // 调用所有处理器
     handlers.forEach((handler) => {
       try {
+        // 如果当前处理器在 emitList 中，跳过，避免重复调用
+        if (emitList.includes(handler)) {
+          this.logger.warn(`[MCP Events] Skipping recursive call for handler of event: ${event}`)
+          return
+        }
+        // 将当前处理器添加到 emitList，避免递归调用
+        emitList.push(handler)
         handler(payload)
       }
       catch (error) {
         this.logger.error(`[MCP Events] Error in event handler for ${event}:`, error)
+      }
+      finally {
+        emitList.pop()
       }
     })
   }
