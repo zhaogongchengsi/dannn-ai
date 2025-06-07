@@ -1,4 +1,4 @@
-import type { ServerConfig } from '../server/server'
+import type { ServerConfig } from '../server/core/config'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { McpServer } from '../server/server'
 

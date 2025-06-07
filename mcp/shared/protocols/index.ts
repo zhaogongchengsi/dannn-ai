@@ -1,6 +1,6 @@
 import type { BaseMessage } from './base'
 import type { RegisterServiceMessage, ServiceListRequest, ServiceListResponse } from './discovery'
-import type { Event } from './event'
+import type { EventMessage } from './event'
 import type { RpcRequest, RpcResponse } from './rpc'
 
 export type McpMessage =
@@ -9,7 +9,7 @@ export type McpMessage =
   | ServiceListResponse
   | RpcRequest
   | RpcResponse
-  | Event
+  | EventMessage
 
 export {
   BaseMessage,

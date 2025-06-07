@@ -3,7 +3,7 @@ import type { BaseMessage } from './base'
 /**
  * 事件通知消息
  */
-export interface Event extends BaseMessage {
+export interface EventMessage extends BaseMessage {
   type: 'event'
 
   /**

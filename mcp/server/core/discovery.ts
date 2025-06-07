@@ -3,6 +3,7 @@ import type { Server as IOServer, Socket } from 'socket.io'
 import type { Logger } from '../../shared/logger'
 import type { RegisterServiceMessage, ServiceListRequest, ServiceListResponse, ServiceRegistrationResponse } from '../../shared/protocols/discovery'
 import type { McpServer } from '../server'
+import type { ConnectionServer } from './connection'
 import { Subject } from 'rxjs'
 
 export interface ServiceInfo {
@@ -15,14 +16,14 @@ export interface ServiceInfo {
 export class ServiceRegistry {
   private services = new Map<string, ServiceInfo>()
   private change$ = new Subject<void>()
-  server: McpServer
   logger: Logger
   socket: IOServer | undefined
+  connection: ConnectionServer
 
-  constructor(server: McpServer) {
-    this.server = server
-    this.logger = server.getLogger()
-    this.socket = server.getSocket()
+  constructor(connection: ConnectionServer, logger: Logger) {
+    this.logger = logger
+    this.connection = connection
+    this.socket = connection.getSocketServer()
     this.socket.on('connection', (socket) => {
       this.handleConnection(socket)
     })
