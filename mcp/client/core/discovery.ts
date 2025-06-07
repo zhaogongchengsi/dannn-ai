@@ -19,11 +19,15 @@ export class Discovery {
     this.messageHandler.registerResponseHandler(
       'system-get-services-response',
       (response: ServiceListResponse) => response.id,
+      (response: ServiceListResponse) => response.services,
+      (response: ServiceListResponse) => response.error || null,
     )
 
     this.messageHandler.registerResponseHandler(
       'system-registered-response',
       (response: ServiceRegistrationResponse) => response.id,
+      (response: ServiceRegistrationResponse) => response.success,
+      (response: ServiceRegistrationResponse) => response.error || null,
     )
   }
 

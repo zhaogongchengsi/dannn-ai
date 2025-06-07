@@ -1,4 +1,4 @@
-import type { RoomRequest, RoomResponse } from 'mcp/shared/room'
+import type { RoomRequest, RoomResponse } from 'mcp/shared/protocols/room'
 import type { Socket, Server as SocketIOServer } from 'socket.io'
 import type { Logger } from '../../shared/logger'
 import type { EventMessage } from '../../shared/protocols/event'
@@ -30,11 +30,18 @@ export class EventManager {
         this.handleEventMessage(socket, message)
       })
 
+      socket.on('room-join', (request: RoomRequest) => {
+        this.handleJoinRoom(socket, request)
+      })
+
       // 当客户端认证/关联用户ID时
       socket.on('authenticate', (userId: string) => {
         this.associateUserWithSocket(userId, socket.id)
       })
 
+      socket.on('room-leave', (request: RoomRequest) => {
+        this.handleRoomLeave(socket, request)
+      })
       // 处理房间相关请求
       // this.setupRoomHandlers(socket)
 
@@ -43,6 +50,56 @@ export class EventManager {
         this.handleDisconnect(socket)
       })
     })
+  }
+
+  private handleRoomLeave(socket: Socket, request: RoomRequest) {
+    this.logger.debug?.(`[MCP EventManager] Room leave request from ${socket.id}`, request)
+
+    // 处理房间离开逻辑
+    const roomId = request.roomId
+    if (roomId) {
+      socket.leave(roomId)
+
+      // 响应客户端
+      const response: RoomResponse = {
+        id: request.id,
+        success: true,
+        roomId,
+        timestamp: Date.now(),
+      }
+
+      socket.emit('room-leave-response', response)
+    }
+    else {
+      // 如果没有提供房间ID，返回错误
+      const errorResponse: RoomResponse = {
+        id: request.id,
+        success: false,
+        roomId: '',
+        error: 'Room ID is required to leave a room',
+        timestamp: Date.now(),
+      }
+
+      socket.emit('room-leave-response', errorResponse)
+    }
+  }
+
+  private handleJoinRoom(socket: Socket, request: RoomRequest) {
+    this.logger.debug?.(`[MCP EventManager] Room join request from ${socket.id}`, request)
+
+    // 处理房间加入逻辑
+    const roomId = request.roomId || `room-${Date.now()}`
+    socket.join(roomId)
+
+    // 响应客户端
+    const response: RoomResponse = {
+      id: request.id,
+      success: true,
+      roomId,
+      timestamp: Date.now(),
+    }
+
+    socket.emit('room-join-response', response)
   }
 
   /**

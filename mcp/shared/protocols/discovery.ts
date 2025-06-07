@@ -63,6 +63,8 @@ export interface ServiceListResponse extends BaseMessage {
     /** 可选的服务元数据 */
     metadata?: Record<string, any>
   }[]
+
+  error?: string | null
 }
 
 export interface ServiceRegistrationResponse extends BaseMessage {

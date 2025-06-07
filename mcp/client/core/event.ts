@@ -1,7 +1,7 @@
 import type { Socket } from 'socket.io-client'
 import type { Logger } from '../../shared/logger'
 import type { EventMessage, EventScope } from '../../shared/protocols/event'
-import type { CreateRoomRequest, CreateRoomResponse, GetRoomMembersResponse, GetUserRoomsResponse, RoomRequest, RoomResponse } from '../../shared/room'
+import type { CreateRoomRequest, CreateRoomResponse, GetRoomMembersResponse, GetUserRoomsResponse, RoomRequest, RoomResponse } from '../../shared/protocols/room'
 import type { Connection } from './connection'
 import type { MessageHandler } from './message-handler'
 import { nanoid } from 'nanoid'
@@ -38,30 +38,40 @@ export class Events {
     this.messageHandler.registerResponseHandler(
       'room-join-response',
       (response: RoomResponse) => response.id,
+      (response: RoomResponse) => response.success,
+      (response: RoomResponse) => response.error || null,
     )
 
     // 离开房间响应
     this.messageHandler.registerResponseHandler(
       'room-leave-response',
       (response: RoomResponse) => response.id,
+      (response: RoomResponse) => response.success,
+      (response: RoomResponse) => response.error || null,
     )
 
     // 获取房间成员响应
     this.messageHandler.registerResponseHandler(
       'room-members-response',
       (response: GetRoomMembersResponse) => response.id,
+      (response: GetRoomMembersResponse) => response.members,
+      (response: GetRoomMembersResponse) => response.error || null,
     )
 
     // 获取用户房间响应
     this.messageHandler.registerResponseHandler(
       'user-rooms-response',
       (response: GetUserRoomsResponse) => response.id,
+      (response: GetUserRoomsResponse) => response.rooms,
+      (response: GetUserRoomsResponse) => response.error || null,
     )
 
     // 创建房间响应
     this.messageHandler.registerResponseHandler(
       'room-create-response',
       (response: CreateRoomResponse) => response.id,
+      (response: CreateRoomResponse) => response.roomId,
+      (response: CreateRoomResponse) => response.error || null,
     )
   }
 
