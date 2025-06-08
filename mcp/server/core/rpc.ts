@@ -7,6 +7,7 @@ import type {
   RpcResponse,
 } from '../../shared/protocols/rpc'
 import type { ConnectionServer } from './connection'
+import { handleHotUpdate } from 'vue-router/auto-routes'
 
 /**
  * RPC 管理器
@@ -39,6 +40,16 @@ export class RpcManager {
         this.handleRegisterRpc(socket, request)
       })
 
+      // 处理 RPC 调用请求
+      socket.on('system-rpc-call', (request: RpcRequest) => {
+        this.handleRpcCall(socket, request)
+      })
+
+      // 处理 RPC 响应请求
+      socket.on('system-rpc-response', (response: RpcResponse) => {
+        this.handleRpcResponse(response)
+      })
+
       // 处理客户端断开连接
       socket.on('disconnect', () => {
         this.handleClientDisconnect(socket.id)
@@ -48,25 +59,95 @@ export class RpcManager {
     this.logger.info('[MCP RPC] RPC Manager initialized')
   }
 
+  // 处理 RPC 响应 将结果转发给请求者
+  private handleRpcResponse(response: RpcResponse) {
+    const { id, to } = response
+    if (!id || !to) {
+      this.logger.warn(`[MCP RPC] Response from ${id} is missing id or to field`)
+      return
+    }
+
+    // 回复给请求者
+    const requesterSocket = this.io.sockets.sockets.get(to)
+    if (requesterSocket) {
+      requesterSocket.emit('system-rpc-response', response)
+    }
+    else {
+      this.logger.warn(`[MCP RPC] Requester socket ${to} not found for response`)
+    }
+  }
+
+  handleRpcCall(socket: Socket, request: RpcRequest): void {
+    const { method, id, from, to } = request
+
+    if (!method) {
+      this.logger.warn(`[MCP RPC] Call request from ${socket.id} is missing method name`)
+      this.handleRpcResponse({
+        type: 'rpc',
+        id,
+        from,
+        to,
+        result: null,
+        error: {
+          code: 400,
+          message: 'Method name is required',
+        },
+        timestamp: Date.now(),
+      })
+      return
+    }
+
+    // 检查方法是否已注册
+    if (!this.methodRegistry.has(method)) {
+      this.logger.warn(`[MCP RPC] Method ${method} is not registered`)
+      const response: RpcResponse = {
+        id,
+        type: 'rpc',
+        version: '1.0',
+        error: {
+          code: 404,
+          message: `Method ${method} not found`,
+        },
+        to, // 回复给请求者
+        from,
+        timestamp: Date.now(),
+      }
+      this.handleRpcResponse(response)
+      return
+    }
+
+    const providerId = this.methodRegistry.get(method)
+    if (!providerId) {
+      this.logger.error(`[MCP RPC] Provider ID for method ${method} not found`)
+      return
+    }
+
+    // 发送请求到对应的提供者
+    const providerSocket = this.io.sockets.sockets.get(providerId)
+    if (!providerSocket) {
+      this.logger.error(`[MCP RPC] Provider socket ${providerId} not found`)
+      return
+    }
+
+    providerSocket.emit('system-rpc-call', request)
+  }
+
   /**
    * 处理 RPC 方法注册请求
    * 这个方法将在后面实现
    */
   private handleRegisterRpc(socket: Socket, request: RpcRegisterMessage): void {
-    const { id, methods, serviceId } = request
+    const { id, method } = request
 
-    if (!methods || methods.length === 0) {
-      this.logger.warn(`[MCP RPC] Service ${serviceId} registered with no methods`)
+    if (!method) {
+      this.logger.warn(`[MCP RPC] Register request from ${socket.id} is missing method name`)
       return
     }
 
-    // 注册每个方法到 methodRegistry
-    for (const method of methods) {
-      if (this.methodRegistry.has(method)) {
-        this.logger.warn(`[MCP RPC] Method ${method} already registered by ${this.methodRegistry.get(method)}`)
-      }
-      this.methodRegistry.set(method, socket.id)
+    if (this.methodRegistry.has(method)) {
+      this.logger.warn(`[MCP RPC] Method ${method} already registered by ${this.methodRegistry.get(method)}`)
     }
+    this.methodRegistry.set(method, socket.id)
 
     // 发送注册响应
     const response: RpcRegisterMessageResponse = {
@@ -74,12 +155,11 @@ export class RpcManager {
       type: 'rpc',
       version: '1.0',
       success: true,
-      serviceId,
       timestamp: Date.now(),
     }
 
     socket.emit('system-register-rpc-response', response)
-    this.logger.info(`[MCP RPC] Service ${serviceId} registered with methods: ${methods.join(', ')}`)
+    this.logger.info(`[MCP RPC] Method ${method} registered by ${socket.id}`)
   }
 
   /**

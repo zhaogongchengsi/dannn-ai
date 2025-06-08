@@ -52,20 +52,27 @@ export interface RpcResponse extends BaseMessage {
     code?: number
     message: string
   }
+
+  /**
+   * 消息发送者 ID
+   */
+  from: string
+
+  /**
+   * 目标接收者 ID
+   */
+  to: string
 }
 
 export interface RpcRegisterMessage extends BaseMessage {
   type: 'rpc'
 
   /**
-   * 注册的服务 ID
-   */
-  serviceId: string
-
-  /**
    * 支持的方法列表
    */
-  methods: string[]
+  method: string
+
+  providerId: string
 
   /**
    * 附加的元数据
@@ -75,13 +82,6 @@ export interface RpcRegisterMessage extends BaseMessage {
 
 export interface RpcRegisterMessageResponse extends BaseMessage {
   type: 'rpc'
-
-  /**
-   * 注册的服务 ID
-   */
-
-  serviceId: string
-
   /**
    * 是否注册成功
    */
@@ -104,4 +104,45 @@ export interface RpcUnregisterMessage extends BaseMessage {
    * 注销的服务 ID
    */
   serviceId: string
+}
+
+export interface RpcFindMethodsByNameRequest extends BaseMessage {
+  type: 'rpc'
+
+  /**
+   * 方法名
+   */
+  method: string
+
+  /**
+   * 附加的查询参数
+   */
+  params?: Record<string, any>
+
+  /**
+   * 消息发送者 ID
+   */
+  from: string
+}
+
+export interface RpcFindMethodsByNameResponse extends BaseMessage {
+  type: 'rpc'
+
+  /**
+   * 匹配到的方法
+   */
+  method: string
+
+  /**
+   * 方法对应的服务 ID
+   */
+  serviceId: string
+
+  /**
+   * 错误信息，如果没有找到方法
+   */
+  error?: {
+    code?: number
+    message: string
+  }
 }

@@ -36,9 +36,18 @@ describe('mcpClient RPC 集成测试', () => {
 
   it('应该能正确注册 RPC 方法', async () => {
     // client1 注册一个 RPC 方法
-    const result = await client1.registerRpcMethod('mathService', 'add', () => {})
+    const result = await client1.registerRpcMethod('add', () => {})
 
     // 验证结果
     expect(result).toBe(true)
+  })
+
+  it('应该能正确调用 RPC 方法', async () => {
+    // client1 注册一个简单的加法方法
+    await client1.registerRpcMethod('add', (a: number, b: number) => a + b)
+    // client2 调用这个方法
+    const result = await client2.callRpcMethod('add', 1, 2)
+    // 验证结果
+    expect(result).toBe(3)
   })
 })

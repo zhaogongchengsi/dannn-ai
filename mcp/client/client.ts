@@ -123,7 +123,11 @@ export class McpClient {
    * @param handler 处理函数
    * @returns boolean
    */
-  public async registerRpcMethod(provideId: string, method: string, handler: (...args: any[]) => any) {
-    return await this._rpc.register(provideId, method, handler)
+  public async registerRpcMethod(method: string, handler: (...args: any[]) => any) {
+    return await this._rpc.register(method, handler)
+  }
+
+  public async callRpcMethod(method: string, ...args: any[]) {
+    return await this._rpc.call(method, args)
   }
 }

@@ -22,7 +22,7 @@ export interface BaseMessage {
    * 协议版本号，方便未来协议升级兼容
    * 例如："1.0"、"2.1" 等
    */
-  version: string
+  version?: string
 
   /**
    * 消息生成时间戳，单位毫秒，方便客户端/服务器做时序校验
