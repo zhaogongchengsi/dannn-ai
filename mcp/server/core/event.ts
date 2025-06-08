@@ -36,7 +36,6 @@ export class EventManager {
 
       // 当客户端认证/关联用户ID时
       socket.on('authenticate', (request: AuthenticateRequest) => {
-        console.log(`[MCP EventManager] User authenticated: ${request.userId} on socket ${socket.id}`)
         this.associateUserWithSocket(request, socket)
       })
 

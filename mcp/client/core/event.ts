@@ -36,14 +36,12 @@ export class Events {
       return false
     }
 
-    console.debug(`[MCP Events] Authenticating with token: ${token}`)
-
     const request: AuthenticateRequest = {
       id: nanoid(),
       userId: token,
       timestamp: Date.now(),
     }
-    
+
     return await this.messageHandler.sendRequest<boolean>(
       'authenticate',
       request,
@@ -56,12 +54,8 @@ export class Events {
       this.logger.warn(`[MCP Events] Cannot deauthenticate: not connected`)
       return
     }
-
-    console.debug(`[MCP Events] Deauthenticating`)
     this.socket.emit('deauthenticate')
   }
-
-
 
   /**
    * 注册房间操作的响应处理器

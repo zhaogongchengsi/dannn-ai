@@ -1,14 +1,14 @@
 import { getRandomPort } from 'get-port-please'
 import { McpServer } from 'mcp/server/server'
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { McpClient } from '../client/client'
 
 // 模拟 logger，避免控制台输出影响测试
 const mockLogger = {
   info: vi.fn(),
-  warn: console.warn,
+  warn: vi.fn(),
   error: vi.fn(),
-  debug: console.debug,
+  debug: vi.fn(),
 }
 
 describe('mcpClient Events 集成测试', () => {
@@ -97,56 +97,56 @@ describe('mcpClient Events 集成测试', () => {
 
   it('应该能正确发送事件到特定用户', async () => {
     // 准备
-    const eventName = 'user-specific-event';
-    const eventData = { message: 'This is for you only' };
+    const eventName = 'user-specific-event'
+    const eventData = { message: 'This is for you only' }
 
     // 每个客户端关联一个唯一的用户ID
-    const user1Id = 'user-1-' + Date.now();
-    const user2Id = 'user-2-' + Date.now();
-    const user3Id = 'user-3-' + Date.now();
+    const user1Id = `user-1-${Date.now()}`
+    const user2Id = `user-2-${Date.now()}`
+    const user3Id = `user-3-${Date.now()}`
 
     // 客户端关联用户ID
-    await client1.authenticate(user1Id);
-    await client2.authenticate(user2Id);
-    await client3.authenticate(user3Id);
+    await client1.authenticate(user1Id)
+    await client2.authenticate(user2Id)
+    await client3.authenticate(user3Id)
 
     // 设置标志来跟踪哪些客户端收到了事件
-    let client1ReceivedEvent = false;
-    let client3ReceivedEvent = false;
+    let client1ReceivedEvent = false
+    let client3ReceivedEvent = false
 
     // 客户端1和客户端3订阅相同的事件
     client1.onEvent(eventName, () => {
-      client1ReceivedEvent = true;
-    });
+      client1ReceivedEvent = true
+    })
 
     client3.onEvent(eventName, () => {
-      client3ReceivedEvent = true;
-    });
+      client3ReceivedEvent = true
+    })
 
     // 创建一个Promise来等待客户端2接收事件
     const eventPromise = new Promise<any>((resolve) => {
       client2.onEvent(eventName, (data) => {
-        resolve(data);
-      });
-    });
+        resolve(data)
+      })
+    })
 
     // 客户端1向客户端2的用户ID发送事件
-    client1.emitEventToUser(user2Id, eventName, eventData);
+    client1.emitEventToUser(user2Id, eventName, eventData)
 
     // 等待事件接收或超时
     const receivedData = await eventPromise
     // 验证
     // 1. 客户端2应该收到事件
-    expect(receivedData).not.toBeNull();
-    expect(receivedData).toEqual(eventData);
+    expect(receivedData).not.toBeNull()
+    expect(receivedData).toEqual(eventData)
 
     // 2. 客户端1和客户端3不应该收到事件
-    expect(client1ReceivedEvent).toBe(false);
-    expect(client3ReceivedEvent).toBe(false);
+    expect(client1ReceivedEvent).toBe(false)
+    expect(client3ReceivedEvent).toBe(false)
 
     // 清理 - 断开用户ID关联
-    await client1.deauthenticate();
-    await client2.deauthenticate();
-    await client3.deauthenticate();
-  });
+    await client1.deauthenticate()
+    await client2.deauthenticate()
+    await client3.deauthenticate()
+  })
 })
