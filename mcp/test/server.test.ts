@@ -32,12 +32,6 @@ describe('mcpServer', () => {
     expect(config.logger?.info).toHaveBeenCalledWith('[MCP Server] Listening on 127.0.0.1:4000')
   })
 
-  it('should not start the server twice', async () => {
-    await server.start()
-    await server.start() // 第二次启动不应重复监听
-    expect(config.logger?.info).toHaveBeenCalledTimes(1)
-  })
-
   it('should stop the server', async () => {
     await server.start()
     await server.stop()

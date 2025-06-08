@@ -2,7 +2,7 @@ import type { BaseMessage } from './base'
 import type { RegisterServiceMessage, ServiceListRequest, ServiceListResponse } from './discovery'
 import type { EventMessage } from './event'
 import type { CreateRoomResponse, GetRoomMembersResponse, GetUserRoomsResponse, RoomResponse } from './room'
-import type { RpcRequest, RpcResponse } from './rpc'
+import type { RpcRegisterMessage, RpcRegisterMessageResponse, RpcRequest, RpcResponse } from './rpc'
 
 export type McpMessage =
   | RegisterServiceMessage
@@ -19,6 +19,8 @@ export type McpMessageResponse =
   | GetRoomMembersResponse
   | GetUserRoomsResponse
   | CreateRoomResponse
+  | RpcRegisterMessage
+  | RpcRegisterMessageResponse
 
 export {
   BaseMessage,

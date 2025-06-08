@@ -25,6 +25,14 @@ export class ConnectionServer {
     return this.io
   }
 
+  getHttpServer(): HTTPServer {
+    return this.httpServer
+  }
+
+  getRunning(): boolean {
+    return this.isStarted
+  }
+
   public async start(): Promise<void> {
     if (this.isStarted)
       return

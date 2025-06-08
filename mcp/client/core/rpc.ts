@@ -1,29 +1,61 @@
+import type { Logger } from 'mcp/shared/logger'
+import type { RpcRegisterMessage, RpcRegisterMessageResponse } from 'mcp/shared/protocols/rpc'
 import type { Socket } from 'socket.io-client'
-import type { Logger } from '../../shared/logger'
+import type { Connection } from './connection'
+import type { MessageHandler } from './message-handler'
+import { nanoid } from 'nanoid'
 
 export class Rpc {
+  socket: Socket
+  rpcHandlers: Map<string, (params: any) => Promise<any>> = new Map()
   constructor(
-    private socket: Socket,
+    private connection: Connection,
+    private messageHandler: MessageHandler,
     private logger: Logger,
-  ) { }
+  ) {
+    this.socket = connection.getSocket()
+
+    this.messageHandler.registerResponseHandler(
+      'system-register-rpc-response',
+      (response: RpcRegisterMessageResponse) => response.id,
+      (response: RpcRegisterMessageResponse) => {
+        return response.success
+      },
+      (response: RpcRegisterMessageResponse) => response?.error?.message || null,
+    )
+  }
 
   /**
-   * 发送 RPC 调用
-   * @param method RPC 方法名
-   * @param params 参数
-   * @returns RPC 响应结果 Promise
+   * 注册RPC方法
+   * @param methodName 方法名
+   * @param handler 处理函数
+   * @example
+   * ```ts
+   * rpc.register('getUser', async (params) => {
+   *   // 处理逻辑
+   *   return { id: 1, name: 'John Doe' }
+   * })
+   * ```
    */
-  public async call<T = any>(method: string, params: any): Promise<T> {
-    this.logger.debug?.(`[MCP RPC] Calling method ${method}`, params)
+  async register(serviceId: string, methodName: string, handler: (params: any) => Promise<any>) {
+    if (this.rpcHandlers.has(methodName)) {
+      this.logger.warn(`[MCP Rpc] Method ${methodName} is already registered, overwriting`)
+    }
+    this.rpcHandlers.set(methodName, handler)
 
-    return new Promise((resolve, reject) => {
-      this.socket.timeout(5000).emit('rpc', { method, params }, (err: any, result: T) => {
-        if (err) {
-          this.logger.error(`[MCP RPC] Error calling ${method}:`, err)
-          return reject(err)
-        }
-        resolve(result)
-      })
-    })
+    const id = nanoid()
+
+    const data: RpcRegisterMessage = {
+      id,
+      type: 'rpc',
+      version: '1.0',
+      methods: [methodName],
+      serviceId,
+      timestamp: Date.now(),
+    }
+
+    this.logger.info(`[MCP Rpc] Registering RPC method ${methodName} for service ${serviceId}`)
+
+    return await this.messageHandler.sendRequest<boolean>('system-register-rpc', data)
   }
 }

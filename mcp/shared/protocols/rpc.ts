@@ -53,3 +53,55 @@ export interface RpcResponse extends BaseMessage {
     message: string
   }
 }
+
+export interface RpcRegisterMessage extends BaseMessage {
+  type: 'rpc'
+
+  /**
+   * 注册的服务 ID
+   */
+  serviceId: string
+
+  /**
+   * 支持的方法列表
+   */
+  methods: string[]
+
+  /**
+   * 附加的元数据
+   */
+  metadata?: Record<string, any>
+}
+
+export interface RpcRegisterMessageResponse extends BaseMessage {
+  type: 'rpc'
+
+  /**
+   * 注册的服务 ID
+   */
+
+  serviceId: string
+
+  /**
+   * 是否注册成功
+   */
+  success: boolean
+
+  /**
+   * 错误信息，如果注册失败
+   */
+
+  error?: {
+    code?: number
+    message: string
+  }
+}
+
+export interface RpcUnregisterMessage extends BaseMessage {
+  type: 'rpc'
+
+  /**
+   * 注销的服务 ID
+   */
+  serviceId: string
+}

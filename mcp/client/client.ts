@@ -33,7 +33,7 @@ export class McpClient {
       logger,
     )
 
-    this._rpc = new Rpc(this._connection.getSocket(), logger)
+    this._rpc = new Rpc(this._connection, this._message, logger)
   }
 
   // 暴露功能模块的访问器
@@ -75,11 +75,6 @@ export class McpClient {
     return await this._discovery.getServiceList()
   }
 
-  // RPC 便捷方法
-  public async callRpc<T = any>(method: string, params: any): Promise<T> {
-    return this._rpc.call<T>(method, params)
-  }
-
   // 事件便捷方法
   public onEvent<T = any>(event: string, handler: (data: T) => void) {
     this._events.subscribe(event, handler)
@@ -119,5 +114,16 @@ export class McpClient {
 
   public offAllEvents() {
     return this._events.unsubscribeAll()
+  }
+
+  /**
+   *
+   * @param provideId 服务提供者ID
+   * @param method 方法名
+   * @param handler 处理函数
+   * @returns boolean
+   */
+  public async registerRpcMethod(provideId: string, method: string, handler: (...args: any[]) => any) {
+    return await this._rpc.register(provideId, method, handler)
   }
 }
