@@ -12,7 +12,12 @@ if (!process.env.DANNN_PROCESS_PATH || !process.env.DANNN_PROCESS_PATH) {
   throw new Error('DANNN_PROCESS_PATH is not defined')
 }
 
+if (!process.env.DANNN_EXTENSION_SERVER_PORT) {
+  throw new Error('DANNN_EXTENSION_SERVER_PORT environment variable is not set.')
+}
+
 async function init() {
+
   const pkgPath = await resolvePackageJSON(process.env.DANNN_PROCESS_PATH)
 
   if (!pkgPath) {

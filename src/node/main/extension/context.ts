@@ -4,9 +4,8 @@ import { EventEmitter } from 'node:events'
 import process from 'node:process'
 import { question } from '~/common/schema'
 import { AI } from './ai'
-import { database, rpc } from './ipc'
+import { client, database } from './ipc'
 import { QuestionEvent } from './question-event'
-import { createClient, McpClient } from 'mcp/client/client'
 
 export interface ExtensionContextEvents {
   /**
@@ -18,36 +17,32 @@ export interface ExtensionContextEvents {
 
 export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
   private readonly aiHub: Map<number, AI> = new Map()
-  private client: McpClient
   constructor() {
     super()
-    if (!process.env.DANNN_EXTENSION_SERVER_PORT) {
-      throw new Error('DANNN_EXTENSION_SERVER_PORT environment variable is not set.')
-    }
-    this.client = createClient({
-      url: `ws://127.0.0.1:${process.env.DANNN_EXTENSION_SERVER_PORT}`,
-      logger: console,
-    })
-
-    rpc.on('extension.question', (preload: Question) => {
-      const { success, data } = question.safeParse(preload)
+    
+    client.onEvent('question', (data: Question) => {
+      const { success, data: parsedData } = question.safeParse(data)
       if (!success) {
-        console.error('Invalid question data received:', data)
+        console.error('Invalid question data received:', parsedData)
         return
       }
-      if (data.aiIds.some((id: number) => this.aiHub.has(id))) {
-        this.emit('question', new QuestionEvent(data))
+      if (parsedData.aiIds.some((id: number) => this.aiHub.has(id))) {
+        this.emit('question', new QuestionEvent(parsedData))
       }
     })
+
+    // rpc.on('extension.question', (preload: Question) => {
+    //   const { success, data } = question.safeParse(preload)
+    //   if (!success) {
+    //     console.error('Invalid question data received:', data)
+    //     return
+    //   }
+    //   if (data.aiIds.some((id: number) => this.aiHub.has(id))) {
+    //     this.emit('question', new QuestionEvent(data))
+    //   }
+    // })
   }
 
-  async mcpConnect() {
-    await this.client.connect()
-  }
-
-  mcpDisconnect() {
-    this.client.disconnect()
-  }
 
   /**
    * Register a new AI instance with the provided configuration.

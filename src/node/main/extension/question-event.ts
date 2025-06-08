@@ -1,7 +1,7 @@
 import type OpenAI from 'openai'
 import type { Answer, Question } from '~/common/schema'
 import type { MessageStatus } from '~/node/database/service/message'
-import { database, rpc } from './ipc'
+import { client, database } from './ipc'
 
 export class QuestionEvent {
   question: Question
@@ -43,13 +43,13 @@ export class QuestionEvent {
 
   async #sendTextAnswer(answer: Answer) {
     const answerMessage = await database.message.createAiAnswer(answer)
-    rpc.emit('window.answer', answerMessage)
+    client.emitEvent('answer', answerMessage)
     return answerMessage
   }
 
   async #updateMessageStatus(messageId: string, status: MessageStatus) {
     database.message.updateMessageStatus(messageId, status)
-    rpc.emit('window.answer-status-update', {
+    client.emitEvent('answer-status-update', {
       messageId,
       status,
     })
@@ -58,7 +58,7 @@ export class QuestionEvent {
   async thinking(aiId: number) {
     this._thinking = true
     this.aiId = aiId
-    rpc.emit('window.ai-thinking', {
+    client.emitEvent('ai-thinking', {
       roomId: this.question.roomId,
       aiId,
       questionId: this.question.id,
@@ -67,7 +67,7 @@ export class QuestionEvent {
 
   async endThink(aiId: number) {
     if (this._thinking) {
-      rpc.emit('window.ai-endThink', {
+      client.emitEvent('ai-endThink', {
         roomId: this.question.roomId,
         aiId,
         questionId: this.question.id,

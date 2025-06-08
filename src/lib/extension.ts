@@ -1,7 +1,7 @@
 import type { Question } from '@/common/schema'
 import type { InfoMessage, MessageStatus } from '@/node/database/service/message'
 import type { ExtensionMetafile } from '@/node/main/lib/hub'
-import { rendererBridge } from './rpc'
+import { client } from './rpc'
 
 /**
  *
@@ -9,7 +9,7 @@ import { rendererBridge } from './rpc'
  * @description 通过渲染器桥发送问题数据到扩展进程
  */
 export function broadcast(data: Question) {
-  rendererBridge.emit('extension.question', data)
+  client.emitEvent('question', data)
 }
 
 /**
@@ -19,7 +19,7 @@ export function broadcast(data: Question) {
 export function onAnswer(
   callback: (data: InfoMessage) => void,
 ) {
-  rendererBridge.on('window.answer', callback)
+  client.onEvent('answer', callback)
 }
 
 /**
@@ -29,7 +29,7 @@ export function onAnswer(
 export function onAiThinking(
   callback: (data: { roomId: number, aiId: number, questionId: string }) => void,
 ) {
-  rendererBridge.on('window.ai-thinking', callback)
+  client.onEvent('ai-thinking', callback)
 }
 
 /**
@@ -39,7 +39,7 @@ export function onAiThinking(
 export function onAiEndThink(
   callback: (data: { roomId: number, aiId: number, questionId: string }) => void,
 ) {
-  rendererBridge.on('window.ai-endThink', callback)
+  client.onEvent('ai-endThink', callback)
 }
 
 /**
@@ -49,7 +49,7 @@ export function onAiEndThink(
 export function onAnswerStatusUpdate(
   callback: (data: { messageId: string, status: MessageStatus }) => void,
 ) {
-  rendererBridge.on('window.answer-status-update', callback)
+  client.onEvent('answer-status-update', callback)
 }
 
 /**

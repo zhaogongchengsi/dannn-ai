@@ -2,6 +2,7 @@ import type { BridgeRequest } from '~/common/bridge'
 import type { ExtensionDatabaseRouter } from '~/node/database/router'
 import { isMainThread, parentPort } from 'node:worker_threads'
 import { Bridge } from '~/common/bridge'
+import { createClient } from 'mcp/client/client'
 
 class Rpc extends Bridge {
   constructor() {
@@ -19,6 +20,11 @@ class Rpc extends Bridge {
     }
   }
 }
+
+export const client = createClient({
+  url: `ws://127.0.0.1:${process.env.DANNN_EXTENSION_SERVER_PORT}`,
+  logger: console,
+})
 
 export const rpc = new Rpc()
 export const database = rpc.createProxy<ExtensionDatabaseRouter>('database')
