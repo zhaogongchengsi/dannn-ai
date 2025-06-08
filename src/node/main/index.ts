@@ -1,5 +1,7 @@
 import process from 'node:process'
 import { app, screen } from 'electron'
+import { getRandomPort } from 'get-port-please'
+import { createServer } from 'mcp/server/server'
 import { migrateDb } from '../database/db'
 import { roomExists } from '../database/service/room'
 import { initAutoUpdater } from './autoupdater'
@@ -25,7 +27,7 @@ app.whenReady().then(() => {
   logger.info('App is ready. Initializing main window and tray...')
   tray = new AppTray('Dannn AI')
 
-  initAutoUpdater(window)
+  // initAutoUpdater(window)
 })
 
 async function bootstrap() {
@@ -44,6 +46,21 @@ async function bootstrap() {
       window.restore()
     }
     window.focus()
+  })
+
+  const port = await getRandomPort()
+
+  logger.info(`Using port: ${port}`)
+
+  const server = createServer({
+    host: '127.0.0.1',
+    port,
+    logger,
+  })
+
+  await server.start()
+  .catch((err) => {
+    logger.error('Failed to start MCP server:', err)
   })
 
   const windowConfig = config.get('window')

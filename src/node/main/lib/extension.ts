@@ -68,26 +68,26 @@ export class ExtensionProcess extends Bridge {
     registerRouterToBridge(this, extensionRouter, 'database')
 
     // 将部分渲染进程的消息转发到扩展进程
-    window.use((data) => {
-      if (data.name.startsWith('extension.')) {
-        // 处理扩展进程的消息
-        this.send(data)
-        return
-      }
+    // window.use((data) => {
+    //   if (data.name.startsWith('extension.')) {
+    //     // 处理扩展进程的消息
+    //     this.send(data)
+    //     return
+    //   }
 
-      return data
-    })
+    //   return data
+    // })
 
     // 将渲染进程的消息转发到win 进程
-    this.use((data) => {
-      if (data.name.startsWith('window.')) {
-        // 处理扩展进程的消息
-        window.send(data)
-        return
-      }
+    // this.use((data) => {
+    //   if (data.name.startsWith('window.')) {
+    //     // 处理扩展进程的消息
+    //     window.send(data)
+    //     return
+    //   }
 
-      return data
-    })
+    //   return data
+    // })
 
     this.on('_extension.ready', () => {
       this.activate()

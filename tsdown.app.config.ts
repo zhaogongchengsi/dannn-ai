@@ -9,6 +9,7 @@ export default defineConfig({
   ],
   alias: {
     '~': './src',
+    'mcp': './mcp',
   },
   shims: true,
   platform: 'node',

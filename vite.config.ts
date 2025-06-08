@@ -50,6 +50,7 @@ export default defineConfig({
       '~': resolve(__dirname, './src'),
       'base': resolve(__dirname, './base'),
       'common': resolve(__dirname, './common'),
+      'mcp': resolve(__dirname, './mcp'),
     },
   },
 })

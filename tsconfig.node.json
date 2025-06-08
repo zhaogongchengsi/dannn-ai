@@ -8,6 +8,9 @@
     "paths": {
       "~/*": [
         "./src/*"
+      ],
+      "mcp/*": [
+        "./mcp/*"
       ]
     },
     "resolveJsonModule": true,

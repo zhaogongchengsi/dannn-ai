@@ -1,11 +1,11 @@
+import type { Server as HTTPServer } from 'node:http'
+import type { Server as IOServer } from 'socket.io'
 import type { Logger } from '../shared/logger'
 import type { ServerConfig } from './core/config'
 import { ConnectionServer } from './core/connection'
 import { Discovery } from './core/discovery'
 import { EventManager } from './core/event'
 import { RpcManager } from './core/rpc'
-import type { Server as HTTPServer } from 'node:http'
-import { Server as IOServer } from 'socket.io'
 
 export interface Server {
   start: () => Promise<void>
@@ -41,15 +41,15 @@ export class McpServer implements Server {
 
   // McpServer 类中添加的测试辅助方法
   public isRunning(): boolean {
-    return this.connection.getRunning(); // 假设内部有_running标志
+    return this.connection.getRunning() // 假设内部有_running标志
   }
 
   public getHttpServer(): HTTPServer | null {
-    return this.connection.getHttpServer();
+    return this.connection.getHttpServer()
   }
 
   public getSocketServer(): IOServer | null {
-    return this.connection.getSocketServer();
+    return this.connection.getSocketServer()
   }
 }
 
