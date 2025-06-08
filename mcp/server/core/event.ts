@@ -1,7 +1,7 @@
 import type { RoomRequest, RoomResponse } from 'mcp/shared/protocols/room'
 import type { Socket, Server as SocketIOServer } from 'socket.io'
 import type { Logger } from '../../shared/logger'
-import type { EventMessage } from '../../shared/protocols/event'
+import type { AuthenticateRequest, EventMessage } from '../../shared/protocols/event'
 import type { ConnectionServer } from './connection'
 
 export class EventManager {
@@ -35,8 +35,9 @@ export class EventManager {
       })
 
       // 当客户端认证/关联用户ID时
-      socket.on('authenticate', (userId: string) => {
-        this.associateUserWithSocket(userId, socket.id)
+      socket.on('authenticate', (request: AuthenticateRequest) => {
+        console.log(`[MCP EventManager] User authenticated: ${request.userId} on socket ${socket.id}`)
+        this.associateUserWithSocket(request, socket)
       })
 
       socket.on('room-leave', (request: RoomRequest) => {
@@ -163,13 +164,22 @@ export class EventManager {
   /**
    * 关联用户ID与Socket ID
    */
-  public associateUserWithSocket(userId: string, socketId: string) {
+  public associateUserWithSocket(request: AuthenticateRequest, socket: Socket) {
+    const userId = request.userId
+    const socketId = socket.id
     if (!this.userSocketMap.has(userId)) {
       this.userSocketMap.set(userId, new Set())
     }
 
     this.userSocketMap.get(userId)!.add(socketId)
     this.logger.debug?.(`[MCP EventManager] Associated user ${userId} with socket ${socketId}`)
+
+    socket.emit('authenticate-response', {
+      id: request.id,
+      success: true,
+      userId: request.userId,
+      timestamp: Date.now(),
+    })
   }
 
   /**

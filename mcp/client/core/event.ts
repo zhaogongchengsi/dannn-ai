@@ -1,6 +1,6 @@
 import type { Socket } from 'socket.io-client'
 import type { Logger } from '../../shared/logger'
-import type { EventMessage, EventScope } from '../../shared/protocols/event'
+import type { AuthenticateRequest, EventMessage, EventScope } from '../../shared/protocols/event'
 import type { CreateRoomRequest, CreateRoomResponse, GetRoomMembersResponse, GetUserRoomsResponse, RoomRequest, RoomResponse } from '../../shared/protocols/room'
 import type { Connection } from './connection'
 import type { MessageHandler } from './message-handler'
@@ -29,6 +29,39 @@ export class Events {
     // 注册房间操作的响应处理器
     this.registerRoomResponseHandlers()
   }
+
+  async authenticate(token: string) {
+    if (!this.connection.isConnected()) {
+      this.logger.warn(`[MCP Events] Cannot authenticate: not connected`)
+      return false
+    }
+
+    console.debug(`[MCP Events] Authenticating with token: ${token}`)
+
+    const request: AuthenticateRequest = {
+      id: nanoid(),
+      userId: token,
+      timestamp: Date.now(),
+    }
+    
+    return await this.messageHandler.sendRequest<boolean>(
+      'authenticate',
+      request,
+      5000, // 5秒超时
+    )
+  }
+
+  deauthenticate(): void | PromiseLike<void> {
+    if (!this.connection.isConnected()) {
+      this.logger.warn(`[MCP Events] Cannot deauthenticate: not connected`)
+      return
+    }
+
+    console.debug(`[MCP Events] Deauthenticating`)
+    this.socket.emit('deauthenticate')
+  }
+
+
 
   /**
    * 注册房间操作的响应处理器
@@ -72,6 +105,13 @@ export class Events {
       (response: CreateRoomResponse) => response.id,
       (response: CreateRoomResponse) => response.roomId,
       (response: CreateRoomResponse) => response.error || null,
+    )
+
+    this.messageHandler.registerResponseHandler(
+      'authenticate-response',
+      (response: { id: string, success: boolean, error?: string }) => response.id,
+      (response: { success: boolean }) => response.success,
+      (response: { error?: string }) => response.error || null,
     )
   }
 
@@ -198,6 +238,7 @@ export class Events {
     target?: string,
   ): void {
     if (!this.connection.isConnected()) {
+      console.warn(`[MCP Events] Cannot emit event ${event}: not connected`)
       this.logger.warn(`[MCP Events] Cannot emit event ${event}: not connected`)
       return
     }
@@ -213,7 +254,7 @@ export class Events {
       target,
     }
 
-    this.logger.debug?.(`[MCP Events] Emitting event: ${event}`, data)
+    this.logger.debug?.(`[MCP Events] Emitting event: ${event}`, message)
     this.socket.emit('event', message)
   }
 

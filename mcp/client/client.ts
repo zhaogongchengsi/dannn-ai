@@ -92,4 +92,32 @@ export class McpClient {
   public emitEvent(event: string, data: any) {
     this._events.emit(event, data)
   }
+
+  public async joinRoom(roomId: string) {
+    return await this._events.joinRoom(roomId)
+  }
+
+  public async leaveRoom(roomId: string) {
+    return await this._events.leaveRoom(roomId)
+  }
+
+  public emitEventToRoom(roomId: string, event: string, data: any) {
+    return this._events.emitToRoom(roomId, event, data)
+  }
+
+  public emitEventToUser(userId: string, event: string, data: any) {
+    return this._events.emitToUser(userId, event, data)
+  }
+
+  public async authenticate(token: string): Promise<boolean> {
+    return this.events.authenticate(token)
+  }
+
+  public async deauthenticate(): Promise<void> {
+    return this._events.deauthenticate()
+  }
+
+  public offAllEvents() {
+    return this._events.unsubscribeAll()
+  }
 }

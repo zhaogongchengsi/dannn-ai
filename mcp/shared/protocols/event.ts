@@ -28,3 +28,9 @@ export interface EventMessage extends BaseMessage {
    */
   target?: string
 }
+
+export interface AuthenticateRequest {
+  id: string
+  userId: string
+  timestamp: number
+}
