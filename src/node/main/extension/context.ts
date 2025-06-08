@@ -19,7 +19,7 @@ export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
   private readonly aiHub: Map<number, AI> = new Map()
   constructor() {
     super()
-    
+
     client.onEvent('question', (data: Question) => {
       const { success, data: parsedData } = question.safeParse(data)
       if (!success) {
@@ -42,7 +42,6 @@ export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
     //   }
     // })
   }
-
 
   /**
    * Register a new AI instance with the provided configuration.

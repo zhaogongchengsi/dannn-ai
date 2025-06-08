@@ -1,8 +1,9 @@
 import type { BridgeRequest } from '~/common/bridge'
 import type { ExtensionDatabaseRouter } from '~/node/database/router'
+import process from 'node:process'
 import { isMainThread, parentPort } from 'node:worker_threads'
-import { Bridge } from '~/common/bridge'
 import { createClient } from 'mcp/client/client'
+import { Bridge } from '~/common/bridge'
 
 class Rpc extends Bridge {
   constructor() {

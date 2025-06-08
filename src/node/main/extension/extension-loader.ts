@@ -17,7 +17,6 @@ if (!process.env.DANNN_EXTENSION_SERVER_PORT) {
 }
 
 async function init() {
-
   const pkgPath = await resolvePackageJSON(process.env.DANNN_PROCESS_PATH)
 
   if (!pkgPath) {

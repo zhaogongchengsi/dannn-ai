@@ -130,7 +130,8 @@ export const useChatStore = defineStore('dannn-chat', () => {
 
     const needJoinPrompt = await database.room.updateRoomMemoryInterval(room.id)
 
-    if (needJoinPrompt && room.prompt) {
+    // 当达到记忆间隔时， 或者 当前房间一条消息都没有则需要在第一次加入提示 加入房间的提示
+    if ((needJoinPrompt || !room.lastEntityMessage) && room.prompt) {
       context.unshift({
         role: 'system',
         content: room.prompt,

@@ -4,7 +4,7 @@ import { client, rpc } from './ipc'
 
 export function bootstrap(modules: Extension) {
   const context = new ExtensionContext()
- 
+
   if (!rpc.isRegistered('_extension.activate')) {
     rpc.register('_extension.activate', async () => {
       await client.connect()
