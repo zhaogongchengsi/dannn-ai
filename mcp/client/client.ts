@@ -131,3 +131,7 @@ export class McpClient {
     return await this._rpc.call(method, args)
   }
 }
+
+export function createClient(config: ClientConfig): McpClient {
+  return new McpClient(config)
+}

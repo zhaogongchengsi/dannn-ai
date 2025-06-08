@@ -6,6 +6,7 @@ import { question } from '~/common/schema'
 import { AI } from './ai'
 import { database, rpc } from './ipc'
 import { QuestionEvent } from './question-event'
+import { createClient, McpClient } from 'mcp/client/client'
 
 export interface ExtensionContextEvents {
   /**
@@ -17,9 +18,17 @@ export interface ExtensionContextEvents {
 
 export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
   private readonly aiHub: Map<number, AI> = new Map()
-
+  private client: McpClient
   constructor() {
     super()
+    if (!process.env.DANNN_EXTENSION_SERVER_PORT) {
+      throw new Error('DANNN_EXTENSION_SERVER_PORT environment variable is not set.')
+    }
+    this.client = createClient({
+      url: `ws://127.0.0.1:${process.env.DANNN_EXTENSION_SERVER_PORT}`,
+      logger: console,
+    })
+
     rpc.on('extension.question', (preload: Question) => {
       const { success, data } = question.safeParse(preload)
       if (!success) {
@@ -30,6 +39,14 @@ export class ExtensionContext extends EventEmitter<ExtensionContextEvents> {
         this.emit('question', new QuestionEvent(data))
       }
     })
+  }
+
+  async mcpConnect() {
+    await this.client.connect()
+  }
+
+  mcpDisconnect() {
+    this.client.disconnect()
   }
 
   /**

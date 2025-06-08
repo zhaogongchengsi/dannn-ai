@@ -19,6 +19,20 @@ if (!gotSingleInstanceLock) {
   app.quit()
 }
 
+const port = await getRandomPort()
+
+logger.info(`Using port: ${port}`)
+
+process.env.MCP_PORT = String(port)
+
+const server = createServer({
+  host: '127.0.0.1',
+  port,
+  logger,
+})
+
+server.start().catch((err) => { logger.error('Failed to start MCP server:', err) })
+
 const config = new Config()
 const extensionHub = new ExtensionHub()
 const window = new Window()
@@ -48,27 +62,12 @@ async function bootstrap() {
     window.focus()
   })
 
-  const port = await getRandomPort()
-
-  logger.info(`Using port: ${port}`)
-
-  const server = createServer({
-    host: '127.0.0.1',
-    port,
-    logger,
-  })
-
-  await server.start()
-  .catch((err) => {
-    logger.error('Failed to start MCP server:', err)
-  })
-
   const windowConfig = config.get('window')
 
   migrateDb()
     .then(async () => {
       // 加载插件并且把窗口传入插件
-      extensionHub.loader(window)
+      extensionHub.loader(port)
         .then(() => {
           extensionHub.startAll()
         })
@@ -79,6 +78,7 @@ async function bootstrap() {
       await window.display({
         width: windowConfig?.width ?? width,
         height: windowConfig?.height ?? height,
+        port,
         currentUrl: await getDefaultRoute()
           .catch((err) => {
             logger.error('Failed to get default route:', err)

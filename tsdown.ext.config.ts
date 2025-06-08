@@ -7,6 +7,8 @@ export default [
     ],
     alias: {
       '~': './src',
+      'mcp': './mcp',
+      'common': './common',
     },
     shims: true,
     loader: {

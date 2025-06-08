@@ -56,13 +56,14 @@ export class ExtensionProcess extends Bridge {
   /**
    * @description 渲染进程进程窗口
    */
-  _window: Window
+  // _window: Window
+  _port: number
 
-  constructor(path: string, window: Window, config: IExtensionConfig = { env: {} }) {
+  constructor(path: string, port: number, config: IExtensionConfig = { env: {} }) {
     super()
     this._path = path
     this._config = config
-    this._window = window
+    this._port = port
 
     // 赋予扩展进程的 操控database 的权限
     registerRouterToBridge(this, extensionRouter, 'database')
@@ -96,10 +97,10 @@ export class ExtensionProcess extends Bridge {
         })
     })
 
-    this.on('_extension.error', (error: string) => {
-      logger.error(`Extension error: ${error}`)
-      this._window.emit('extension.error', { id: this.id, error })
-    })
+    // this.on('_extension.error', (error: string) => {
+    //   logger.error(`Extension error: ${error}`)
+    //   this._window.emit('extension.error', { id: this.id, error })
+    // })
   }
 
   async getMetafile() {
@@ -205,6 +206,7 @@ export class ExtensionProcess extends Bridge {
       const env = {
         ...extensionNeedEnv,
         ...this._config.env,
+        DANNN_EXTENSION_SERVER_PORT: this._port ?? '',
         DANNN_PROCESS_ID: String(this.id),
         DANNN_PROCESS_PID: String(this.pid),
         DANNN_PROCESS_PATH: normalize(this._path),

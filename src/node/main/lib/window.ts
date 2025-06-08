@@ -14,6 +14,7 @@ export interface WindowOptions {
   width?: number
   height?: number
   currentUrl?: string
+  port?: number
 }
 
 export interface WindowEvents {
@@ -59,12 +60,14 @@ export class Window extends Bridge {
     registerRouterToBridge(this, databaseRouter, 'database')
   }
 
-  async createWindow({ width, height, currentUrl }: WindowOptions = { width: 800, height: 600 }) {
+  async createWindow({ width, height, currentUrl, port }: WindowOptions = { width: 800, height: 600 }) {
     this.isShow = false
     await app.whenReady()
 
     const minWidth = 800
     const minHeight = 540
+
+    const _port = port || process.env.MCP_PORT
 
     this.window = new BrowserWindow({
       width: width ?? 800,
@@ -78,7 +81,7 @@ export class Window extends Bridge {
       titleBarOverlay: isMacOS,
       trafficLightPosition: { x: 10, y: 10 },
       webPreferences: {
-        additionalArguments: [`--name=${this.name}`],
+        additionalArguments: [`--name=${this.name}`, _port ? `--port=${_port}` : ''].filter(Boolean),
         nodeIntegration: true,
         webSecurity: false,
         preload: this.preload,

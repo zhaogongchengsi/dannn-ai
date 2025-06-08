@@ -29,14 +29,14 @@ export class ExtensionHub {
     })
   }
 
-  loader(window: Window) {
+  loader(port: number) {
     return new Promise<void>((resolve, reject) => {
       readdir(EXTENSIONS_ROOT)
         .then((dirs) => {
           for (const dir of dirs) {
             const extensionPath = join(EXTENSIONS_ROOT, dir)
             logger.info(`Loading extension: ${extensionPath}`)
-            const subprocess = new ExtensionProcess(extensionPath, window)
+            const subprocess = new ExtensionProcess(extensionPath, port)
             ExtensionHub.hub.set(subprocess.getId(), subprocess)
           }
 
